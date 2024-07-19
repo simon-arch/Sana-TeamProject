@@ -5,13 +5,32 @@ ul {
 
 li {
     padding: 5px 0;
-}
-
-/* border for easier designing */
-div {
-    border: 1px black solid;
+    margin-left: 20px;
 }
 
 #canvas-halfscreen {
     width: 50%;
+}
+
+.menu-icon {
+    margin-right: 5px;
+}
+
+.menu-entry {
+    display: flex;
+    align-items: center;
+}
+
+.menu-category {
+    font-weight: 400;
+    font-size: small;
+}
+
+hr {
+    margin: 0;
+}
+
+/* borders for easier designing *//*
+div {
+    border: 1px black dashed;
 }

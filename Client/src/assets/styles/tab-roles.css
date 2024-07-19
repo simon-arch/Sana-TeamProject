@@ -1,0 +1,38 @@
+.roleMenu-header {
+    text-align: center;
+}
+
+table {
+    text-align: center;
+}
+
+.roleMenu-badge {
+    font-size: 13px;
+    padding: 5px 20px;
+}
+
+.roleMenu-button-edit {
+    font-size: 15px;
+    padding: 3px 7px;
+    margin: 0 3px;
+}
+
+td {
+    vertical-align: middle;
+}
+
+td:last-child {
+    padding: 0;
+}
+
+.roleMenu-colorDirector {
+    background-color: #9A2617 !important;
+}
+
+.roleMenu-colorAccountant {
+    background-color: #107896 !important;
+}
+
+.roleMenu-colorDeveloper {
+    background-color: #829356 !important;
+}

@@ -1,9 +1,9 @@
+import "../assets/styles/offcanvas.css";
 import React, { PropsWithChildren, useState } from 'react';
-import Offcanvas from 'react-bootstrap/Offcanvas';
 import { Button } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import Offcanvas from 'react-bootstrap/Offcanvas';
 
-interface Props extends PropsWithChildren<any>{
+interface Props extends PropsWithChildren<any> {
     children?: React.ReactElement; // content that will be displayed inside a canvas body.
     title?: string; // text that will be displayed on the top of a canvas.
     trigger?: React.ReactElement; // any react element that will trigger canvas opening.
@@ -22,15 +22,18 @@ function OffCanvas({
   const handleShow = () => setShow(true);
   return (
     <>
-        <span onClick={handleShow} style={{ cursor: 'pointer' }}>
+        <span onClick={handleShow} className="btn-canvas-open">
             {trigger}
         </span>
 
         <Offcanvas show={show} onHide={handleClose} {...props}>
-            <Offcanvas.Header closeButton>
-                <Offcanvas.Title>{title}</Offcanvas.Title>
-            </Offcanvas.Header>
-            <Offcanvas.Body>
+        <Offcanvas.Header>
+        <Button variant="outline-danger" className="btn-close btn-canvas-close" onClick={handleClose}></Button>
+        <div className="text-center flex-grow-1">
+            <Offcanvas.Title>{title}</Offcanvas.Title>
+        </div>
+        </Offcanvas.Header>
+            <Offcanvas.Body className="canvas-content">
                 {children}
             </Offcanvas.Body>
         </Offcanvas>

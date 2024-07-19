@@ -1,0 +1,11 @@
+.canvas-content {
+    padding: 0;
+}
+
+.btn-canvas-close {
+    position: fixed;
+}
+
+.btn-canvas-open {
+    cursor: pointer;
+}
