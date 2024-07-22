@@ -42,7 +42,7 @@ function UserCard(props: Props) {
             {props.canEdit ? (
                 <>
                     <td>
-                        <Form.Select value={role} className="roleMenu-select form-select-sm" style={{margin:"auto"}} onChange={handleChange}>
+                        <Form.Select name={props.name} value={role} className="roleMenu-select form-select-sm" style={{margin:"auto"}} onChange={handleChange}>
                         {props.avaliableRoles.map((value, key) => (
                             <option key={key} value={value}>
                                 {value}
