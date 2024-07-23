@@ -17,5 +17,8 @@ namespace Server.Data
         public static IEnumerable<User> GetUsers() => Users;
         public static List<string> GetRoles() => Users.Select(user => user.Role).ToList();
         public static Dictionary<string, string> GetUserRoles () => Users.ToDictionary(user => user.Username, user => user.Role.ToString());
+        public static List<string> GetPermissionsForRole(string role) =>
+            Role.Permissions.TryGetValue(role, out var value) ? value.Select(p => p.ToString()).ToList()
+                : [];
     }
 }

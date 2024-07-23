@@ -7,7 +7,7 @@ namespace Server.Authorization
         public const string Developer = "Developer";
         public const string UserManager = "UserManager";
 
-        private static readonly Dictionary<string, HashSet<Permission>> Permissions = new()
+        public static readonly Dictionary<string, HashSet<Permission>> Permissions = new()
         {
             {Developer, [Permission.ViewUsers] },
             {UserManager, [Permission.ViewUsers, Permission.ManageUsers] }
