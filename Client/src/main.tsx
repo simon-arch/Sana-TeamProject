@@ -2,7 +2,7 @@ import App from "./App"
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { Provider } from "react-redux"
-import { setupStore } from "./store/index"
+import { setupStore } from "./store"
 import { createRoot } from "react-dom/client";
 
 import OffCanvas from "./components/offcanvas";
@@ -10,6 +10,8 @@ import RoleMenu from "./components/tab-roles/rolemenu";
 
 import { BsListColumns, BsFillQuestionCircleFill } from "react-icons/bs";
 import "./assets/styles/main.css";
+
+import AccountComponent from "./components/account-info/account-component.tsx";
 
 const store = setupStore();
 const container = document.getElementById('root');
@@ -22,7 +24,7 @@ root.render(
             <div className="row">
                 <div className="col-md-2 home-menu"> {/* User menu column */}
                     <ul>
-                        <OffCanvas title="Account Info" placement="start" trigger = {<h4 style={{textAlign:"center"}}>FUTURE ACCOUNT INFO HERE</h4>}/>
+                        <AccountComponent/>
                         <hr/>
                         <li className="menu-category">Dashboard</li>
                         <li><OffCanvas title="Placeholder Tab" placement="start" trigger = {<span className="menu-entry"><BsFillQuestionCircleFill className="menu-icon"/>Placeholder</span>}/></li>
