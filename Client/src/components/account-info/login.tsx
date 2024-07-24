@@ -1,15 +1,15 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAccountInfo, setError} from '../../hooks/accountSlice.ts';
+import {RootState} from "../../store";
 
 const Login = () => {
     const dispatch = useDispatch();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    // @ts-ignore
-    const error = useSelector(state => state.accountInfo.error);
+    const error = useSelector((state: RootState) => state.accountInfo.error);
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (username && password) {
             // @ts-ignore

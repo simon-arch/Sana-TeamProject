@@ -20,7 +20,7 @@ const AccountInfo: React.FC = () => {
             <div>
                 <p>Username: {account.name}</p>
                 <p>Role: {account.role}</p>
-                <p>Permissions: {account.permissions.length > 0 ? account.permissions.join(', ') : 'No permissions available.'}</p>
+                <p>Permissions: {account.permissions.length > 0 ? account.permissions.join(', ') : 'No permissions available :('}</p>
             </div>
             <button onClick={handleLogout}>Logout</button>
         </div>
