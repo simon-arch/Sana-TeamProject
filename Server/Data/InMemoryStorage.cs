@@ -5,20 +5,22 @@ namespace Server.Data
 {
     public static class InMemoryStorage
     {
-        private static readonly List<User> Users = new List<User>
-        {
-            new User { Id = 1, Username = "John", Password = "psw", Role = Role.UserManager },
-            new User { Id = 2, Username = "Doe", Password = "psw", Role = Role.Developer }
-        };
+        private static readonly IList<User> Users =
+        [
+            new() { Id = 1, Username = "John", Password = "psw", Role = Role.UserManager },
+            new() { Id = 2, Username = "Doe", Password = "psw", Role = Role.Developer }
+        ];
 
         public static User? Authenticate(string username, string password) =>
-            Users.SingleOrDefault(u => u.Username == username && u.Password == password);
+            Users.SingleOrDefault(user => user.Username == username && user.Password == password);
 
-        public static IEnumerable<User> GetUsers() => Users;
-        public static List<string> GetRoles() => Users.Select(user => user.Role).ToList();
-        public static Dictionary<string, string> GetUserRoles () => Users.ToDictionary(user => user.Username, user => user.Role.ToString());
-        public static List<string> GetPermissionsForRole(string role) =>
-            Role.Permissions.TryGetValue(role, out var value) ? value.Select(p => p.ToString()).ToList()
-                : [];
+        public static IDictionary<string, string> GetUsers() =>
+            Users.ToDictionary(user => user.Username, user => user.Role.ToString());
+
+        public static IEnumerable<string> GetRoles() => 
+            Users.Select(user => user.Role);
+
+        public static IEnumerable<string> GetPermissionsForRole(string role) =>
+            Role.Permissions.TryGetValue(role, out var value) ? value.Select(perm => perm.ToString()) : [];
     }
 }
