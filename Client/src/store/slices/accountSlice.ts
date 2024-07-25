@@ -1,31 +1,33 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import config from '../../../config.json'
 
-interface AccountState {
+export interface AccountState {
     name: string;
     role: string;
     permissions: string[];
     error: string | null;
-    isLoggedIn: boolean;
+    isLoggedIn: boolean | null;
 }
 
-const initialState: AccountState = {
+export const initialState: AccountState = {
     name: '',
     role: '',
     permissions: [],
     error: null,
-    isLoggedIn: false,
+    isLoggedIn: null,
 };
 
 const accountSlice = createSlice({
     name: 'accountInfo',
     initialState,
     reducers: {
-        getAccountInfo() {},
-        checkAuthStatus() {},
-        setAccountInfo: (state, action: PayloadAction<{ userName: string; userRole: string; permissions: string[] }>) => {
+        //@ts-ignore
+        getAccountInfo(state, action) {},
+        getAccountStatus() {},
+        setAccountInfo: (state, action: PayloadAction<{ username: string; role: string; permissions: string[] }>) => {
             console.log('setAccountInfo reducer called with:', action.payload);
-            state.name = action.payload.userName;
-            state.role = action.payload.userRole;
+            state.name = action.payload.username;
+            state.role = action.payload.role;
             state.permissions = action.payload.permissions;
             state.error = null;
             state.isLoggedIn = true;
@@ -35,6 +37,7 @@ const accountSlice = createSlice({
             state.isLoggedIn = false;
         },
         logout: (state) => {
+            fetch(`${config.apiEndpoint}/Auth/Logout`, {credentials: 'include'});
             state.name = '';
             state.role = '';
             state.permissions = [];
@@ -44,5 +47,5 @@ const accountSlice = createSlice({
     },
 });
 
-export const { getAccountInfo, setAccountInfo, setError, logout, checkAuthStatus } = accountSlice.actions;
+export const { getAccountInfo, setAccountInfo, setError, logout, getAccountStatus } = accountSlice.actions;
 export default accountSlice.reducer;

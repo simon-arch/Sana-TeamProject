@@ -3,8 +3,8 @@ import UserCard from "./usercard";
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from "../../store";
 import { useEffect } from "react";
-import { getUsers } from "../../hooks/userSlice";
-import { getRoles } from "../../hooks/roleSlice";
+import { getUsers } from "../../store/slices/userSlice";
+import { getRoles } from "../../store/slices/roleSlice";
 
 
 function RoleMenu() {

@@ -1,12 +1,12 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import userSlice from '../hooks/userSlice';
-import roleSlice from '../hooks/roleSlice';
+import userSlice from './slices/userSlice.ts';
+import roleSlice from './slices/roleSlice.ts';
 import { createEpicMiddleware } from 'redux-observable';
-import roleEpic from '../hooks/roleEpic';
-import userEpic from '../hooks/userEpic';
-import accountInfoSlice from '../hooks/accountSlice.ts';
-import loginEpic from '../hooks/loginEpic.ts';
-import userAuthEpic from "../hooks/userAuthEpic.ts";
+import roleEpic from './epics/roleEpic.ts';
+import userEpic from './epics/userEpic.ts';
+import accountInfoSlice from './slices/accountSlice.ts';
+import loginEpic from './epics/loginEpic.ts';
+import authEpic from "./epics/authEpic.ts";
 
 const rootReducer = combineReducers({
     users: userSlice,
@@ -25,7 +25,7 @@ export const setupStore = () => {
     epicMiddleware.run(userEpic);
     epicMiddleware.run(roleEpic);
     epicMiddleware.run(loginEpic);
-    epicMiddleware.run(userAuthEpic);
+    epicMiddleware.run(authEpic);
 
     return store;
 };
