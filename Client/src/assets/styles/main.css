@@ -16,6 +16,11 @@ li {
     margin-right: 5px;
 }
 
+#menu-logout {
+    color: red;
+    cursor: pointer;
+}
+
 .menu-entry {
     display: flex;
     align-items: center;

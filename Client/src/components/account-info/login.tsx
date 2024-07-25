@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector} from 'react-redux';
 import { getAccountInfo, setError} from '../../store/slices/accountSlice.ts';
 import { RootState } from "../../store";
-import { Button, Form, InputGroup } from "react-bootstrap";
+import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { BsFillPersonFill, BsFillKeyFill } from "react-icons/bs";
 
 const Login = () => {
@@ -43,9 +43,20 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}/>
                 </InputGroup>
             </div>
-            <Button id="login-button" variant="success" type="button" onClick={handleSubmit}>Login</Button>
+            
 
-            {error && <div style={{color: 'red'}}>{error}</div>}
+            <OverlayTrigger
+            show={!!error}
+            placement="right"
+            delay={{ show: 250, hide: 400 }}
+            overlay={
+                <Tooltip id="login-tooltip">
+                    <div>{error}</div>
+                </Tooltip>
+            }
+            >
+            <Button id="login-button" variant="success" type="button" onClick={handleSubmit}>Login</Button>
+            </OverlayTrigger>
         </div>
     );
 };

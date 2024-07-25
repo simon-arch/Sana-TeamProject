@@ -19,8 +19,8 @@ action$.pipe(
                 }
             }),
             catchError((error) => {
-                console.error('Error fetching user account info:', error);
-                return of(setError('Error fetching user account info.'));
+                console.error('Error fetching user info:', error);
+                return of(setError('Error fetching user info.'));
             })
         );
     })

@@ -6,8 +6,9 @@ import Login from "./login.tsx";
 import OffCanvas from "../offcanvas.tsx";
 import AccountInfo from "./account-info.tsx";
 import { getAccountStatus } from "../../store/slices/accountSlice.ts";
+import { Button, Spinner } from "react-bootstrap";
 
-const AccountComponent: React.FC = () => {
+const AccountWindow: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { name, isLoggedIn } = useSelector((state: RootState) => state.accountInfo);
 
@@ -18,20 +19,27 @@ const AccountComponent: React.FC = () => {
     }, [dispatch]);
 
     if (isLoggedIn === null)
-        return null;
+        return <Spinner id="login-spinner" animation="border" role="status"></Spinner>;
 
     return (
-        <>
+        <div className="account-container">
             {!isLoggedIn ? (
-                <Login />
+                <div id="login-container">
+                    <Login />
+                </div>
             ) : (
-                <OffCanvas title="Account Tab"
-                            trigger={<h4 id="welcome-sign">Welcome, {name}!</h4>} id="account-info">
-                    <AccountInfo/>
-                </OffCanvas>
+                <div id="welcome-container">
+                    <OffCanvas title="Account Info Tab"
+                                trigger={<span id="welcome-sign">Welcome,<br/>{name}!</span>}>
+                        <AccountInfo/>
+                    </OffCanvas>
+                    <div id="control-container">
+                        <Button variant='success' className="account-controls">placeholder1</Button>
+                    </div>
+                </div>
             )}
-        </>
+        </div>
     );
 };
 
-export default AccountComponent;
+export default AccountWindow;
