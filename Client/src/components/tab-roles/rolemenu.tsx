@@ -15,7 +15,6 @@ function RoleMenu() {
       dispatch(getRoles());
     }, [dispatch]);
 
-    const isUserEditor = true; // show roles as badges or as droplists
     const users = useSelector((state: RootState) => state.users);
     const roles = useSelector((state: RootState) => state.roles);
 
@@ -25,13 +24,12 @@ function RoleMenu() {
             <thead>
                 <tr>
                 <th scope="col">Credentials</th>
-                <th scope="col">Lorem</th>
                 <th scope="col">Role</th>
                 </tr>
             </thead>
             <tbody>
                 {users.map((user, key) => (
-                  <UserCard key={key} name={user.name} role={user.role} placeholder1="lorem" canEdit={isUserEditor} avaliableRoles={roles}></UserCard>
+                  <UserCard key={key} user={user} avaliableRoles={roles}></UserCard>
                 ))}
             </tbody>
         </table>

@@ -5,12 +5,14 @@ namespace Server.Authorization
     public static class Role
     {
         public const string Developer = "Developer";
-        public const string UserManager = "UserManager";
+        public const string PermissionManager = "Permission Manager";
+        public const string RoleManager = "User Manager";
 
         public static readonly Dictionary<string, HashSet<Permission>> Permissions = new()
         {
             {Developer, [Permission.ViewUsers] },
-            {UserManager, [Permission.ViewUsers, Permission.ManageUsers] }
+            {PermissionManager, [Permission.ViewUsers, Permission.ManageUserPermissions] },
+            {RoleManager, [Permission.ViewUsers, Permission.ManageUserRoles] }
         };
 
         public static bool HasPermission(this ClaimsPrincipal? user, Permission requiredPermission)

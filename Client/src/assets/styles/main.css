@@ -4,7 +4,7 @@ ul {
 }
 
 li {
-    padding: 5px 0;
+    padding: 0 0;
     margin-left: 20px;
 }
 
@@ -24,6 +24,7 @@ li {
 .menu-entry {
     display: flex;
     align-items: center;
+    margin-top: 5px;
 }
 
 .menu-category {

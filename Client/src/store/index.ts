@@ -7,10 +7,13 @@ import userEpic from './epics/userEpic.ts';
 import accountInfoSlice from './slices/accountSlice.ts';
 import loginEpic from './epics/loginEpic.ts';
 import authEpic from "./epics/authEpic.ts";
+import permissionEpic from './epics/permissionEpic.ts';
+import permissionSlice from './slices/permissionSlice.ts';
 
 const rootReducer = combineReducers({
     users: userSlice,
     roles: roleSlice,
+    permissions: permissionSlice,
     accountInfo: accountInfoSlice
 });
 
@@ -26,6 +29,7 @@ export const setupStore = () => {
     epicMiddleware.run(roleEpic);
     epicMiddleware.run(loginEpic);
     epicMiddleware.run(authEpic);
+    epicMiddleware.run(permissionEpic);
 
     return store;
 };

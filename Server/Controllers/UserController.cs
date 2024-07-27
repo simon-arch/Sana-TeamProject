@@ -11,7 +11,7 @@ namespace Server.Controllers
     public class UserController : ControllerBase
     {
         [HttpGet("GetAll")]
-        public IDictionary<string, string> GetUsers() => InMemoryStorage.GetUsers();
+        public IDictionary<int, Dictionary<string, object>> GetUsers() => InMemoryStorage.GetUsers();
 
         [HttpGet("GetCurrent")]
         public IActionResult GetCurrent()

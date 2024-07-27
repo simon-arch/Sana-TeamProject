@@ -11,12 +11,6 @@ table {
     padding: 5px 20px;
 }
 
-.roleMenu-button-edit {
-    font-size: 15px;
-    padding: 3px 7px;
-    margin: 0 3px;
-}
-
 td {
     vertical-align: middle;
 }
@@ -25,12 +19,19 @@ td:last-child {
     padding: 0;
 }
 
-.roleMenu-colorDirector {
-    background-color: #9A2617 !important;
+.roleMenu-button-edit {
+    font-size: 15px;
+    padding: 3px 7px;
+    margin: 0 3px;
 }
 
-.roleMenu-colorAccountant {
-    background-color: #107896 !important;
+/* .roleMenu-color<permission_name> */
+.roleMenu-colorUser-Manager {
+    background-color: #3e179a !important;
+}
+
+.roleMenu-colorPermission-Manager {
+    background-color: #9A2617 !important;
 }
 
 .roleMenu-colorDeveloper {

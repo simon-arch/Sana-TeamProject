@@ -3,6 +3,7 @@
     public enum Permission
     {
         ViewUsers,
-        ManageUsers
+        ManageUserPermissions,
+        ManageUserRoles
     }
 }

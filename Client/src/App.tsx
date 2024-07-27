@@ -6,12 +6,13 @@ import "./assets/styles/tab-account.css";
 import OffCanvas from "./components/offcanvas";
 import RoleMenu from "./components/tab-roles/rolemenu";
 
-import { BsListColumns, BsFillQuestionCircleFill, BsFillPersonFill, BsDoorOpenFill } from "react-icons/bs";
+import { BsListColumns, BsFillQuestionCircleFill, BsFillPersonFill, BsDoorOpenFill, BsPencilSquare } from "react-icons/bs";
 import AccountWindow from "./components/account-info/account-window.tsx";
 import AccountInfo from './components/account-info/account-info.tsx';
 import { logout } from './store/slices/accountSlice.ts';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from './store';
+import RoleManager from './components/tab-rolemanager/rolemanager.tsx';
 
 
 
@@ -42,9 +43,13 @@ function App() {
                                 <>
                                     <li className="menu-category">Main Menu</li>
                                     <li><OffCanvas title="Placeholder Tab" placement="start" trigger = {<span className="menu-entry"><BsFillQuestionCircleFill className="menu-icon"/>Placeholder</span>}/></li>
-                                    <li><OffCanvas title="Placeholder Tab" placement="start" trigger = {<span className="menu-entry"><BsFillQuestionCircleFill className="menu-icon"/>Placeholder</span>}/></li>
                                     <li>
-                                        <OffCanvas title="Roles Tab" placement="start" trigger = {<span className="menu-entry"><BsListColumns className="menu-icon"/>Roles</span>} id="role-menu">
+                                        <OffCanvas permission="ManageUserPermissions" title="Permissions Tab" placement="start" trigger = {<span className="menu-entry"><BsPencilSquare className="menu-icon"/>Permissions</span>}>
+                                            <RoleManager></RoleManager>
+                                        </OffCanvas> 
+                                    </li>
+                                    <li>
+                                        <OffCanvas permission={["ViewUsers", "ManageUserRoles"]} title="Roles Tab" placement="start" trigger = {<span className="menu-entry"><BsListColumns className="menu-icon"/>Roles</span>} id="role-menu">
                                             <RoleMenu></RoleMenu>
                                         </OffCanvas>
                                     </li>

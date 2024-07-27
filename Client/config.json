@@ -1,3 +1,9 @@
 {
-    "apiEndpoint": "https://localhost:7102"
+    "apiEndpoint": "https://localhost:7102",
+    "presets": {
+        "Preset1": ["ViewUsers"],
+        "Preset2": ["ManageUserPermissions"],
+        "Preset3": ["ViewUsers", "ManageUserRoles"],
+        "Preset4": ["ManageUserRoles"]
+    }
 }

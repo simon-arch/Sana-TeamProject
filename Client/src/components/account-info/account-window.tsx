@@ -10,7 +10,8 @@ import { Button, Spinner } from "react-bootstrap";
 
 const AccountWindow: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { name, isLoggedIn } = useSelector((state: RootState) => state.accountInfo);
+    const { firstname } = useSelector((state: RootState) => state.accountInfo.user);
+    const { isLoggedIn } = useSelector((state: RootState) => state.accountInfo);
 
     useEffect(() => {
         if (!isLoggedIn) {
@@ -30,7 +31,7 @@ const AccountWindow: React.FC = () => {
             ) : (
                 <div id="welcome-container">
                     <OffCanvas title="Account Info Tab"
-                                trigger={<span id="welcome-sign">Welcome,<br/>{name}!</span>}>
+                                trigger={<span id="welcome-sign">Welcome,<br/>{firstname}!</span>}>
                         <AccountInfo/>
                     </OffCanvas>
                     <div id="control-container">

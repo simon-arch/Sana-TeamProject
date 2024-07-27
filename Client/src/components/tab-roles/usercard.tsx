@@ -4,23 +4,20 @@ import { BsArrowCounterclockwise, BsCheck2 } from "react-icons/bs";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import { User } from "../../store/slices/userSlice";
 
 interface Props {
-    name: string;
-    role: string;
-    placeholder1?: string;
-    placeholder2?: string;
-    canEdit?: boolean;
+    user: User
     avaliableRoles: string[];
 }
 
 function UserCard(props: Props) {
     const [isEdited, setEdited] = useState<boolean>(false);
-    const [role, setRole] = useState<string>(props.role);
-    const oldRole = props.role;
+    const [role, setRole] = useState<string>(props.user.role);
+    const oldRole = props.user.role;
 
-    const permissions = useSelector((state: RootState) => state.accountInfo.permissions);
-    const canManageUsers = permissions.includes('ManageUsers');
+    const permissions = useSelector((state: RootState) => state.accountInfo.user.permissions);
+    const canManageRoles = permissions.includes('ManageUserRoles');
 
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newRole = event.target.value;
@@ -41,44 +38,29 @@ function UserCard(props: Props) {
     return (
         <>
             <tr>
-                <td scope="row">{props.name}</td>
-                <td>{props.placeholder1}</td>
-                {canManageUsers && (
-                    <>
-                        {props.canEdit ? (
-                            <>
-                                <td>
-                                    <Form.Select name={props.name} value={role} className="roleMenu-select form-select-sm" style={{ margin: "auto" }} onChange={handleChange}>
-                                        {props.avaliableRoles.map((value, key) => (
-                                            <option key={key} value={value}>
-                                                {value}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                </td>
-                                <td>
-                                    <Button variant="success" className="roleMenu-button-edit" disabled={!isEdited} onClick={handleConfirm}><BsCheck2 /></Button>
-                                    <Button variant="warning" className="roleMenu-button-edit" disabled={!isEdited} onClick={handleReset}><BsArrowCounterclockwise /></Button>
-                                </td>
-                            </>
-                        ) : (
-                            <>
-                                <td>
-                                    <Badge pill className={"roleMenu-badge roleMenu-color" + props.role}>
-                                        {props.role}
-                                    </Badge>
-                                </td>
-                                <td>
-                                </td>
-                            </>
-                        )}
-                    </>
-                )}
-                {!canManageUsers && (
+                <td scope="row">{props.user.firstname} {canManageRoles && (<br/>)}{props.user.lastname}</td>
+                {canManageRoles && (
                     <>
                         <td>
-                            <Badge pill className={"roleMenu-badge roleMenu-color" + props.role}>
-                                {props.role}
+                            <Form.Select name={props.user.firstname} value={role} className="roleMenu-select form-select-sm" style={{ margin: "auto" }} onChange={handleChange}>
+                                {props.avaliableRoles.map((value, key) => (
+                                    <option key={key} value={value}>
+                                        {value}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </td>
+                        <td>
+                            <Button variant="success" className="roleMenu-button-edit" disabled={!isEdited} onClick={handleConfirm}><BsCheck2 /></Button>
+                            <Button variant="warning" className="roleMenu-button-edit" disabled={!isEdited} onClick={handleReset}><BsArrowCounterclockwise /></Button>
+                        </td>
+                    </>
+                )}
+                {!canManageRoles && (
+                    <>
+                        <td>
+                            <Badge pill className={"roleMenu-badge roleMenu-color" + props.user.role.replace(" ","-")}>
+                                {props.user.role}
                             </Badge>
                         </td>
                         <td>

@@ -1,18 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import config from '../../../config.json'
+import { User } from './userSlice';
 
 export interface AccountState {
-    name: string;
-    role: string;
-    permissions: string[];
+    user: User;
     error: string | null;
     isLoggedIn: boolean | null;
 }
 
 export const initialState: AccountState = {
-    name: '',
-    role: '',
-    permissions: [],
+    user: <User>{},
     error: null,
     isLoggedIn: null,
 };
@@ -26,9 +23,10 @@ const accountSlice = createSlice({
         getAccountStatus() {},
         setAccountInfo: (state, action: PayloadAction<{ username: string; role: string; permissions: string[] }>) => {
             console.log('setAccountInfo reducer called with:', action.payload);
-            state.name = action.payload.username;
-            state.role = action.payload.role;
-            state.permissions = action.payload.permissions;
+            state.user.firstname = action.payload.username;
+            state.user.lastname = 'placeholder';
+            state.user.role = action.payload.role;
+            state.user.permissions = action.payload.permissions;
             state.error = null;
             state.isLoggedIn = true;
         },
@@ -38,9 +36,7 @@ const accountSlice = createSlice({
         },
         logout: (state) => {
             fetch(`${config.apiEndpoint}/Auth/Logout`, {credentials: 'include'});
-            state.name = '';
-            state.role = '';
-            state.permissions = [];
+            state.user = <User>{};
             state.error = null;
             state.isLoggedIn = false;
         },

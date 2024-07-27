@@ -20,16 +20,20 @@ const AccountInfo: React.FC = () => {
             <Table striped bordered hover size="sm text-start">
             <tbody>
                 <tr>
-                <td><span>Username:</span></td>
-                <td className="ps-2">{account.name}</td>
+                <td><span>First name:</span></td>
+                <td className="ps-2">{account.user.firstname}</td>
+                </tr>
+                <tr>
+                <td><span>Last name:</span></td>
+                <td className="ps-2">{account.user.lastname}</td>
                 </tr>
                 <tr>
                 <td><span>Role:</span></td>
-                <td className="ps-2">{account.role}</td>
+                <td className="ps-2">{account.user.role}</td>
                 </tr>
                 <tr>
                 <td><span>Permissions:</span></td>
-                <td className="ps-2">{account.permissions.length > 0 ? account.permissions.join(', ') : 'No permissions available :('}</td>
+                <td className="ps-2">{account.user.permissions.length > 0 ? account.user.permissions.join(', ') : 'No permissions available :('}</td>
                 </tr>
             </tbody>
             </Table>
