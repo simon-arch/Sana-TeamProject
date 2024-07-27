@@ -1,55 +1,73 @@
+using Dapper;
+using GraphQL;
+using GraphQL.MicrosoftDI;
+using GraphQL.Types;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Server.API;
 using Server.Authorization;
+using Server.Data;
+using Server.Data.Helpers;
+using Server.Data.Repositories;
+using Server.Services;
+using System.Text;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
+
+        builder.Services.AddSingleton<TokenService>();
+
+        builder.Services.AddSingleton<DbProvider>();
+        SqlMapper.AddTypeHandler(typeof(Permission[]), new JsonTypeHandler());
+
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+        builder.Services.AddSingleton<ISchema ,RootSchema>(services => new(new SelfActivatingServiceProvider(services)));
+
         builder.Services.AddCors(options => options
             .AddDefaultPolicy(policy => policy
                 .WithOrigins("https://localhost:5173")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
-                .AllowCredentials()
             )
         );
 
-        builder.Services.AddAuthentication("cookie")
-            .AddCookie("cookie", options =>
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
             {
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-
-                options.Events.OnRedirectToLogin = context =>
+                var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
+                options.TokenValidationParameters = new()
                 {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Task.CompletedTask;
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
             });
-        
-        builder.Services.AddAuthorization(options =>
-        {
-            foreach (var permission in Enum.GetValues<Permission>())
-            {
-                options.AddPolicy(permission.ToString(), policy =>
-                    policy.RequireAssertion(context => context.User.HasPermission(permission)));
-            }
-        });
 
-        builder.Services.AddControllers();
+        builder.Services.AddGraphQL(builder => builder
+            .AddSystemTextJson()
+            .AddAuthorization(settings =>
+            {
+                foreach (Permission permission in Enum.GetValues(typeof(Permission)))
+                {
+                    settings.AddPolicy(permission.ToString(), policy =>
+                        policy.RequireClaim("permissions", permission.ToString()));
+                }
+            }));
 
         var app = builder.Build();
 
-        app.UseCors();
-
-        app.UseHttpsRedirection();
         app.UseRouting();
-
+        app.UseCors();
         app.UseAuthentication();
-        app.UseAuthorization();
-
-        app.MapControllers();
+        app.UseGraphQL();
 
         app.Run();
     }
