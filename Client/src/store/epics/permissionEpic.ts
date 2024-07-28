@@ -1,17 +1,23 @@
 import { ofType } from 'redux-observable';
-import { concatMap, map } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { getPermissions, setPermissions } from '../slices/permissionSlice';
-import config from '../../../config.json'
+import { sendRequest } from './helpers/request';
 
 const permissionEpic = (action$: any) =>
   action$.pipe(
     ofType(getPermissions.type),
-    concatMap(() =>
-      from(fetch(`${config.apiEndpoint}/Permission/GetAll`, {credentials: 'include'})).pipe(
-        concatMap((response) => {
+    mergeMap(() =>
+      from(sendRequest(`
+        query {
+          auth {
+            permissions 
+          }
+        }`, localStorage.getItem('authToken')!
+    )).pipe(
+        mergeMap((response) => {
           return from(response.json()).pipe(
-            map((data) => setPermissions(data)),
+            map((data) => setPermissions(data.data.auth.permissions)),
           );
         })
       ) 

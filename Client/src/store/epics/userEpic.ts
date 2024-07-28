@@ -1,20 +1,28 @@
 import { ofType } from 'redux-observable';
-import { concatMap, map } from 'rxjs/operators';
+import { mergeMap, map } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { getUsers, setUsers } from '../slices/userSlice';
-import config from '../../../config.json'
+import { sendRequest } from './helpers/request';
 
 const userEpic = (action$: any) =>
   action$.pipe(
     ofType(getUsers.type),
-    concatMap(() =>
-      from(fetch(`${config.apiEndpoint}/User/GetAll`, {credentials: 'include'})).pipe(
-        concatMap((response) => {
+    mergeMap(() => {
+      return from(sendRequest(
+        `query {
+          user {
+            get_all {
+              id, firstName, lastName, role, permissions
+            }
+          }
+        }`, localStorage.getItem('authToken')!
+      )).pipe(
+        mergeMap((response) => {
           return from(response.json()).pipe(
-            map((data) => setUsers(data)),
+            map((data) => setUsers(data.data.user.get_all)),
           );
         })
-      )
+      )}
     )
   );
 

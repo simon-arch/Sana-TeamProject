@@ -1,26 +1,25 @@
 import "../../assets/styles/tab-account.css";
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../../store/index.ts';
+import { RootState } from '../../store/index.ts';
 import Login from "./login.tsx";
 import OffCanvas from "../offcanvas.tsx";
 import AccountInfo from "./account-info.tsx";
-import { getAccountStatus } from "../../store/slices/accountSlice.ts";
-import { Button, Spinner } from "react-bootstrap";
+import { Button } from "react-bootstrap";
+import { setAccountInfo } from "../../store/slices/accountSlice.ts";
 
 const AccountWindow: React.FC = () => {
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useDispatch();
     const { firstname } = useSelector((state: RootState) => state.accountInfo.user);
     const { isLoggedIn } = useSelector((state: RootState) => state.accountInfo);
 
     useEffect(() => {
         if (!isLoggedIn) {
-            dispatch(getAccountStatus());
+            const token = localStorage.getItem('authToken');
+            if (token != null)
+                dispatch(setAccountInfo(token));
         }
     }, [dispatch]);
-
-    if (isLoggedIn === null)
-        return <Spinner id="login-spinner" animation="border" role="status"></Spinner>;
 
     return (
         <div className="account-container">

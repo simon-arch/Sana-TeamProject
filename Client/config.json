@@ -1,9 +1,9 @@
 {
-    "apiEndpoint": "https://localhost:7102",
+    "apiEndpoint": "https://localhost:7102/graphql",
     "presets": {
-        "Preset1": ["ViewUsers"],
-        "Preset2": ["ManageUserPermissions"],
-        "Preset3": ["ViewUsers", "ManageUserRoles"],
-        "Preset4": ["ManageUserRoles"]
+        "Preset1": ["VIEW_USERS"],
+        "Preset2": ["MANAGE_USER_ROLES"],
+        "Preset3": ["MANAGE_USER_ROLES", "MANAGE_USER_PERMISSIONS"],
+        "Preset4": [""]
     }
 }

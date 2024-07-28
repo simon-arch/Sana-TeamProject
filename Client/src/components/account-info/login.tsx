@@ -1,7 +1,7 @@
 import "../../assets/styles/tab-account.css";
 import React, { useState } from 'react';
 import { useDispatch, useSelector} from 'react-redux';
-import { getAccountInfo, setError} from '../../store/slices/accountSlice.ts';
+import { getAccessToken, setError} from '../../store/slices/accountSlice.ts';
 import { RootState } from "../../store";
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { BsFillPersonFill, BsFillKeyFill } from "react-icons/bs";
@@ -15,7 +15,7 @@ const Login = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (username && password) {
-            dispatch(getAccountInfo({username: username, password: password}));
+            dispatch(getAccessToken(({username: username, password: password})));
         } else {
             dispatch(setError('All fields are required.'));
         }
@@ -43,8 +43,6 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}/>
                 </InputGroup>
             </div>
-            
-
             <OverlayTrigger
             show={!!error}
             placement="right"

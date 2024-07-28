@@ -19,6 +19,10 @@ td:last-child {
     padding: 0;
 }
 
+td:first-child {
+    padding: 0 !important;
+}
+
 .roleMenu-button-edit {
     font-size: 15px;
     padding: 3px 7px;
@@ -28,12 +32,4 @@ td:last-child {
 /* .roleMenu-color<permission_name> */
 .roleMenu-colorUser-Manager {
     background-color: #3e179a !important;
-}
-
-.roleMenu-colorPermission-Manager {
-    background-color: #9A2617 !important;
-}
-
-.roleMenu-colorDeveloper {
-    background-color: #829356 !important;
 }

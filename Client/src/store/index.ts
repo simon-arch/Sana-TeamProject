@@ -6,7 +6,6 @@ import roleEpic from './epics/roleEpic.ts';
 import userEpic from './epics/userEpic.ts';
 import accountInfoSlice from './slices/accountSlice.ts';
 import loginEpic from './epics/loginEpic.ts';
-import authEpic from "./epics/authEpic.ts";
 import permissionEpic from './epics/permissionEpic.ts';
 import permissionSlice from './slices/permissionSlice.ts';
 
@@ -28,7 +27,6 @@ export const setupStore = () => {
     epicMiddleware.run(userEpic);
     epicMiddleware.run(roleEpic);
     epicMiddleware.run(loginEpic);
-    epicMiddleware.run(authEpic);
     epicMiddleware.run(permissionEpic);
 
     return store;

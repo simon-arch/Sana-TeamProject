@@ -18,13 +18,12 @@ const userSlice = createSlice(
             getUsers(){},
             setUsers(state, action) {
                 state;
-                console.log(action.payload);
                 const users: User[] = Object.keys(action.payload).map(index => ({
-                    id: Number(index),
-                    firstname: action.payload[index].Name,
-                    lastname: 'placeholder',
-                    role: action.payload[index].Role,
-                    permissions: action.payload[index].Permissions
+                    id: action.payload[index].id,
+                    firstname: action.payload[index].firstName,
+                    lastname: action.payload[index].lastName,
+                    role: action.payload[index].role,
+                    permissions: action.payload[index].permissions
                 }));
                 return users;
             }

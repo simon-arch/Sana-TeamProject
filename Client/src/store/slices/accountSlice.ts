@@ -1,32 +1,43 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import config from '../../../config.json'
+import { jwtDecode } from 'jwt-decode';
 import { User } from './userSlice';
 
 export interface AccountState {
     user: User;
     error: string | null;
+    token: string;
     isLoggedIn: boolean | null;
 }
 
 export const initialState: AccountState = {
     user: <User>{},
+    token: '',
     error: null,
     isLoggedIn: null,
 };
+
+interface JWTData {
+    username: string;
+    role: string;
+    firstname: string;
+    lastname: string;
+    permissions: string[];
+}
 
 const accountSlice = createSlice({
     name: 'accountInfo',
     initialState,
     reducers: {
         //@ts-ignore
-        getAccountInfo(state, action) {},
-        getAccountStatus() {},
-        setAccountInfo: (state, action: PayloadAction<{ username: string; role: string; permissions: string[] }>) => {
-            console.log('setAccountInfo reducer called with:', action.payload);
-            state.user.firstname = action.payload.username;
-            state.user.lastname = 'placeholder';
-            state.user.role = action.payload.role;
-            state.user.permissions = action.payload.permissions;
+        getAccessToken(state, payload) {},
+        setAccountInfo: (state, action: PayloadAction<string>) => {
+            state.token = action.payload;
+            localStorage.setItem('authToken', action.payload);
+            const data: JWTData = jwtDecode(action.payload) as JWTData;
+            state.user.firstname = data.firstname;
+            state.user.lastname = data.lastname;
+            state.user.role = data.role;
+            state.user.permissions = (Array.isArray(data.permissions)) ? data.permissions : [data.permissions];
             state.error = null;
             state.isLoggedIn = true;
         },
@@ -35,7 +46,7 @@ const accountSlice = createSlice({
             state.isLoggedIn = false;
         },
         logout: (state) => {
-            fetch(`${config.apiEndpoint}/Auth/Logout`, {credentials: 'include'});
+            localStorage.clear();
             state.user = <User>{};
             state.error = null;
             state.isLoggedIn = false;
@@ -43,5 +54,5 @@ const accountSlice = createSlice({
     },
 });
 
-export const { getAccountInfo, setAccountInfo, setError, logout, getAccountStatus } = accountSlice.actions;
+export const { getAccessToken, setAccountInfo, setError, logout } = accountSlice.actions;
 export default accountSlice.reducer;

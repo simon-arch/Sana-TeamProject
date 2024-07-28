@@ -1,19 +1,11 @@
 import "../../assets/styles/tab-account.css";
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../store/index.ts';
-import { getAccountStatus } from '../../store/slices/accountSlice.ts';
 import { Table } from 'react-bootstrap';
 
 const AccountInfo: React.FC = () => {
-    const dispatch = useDispatch();
     const account = useSelector((state: RootState) => state.accountInfo);
-
-    useEffect(() => {
-        dispatch(getAccountStatus());
-    }, [dispatch]);
-
-
     return (
         <div className="account-data">
             <div>

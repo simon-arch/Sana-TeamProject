@@ -106,14 +106,14 @@ function RoleManager() {
                         onChange={handleSetUser}>
                         {users.map(user => (
                             <option key={user.id} value={user.id}>
-                                {user.firstname}
+                                {user.firstname} {user.lastname}
                             </option>
                         ))}
                     </Form.Select>
                 </div>
                 <div className="container-preset">
                     <Form.Select className="roleManager-select form-select-sm" value={preset} onChange={handlePresetChange}>
-                        <option value="">Optional preset...</option>
+                        <option value="" disabled>Optional preset...</option>
                         {Object.keys(config.presets).map(preset => (
                             <option key={preset} value={preset}>{preset}</option>
                         ))}
