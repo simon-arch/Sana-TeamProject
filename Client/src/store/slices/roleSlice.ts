@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice} from "@reduxjs/toolkit";
 
 const initialState: string[] = [];
 
@@ -7,10 +7,11 @@ const roleSlice = createSlice(
         name: 'roles',
         initialState,
         reducers: {
-            getRoles(){},
+            getRoles() {
+            },
             setRoles(state, action) {
                 state;
-                const roles: string[] = action.payload.map((role: string) => role );
+                const roles: string[] = action.payload.map((role: string) => (role));
                 return roles;
             },
         }

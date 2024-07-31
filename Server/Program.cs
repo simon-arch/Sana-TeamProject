@@ -11,6 +11,7 @@ using Server.Data.Helpers;
 using Server.Data.Repositories;
 using Server.Services;
 using System.Text;
+using GraphQL.Server.Ui.Altair;
 
 internal class Program
 {
@@ -63,11 +64,17 @@ internal class Program
             }));
 
         var app = builder.Build();
+        
+        using (var scope = app.Services.CreateScope())
+        {
+            var dbProvider = scope.ServiceProvider.GetRequiredService<DbProvider>();
+        }
 
         app.UseRouting();
         app.UseCors();
         app.UseAuthentication();
         app.UseGraphQL();
+        app.UseGraphQLAltair(new AltairOptions().GraphQLEndPoint = "/altair");
 
         app.Run();
     }

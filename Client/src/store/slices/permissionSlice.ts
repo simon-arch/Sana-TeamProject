@@ -10,7 +10,7 @@ const permissionSlice = createSlice(
             getPermissions(){},
             setPermissions(state, action) {
                 state;
-                const permissions: string[] = action.payload.map((perm: string) => perm );
+                const permissions: string[] = action.payload.map((perm: string) => (perm) );
                 return permissions;
             },
         }

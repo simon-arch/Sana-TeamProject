@@ -1,9 +1,10 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { jwtDecode } from 'jwt-decode';
-import { User } from './userSlice';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {jwtDecode} from 'jwt-decode';
+import {User} from './userSlice';
 
 export interface AccountState {
     user: User;
+    users: User[];
     error: string | null;
     token: string;
     isLoggedIn: boolean | null;
@@ -11,6 +12,7 @@ export interface AccountState {
 
 export const initialState: AccountState = {
     user: <User>{},
+    users: [],
     token: '',
     error: null,
     isLoggedIn: null,
@@ -29,7 +31,8 @@ const accountSlice = createSlice({
     initialState,
     reducers: {
         //@ts-ignore
-        getAccessToken(state, payload) {},
+        getAccessToken(state, payload) {
+        },
         setAccountInfo: (state, action: PayloadAction<string>) => {
             state.token = action.payload;
             localStorage.setItem('authToken', action.payload);
@@ -54,5 +57,5 @@ const accountSlice = createSlice({
     },
 });
 
-export const { getAccessToken, setAccountInfo, setError, logout } = accountSlice.actions;
+export const {getAccessToken, setAccountInfo, setError, logout} = accountSlice.actions;
 export default accountSlice.reducer;

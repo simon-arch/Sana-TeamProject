@@ -4,6 +4,9 @@
     {
         ViewUsers,
         ManageUserRoles,
-        ManageUserPermissions
+        ManageUserPermissions,
+        CreateUsers,
+        UpdateUsers,
+        DeleteUsers
     }
 }

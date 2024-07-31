@@ -8,58 +8,59 @@ namespace Server.Data.Repositories
     {
         private readonly SqlConnection _sql = provider.Connection;
 
-        public Task<User?> GetAsync(int id)
+        public async Task<User?> GetAsync(int id)
         {
-            string query = $@"
+            var query = $@"
                 SELECT Id, Username, PasswordHash, FirstName, LastName, Role, Permissions
                 FROM Users
                 WHERE Id = {id}";
 
-            return _sql.QuerySingleAsync<User?>(query);
+            return await _sql.QuerySingleAsync<User?>(query);
         }
 
-        public Task<User?> GetAsync(string username)
+        public async Task<User?> GetAsync(string username)
         {
-            string query = $@"
+            var query = $@"
                 SELECT Id, Username, PasswordHash, FirstName, LastName, Role, Permissions
                 FROM Users
                 WHERE Username = '{username}'";
 
-            return _sql.QuerySingleAsync<User?>(query);
+            return await _sql.QuerySingleAsync<User?>(query);
         }
 
-        public Task<IEnumerable<User>> GetAllAsync()
+        public async Task<IEnumerable<User>> GetAllAsync()
         {
-            string query = @"
+            var query = @"
                 SELECT Id, Username, PasswordHash, FirstName, LastName, Role, Permissions
                 FROM Users";
 
-            return _sql.QueryAsync<User>(query);
+            return await _sql.QueryAsync<User>(query);
         }
 
-        public Task<int> InsertAsync(User user)
+        public async Task<int> InsertAsync(User user)
         {
-            string query = @"
+            var query = @"
                 INSERT INTO Users (Username, PasswordHash, FirstName, LastName, Role, Permissions)
                 OUTPUT inserted.Id
                 VALUES (@Username, @PasswordHash, @FirstName, @LastName, @Role, @Permissions)";
 
-            return _sql.QuerySingleAsync<int>(query, user);
+            var newId = await _sql.ExecuteScalarAsync<int>(query, user);
+            return user.Id = newId;
         }
 
-        public Task UpdateAsync(User user)
+        public async Task UpdateAsync(User user)
         {
-            string query = $@"
+            var query = @"
                 UPDATE Users
                 SET Username = @Username, PasswordHash = @PasswordHash, FirstName = @FirstName,
                 LastName = @LastName, Role = @Role, Permissions = @Permissions
                 WHERE Id = @Id";
 
-            return _sql.ExecuteAsync(query, user);
+            await _sql.ExecuteAsync(query, user);
         }
 
-        public Task DeleteAsync(int id) => 
-            _sql.ExecuteAsync($"DELETE FROM Users WHERE Id = {id}");
+        public async Task DeleteAsync(int id) => 
+           await _sql.ExecuteAsync($"DELETE FROM Users WHERE Id = {id}");
 
     }
 }
