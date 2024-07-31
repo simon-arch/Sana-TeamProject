@@ -10,7 +10,7 @@ namespace Server.API.Mutations
 {
     public class AuthMutation : ObjectGraphType
     {
-        public AuthMutation()
+        public AuthMutation(IHttpContextAccessor accessor)
         {
             Field<StringGraphType>("login")
                 .Argument<StringGraphType>("username")
@@ -20,7 +20,9 @@ namespace Server.API.Mutations
                     var username = context.GetArgument<string>("username");
                     var password = context.GetArgument<string>("password");
 
-                    var user = await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username);
+                    var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+
+                    var user = await userRepository.GetAsync(username);
 
                     if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
                     {
@@ -28,7 +30,12 @@ namespace Server.API.Mutations
                         return string.Empty;                       
                     }
 
-                    return context.RequestServices!.GetRequiredService<TokenService>().CreateToken(user);
+                    var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
+
+                    user.TokenId = tokenService.SetRefreshTokenToCookie(accessor.HttpContext!);
+                    await userRepository.UpdateAsync(user);
+
+                    return tokenService.GenerateAccessToken(user);
                 });
 
             Field<UserGraphType>("register")
@@ -41,6 +48,78 @@ namespace Server.API.Mutations
                     user.Id = await context.RequestServices!.GetRequiredService<IUserRepository>().InsertAsync(user);
 
                     return user;
+                });
+
+            Field<StringGraphType>("refresh")
+                .ResolveAsync(async context =>
+                {
+                    var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
+
+                    var token = tokenService.GetRefreshTokenFromCookie(accessor.HttpContext!);
+
+                    if (token == null)
+                    {
+                        context.Errors.Add(new("Required cookie was not found."));
+                        return string.Empty;
+                    }
+
+                    var tokenId = tokenService.ValidateRefreshToken(token);
+
+                    if (tokenId == null)
+                    {
+                        context.Errors.Add(new("Token was corrupted."));
+                        return string.Empty;
+                    }
+
+                    var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                    var user = await userRepository.GetAsync((Guid)tokenId);
+
+                    if (user == null)
+                    {
+                        return string.Empty;
+                    }
+
+                    user.TokenId = tokenService.SetRefreshTokenToCookie(accessor.HttpContext!);
+                    await userRepository.UpdateAsync(user);
+
+                    return tokenService.GenerateAccessToken(user);
+                });
+
+            Field<StringGraphType>("logout")
+                .ResolveAsync(async context =>
+                {
+                    var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
+
+                    var token = tokenService.GetRefreshTokenFromCookie(accessor.HttpContext!);
+
+                    if (token == null)
+                    {
+                        context.Errors.Add(new("Required cookie was not found."));
+                        return string.Empty;
+                    }
+
+                    var tokenId = tokenService.ValidateRefreshToken(token);
+
+                    if (tokenId == null)
+                    {
+                        context.Errors.Add(new("Token was corrupted."));
+                        return string.Empty;
+                    }
+
+                    var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                    var user = await userRepository.GetAsync((Guid)tokenId);
+
+                    if (user == null)
+                    {
+                        return string.Empty;
+                    }
+
+                    user.TokenId = null;
+                    await userRepository.UpdateAsync(user);
+
+                    tokenService.DeleteRefreshTokenFromCookie(accessor.HttpContext!);
+
+                    return "Success.";
                 });
         }
     }

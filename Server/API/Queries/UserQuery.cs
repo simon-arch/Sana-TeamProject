@@ -6,7 +6,6 @@ using Server.Data.Repositories;
 
 namespace Server.API.Queries
 {
-    [Authorize]
     public class UserQuery : ObjectGraphType
     {
         public UserQuery()
@@ -17,8 +16,6 @@ namespace Server.API.Queries
                 .Argument<IdGraphType>("id")
                 .ResolveAsync(async context =>
                 {
-                    var user = context.User;
-
                     int id = context.GetArgument<int>("id");
                     return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(id);
                 });

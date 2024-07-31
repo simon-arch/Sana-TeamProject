@@ -6,6 +6,7 @@ namespace Server.Data.Repositories
     {
         Task<User?> GetAsync(int id);
         Task<User?> GetAsync(string username);
+        Task<User?> GetAsync(Guid tokenId);
         Task<IEnumerable<User>> GetAllAsync();
         Task<int> InsertAsync(User user);
         Task UpdateAsync(User user);

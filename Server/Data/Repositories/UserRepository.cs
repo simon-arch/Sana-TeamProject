@@ -8,22 +8,18 @@ namespace Server.Data.Repositories
     {
         private readonly SqlConnection _sql = provider.Connection;
 
-        public Task<User?> GetAsync(int id)
+        public Task<User?> GetAsync(int id) => _GetAsync($"Id = {id}");
+
+        public Task<User?> GetAsync(string username) => _GetAsync($"Username = '{username}'");
+
+        public Task<User?> GetAsync(Guid tokenId) => _GetAsync($"TokenId = '{tokenId}'");
+
+        private Task<User?> _GetAsync(string condition)
         {
             string query = $@"
-                SELECT Id, Username, PasswordHash, FirstName, LastName, Role, Permissions
+                SELECT Id, Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions
                 FROM Users
-                WHERE Id = {id}";
-
-            return _sql.QuerySingleAsync<User?>(query);
-        }
-
-        public Task<User?> GetAsync(string username)
-        {
-            string query = $@"
-                SELECT Id, Username, PasswordHash, FirstName, LastName, Role, Permissions
-                FROM Users
-                WHERE Username = '{username}'";
+                WHERE {condition}";
 
             return _sql.QuerySingleAsync<User?>(query);
         }
@@ -31,7 +27,7 @@ namespace Server.Data.Repositories
         public Task<IEnumerable<User>> GetAllAsync()
         {
             string query = @"
-                SELECT Id, Username, PasswordHash, FirstName, LastName, Role, Permissions
+                SELECT Id, Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions
                 FROM Users";
 
             return _sql.QueryAsync<User>(query);
@@ -40,9 +36,9 @@ namespace Server.Data.Repositories
         public Task<int> InsertAsync(User user)
         {
             string query = @"
-                INSERT INTO Users (Username, PasswordHash, FirstName, LastName, Role, Permissions)
+                INSERT INTO Users (Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions)
                 OUTPUT inserted.Id
-                VALUES (@Username, @PasswordHash, @FirstName, @LastName, @Role, @Permissions)";
+                VALUES (@Username, @PasswordHash, @TokenId, @FirstName, @LastName, @Role, @Permissions)";
 
             return _sql.QuerySingleAsync<int>(query, user);
         }
@@ -51,8 +47,8 @@ namespace Server.Data.Repositories
         {
             string query = $@"
                 UPDATE Users
-                SET Username = @Username, PasswordHash = @PasswordHash, FirstName = @FirstName,
-                LastName = @LastName, Role = @Role, Permissions = @Permissions
+                SET Username = @Username, PasswordHash = @PasswordHash, TokenId = @TokenId,
+                FirstName = @FirstName, LastName = @LastName, Role = @Role, Permissions = @Permissions
                 WHERE Id = @Id";
 
             return _sql.ExecuteAsync(query, user);

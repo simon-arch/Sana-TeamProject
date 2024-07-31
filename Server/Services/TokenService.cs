@@ -8,44 +8,124 @@ namespace Server.Services
 {
     public class TokenService(IConfiguration configuration)
     {
-        public string CreateToken(User user)
+        private class TokenIdPair
         {
-            var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!);
-            var expiration = double.Parse(configuration["Jwt:ExpirationHours"]!);
+            public required Guid Id { get; init; }
+            public required string Token { get; init; }
+        }
+
+        private readonly JwtSecurityTokenHandler _tokenHandler = new();
+
+        public static TokenValidationParameters GetValidationParameters(IConfiguration config)
+        {
+            return new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = config["Jwt:Issuer"],
+                ValidAudience = config["Jwt:Audience"],
+                IssuerSigningKeys = [
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:AccessSecret"]!)),
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:RefreshSecret"]!))
+                ],
+                ClockSkew = TimeSpan.Zero
+            };
+        }
+
+        public Guid? ValidateRefreshToken(string token)
+        {
+            try
+            {
+                var principal = _tokenHandler.ValidateToken(token, GetValidationParameters(configuration), out _);
+                string? id = principal.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
+                return id != null 
+                    ? Guid.Parse(id)
+                    : null;
+            }
+            catch { }
+
+            return null;
+        }
+
+        public string GenerateAccessToken(User user)
+        {
+            var claims = new List<Claim> { 
+                new(JwtRegisteredClaimNames.Sub, user.Username),
+            };
+            foreach (var permission in user.Permissions)
+            {
+                claims.Add(new("permissions", permission.ToString()));
+            }
+
+            var expiration = double.Parse(configuration["Jwt:AccessExpireMinutes"]!);
+            var secret = Encoding.UTF8.GetBytes(configuration["Jwt:AccessSecret"]!);
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
-                Subject = GenerateClaimsIdentity(user),
-                Expires = DateTime.UtcNow.AddHours(expiration),
-                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256),
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(expiration),
+                SigningCredentials = new(new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha256),
                 Issuer = configuration["Jwt:Issuer"],
                 Audience = configuration["Jwt:Audience"]
             };
-            var tokenHandler = new JwtSecurityTokenHandler();
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            var token = _tokenHandler.CreateToken(tokenDescriptor);
+
+            return _tokenHandler.WriteToken(token);
         }
 
-        private static ClaimsIdentity GenerateClaimsIdentity(User user)
+        private TokenIdPair GenerateRefreshToken()
         {
-            var claims = new List<Claim>
+            Guid tokenId = Guid.NewGuid();
+
+            Claim[] claims = [ 
+                new(JwtRegisteredClaimNames.Jti, tokenId.ToString()) 
+            ];
+
+            var expiration = double.Parse(configuration["Jwt:RefreshExpireDays"]!);
+            var secret = Encoding.UTF8.GetBytes(configuration["Jwt:RefreshSecret"]!);
+
+            var tokenDescriptor = new SecurityTokenDescriptor()
             {
-                new("username", user.Username),
-                new("role", user.Role.ToString()),
-                new("firstname", user.FirstName),
-                new("lastname", user.LastName),
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddDays(expiration),
+                SigningCredentials = new(new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha256),
+                Issuer = configuration["Jwt:Issuer"],
+                Audience = configuration["Jwt:Audience"]
             };
 
-            if (user.Permissions != null)
-            {
-                foreach (var permission in user.Permissions)
-                {
-                    claims.Add(new("permissions", permission.ToString()));
-                }
-            }
+            var token = _tokenHandler.CreateToken(tokenDescriptor);
 
-            return new ClaimsIdentity(claims);
+            return new TokenIdPair
+            {
+                Id = tokenId,
+                Token = _tokenHandler.WriteToken(token)
+            };
         }
+
+        public Guid SetRefreshTokenToCookie(HttpContext context)
+        {
+            var expiration = double.Parse(configuration["Jwt:RefreshExpireDays"]!);
+            var tokenIdPair = GenerateRefreshToken();
+
+            context.Response.Cookies.Append("jwt", tokenIdPair.Token,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    MaxAge = TimeSpan.FromDays(expiration)
+                });
+
+            return tokenIdPair.Id;
+        }
+
+        public string? GetRefreshTokenFromCookie(HttpContext context) =>
+            context.Request.Cookies["jwt"];
+
+        public void DeleteRefreshTokenFromCookie(HttpContext context) =>
+            context.Response.Cookies.Delete("jwt");
     }
 }

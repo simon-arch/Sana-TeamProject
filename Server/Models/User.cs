@@ -7,6 +7,7 @@ namespace Server.Models
         public int Id { get; set; }
         public required string Username { get; set; }
         public required string PasswordHash { get; set; }
+        public Guid? TokenId { get; set; }
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
         public required Role Role { get; set; }
