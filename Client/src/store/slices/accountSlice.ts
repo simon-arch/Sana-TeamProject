@@ -17,7 +17,7 @@ export const initialState: AccountState = {
 };
 
 interface JWTData {
-    username: string;
+    id: number;
     role: string;
     firstname: string;
     lastname: string;
@@ -34,6 +34,7 @@ const accountSlice = createSlice({
             state.token = action.payload;
             localStorage.setItem('authToken', action.payload);
             const data: JWTData = jwtDecode(action.payload) as JWTData;
+            state.user.id = data.id;
             state.user.firstname = data.firstname;
             state.user.lastname = data.lastname;
             state.user.role = data.role;

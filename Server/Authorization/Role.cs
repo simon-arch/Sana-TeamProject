@@ -2,7 +2,7 @@
 {
     public enum Role
     {
-        Developer,
-        UserManager
+        DEVELOPER,
+        USER_MANAGER
     }
 }

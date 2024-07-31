@@ -29,6 +29,10 @@ td:first-child {
     margin: 0 3px;
 }
 
+.roleMenu-spinner {
+    margin: 5% 45%;
+}
+
 /* .roleMenu-color<permission_name> */
 .roleMenu-colorUser-Manager {
     background-color: #3e179a !important;

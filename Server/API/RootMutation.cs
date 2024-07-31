@@ -10,6 +10,7 @@ namespace Server.API
             Name = "mutation";
 
             Field<AuthMutation>("auth").Resolve(context => new { });
+            Field<UserMutation>("user").Resolve(context => new { });
         }
     }
 }

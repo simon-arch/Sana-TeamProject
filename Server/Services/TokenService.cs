@@ -31,6 +31,7 @@ namespace Server.Services
         {
             var claims = new List<Claim>
             {
+                new("id", user.Id.ToString()),
                 new("username", user.Username),
                 new("role", user.Role.ToString()),
                 new("firstname", user.FirstName),

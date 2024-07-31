@@ -5,18 +5,30 @@ import { RootState } from "../../store";
 import { useEffect } from "react";
 import { getUsers } from "../../store/slices/userSlice";
 import { getRoles } from "../../store/slices/roleSlice";
+import { Alert, Spinner } from "react-bootstrap";
 
 
 function RoleMenu() {
     const dispatch = useDispatch();
+
+    const usersState = useSelector((state: RootState) => state.users);
+    const uStatus = usersState.status;
+    const users = usersState.users;
+
+    const rolesState = useSelector((state: RootState) => state.roles);
+    const rStatus = rolesState.status;
+    const roles = rolesState.roles;
 
     useEffect(() => {
       dispatch(getUsers());
       dispatch(getRoles());
     }, [dispatch]);
 
-    const users = useSelector((state: RootState) => state.users);
-    const roles = useSelector((state: RootState) => state.roles);
+    if (uStatus == 'loading' || rStatus == 'loading')
+      return <Spinner className="roleMenu-spinner" animation="border" role="status"></Spinner>;
+
+    if (uStatus == 'error' || rStatus == 'error')
+      return (<Alert variant='danger' className="text-center mx-2">Error fetching data.</Alert>)
 
     return (
       <>
