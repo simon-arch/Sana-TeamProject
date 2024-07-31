@@ -1,6 +1,6 @@
 import { ofType } from 'redux-observable';
-import { from, of } from 'rxjs';
-import { catchError, mergeMap } from 'rxjs/operators';
+import {from, of, switchMap} from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { getAccessToken, setAccountInfo, setError } from '../slices/accountSlice';
 import { sendRequest } from './helpers/request';
 
@@ -8,7 +8,7 @@ const loginEpic = (action$: any) =>
 {
     return action$.pipe(
         ofType(getAccessToken.type),
-        mergeMap((action: any) => {
+        switchMap((action: any) => {
             const { username, password } = action.payload;
             return from(sendRequest(
                 `mutation {
@@ -17,8 +17,8 @@ const loginEpic = (action$: any) =>
                     }
                 }`, '')
             ).pipe(
-                mergeMap(response => response.json()),
-                mergeMap((data) => {
+                switchMap(response => response.json()),
+                switchMap((data) => {
                     return of(setAccountInfo(data.data.auth.login));
                 }),
                 catchError((error) => {

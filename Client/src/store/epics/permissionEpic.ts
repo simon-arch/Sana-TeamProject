@@ -1,5 +1,5 @@
 import { ofType } from 'redux-observable';
-import { map, mergeMap } from 'rxjs/operators';
+import {map, switchMap} from 'rxjs/operators';
 import { from } from 'rxjs';
 import { getPermissions, setPermissions } from '../slices/permissionSlice';
 import { sendRequest } from './helpers/request';
@@ -7,7 +7,7 @@ import { sendRequest } from './helpers/request';
 const permissionEpic = (action$: any) =>
   action$.pipe(
     ofType(getPermissions.type),
-    mergeMap(() =>
+    switchMap(() =>
       from(sendRequest(`
         query {
           auth {
@@ -15,7 +15,7 @@ const permissionEpic = (action$: any) =>
           }
         }`, localStorage.getItem('authToken')!
     )).pipe(
-        mergeMap((response) => {
+        switchMap((response) => {
           return from(response.json()).pipe(
             map((data) => setPermissions(data.data.auth.permissions)),
           );

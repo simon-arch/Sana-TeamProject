@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, InputGroup, Button, FormGroup, FormCheck } from "react-bootstrap";
-import { BsFillKeyFill, BsFillPersonFill } from "react-icons/bs";
 import { RootState } from "../../store";
 import { getRoles } from "../../store/slices/roleSlice";
 import { getPermissions } from "../../store/slices/permissionSlice";
-import { setError } from "../../store/slices/accountSlice";
-import { registerRequest } from "../../store/slices/userSlice";
+import { updateUserRequest } from "../../store/slices/userSlice";
 import config from "../../../config.json"; // Assuming this is where your presets are defined
 
 export interface Config {
@@ -17,8 +15,12 @@ export interface Config {
 
 const data: Config = config as Config;
 
-function RegisterUser() {
+function EditUser() {
     const dispatch = useDispatch();
+    const selectedUser = useSelector((state: RootState) => state.users.selectedUser);
+    const roles = useSelector((state: RootState) => state.roles);
+    const permissions = useSelector((state: RootState) => state.permissions);
+
     const [username, setUsername] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -27,13 +29,21 @@ function RegisterUser() {
     const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
     const [preset, setPreset] = useState<string>('');
 
-    const roles = useSelector((state: RootState) => state.roles);
-    const permissions = useSelector((state: RootState) => state.permissions);
-
     useEffect(() => {
         dispatch(getRoles());
         dispatch(getPermissions());
     }, [dispatch]);
+
+    useEffect(() => {
+        if (selectedUser) {
+            setUsername(selectedUser.username);
+            setFirstName(selectedUser.firstname);
+            setLastName(selectedUser.lastname);
+            setPassword(selectedUser.password);
+            setRole(selectedUser.role);
+            setSelectedPermissions(selectedUser.permissions);
+        }
+    }, [selectedUser]);
 
     const handlePermissionChange = (perm: string) => {
         setSelectedPermissions(prev =>
@@ -49,71 +59,70 @@ function RegisterUser() {
         if (selectedPreset) {
             const presetPermissions = data.presets[selectedPreset];
             setSelectedPermissions(presetPermissions);
+        } else {
+            setSelectedPermissions([]);
         }
     };
 
-    const handleAddUser = (e: React.FormEvent) => {
+    const handleUpdateUser = (e: React.FormEvent) => {
         e.preventDefault();
         if (username && firstName && lastName && password && role) {
-            dispatch(registerRequest({
-                id: 0,
-                username,
-                firstname: firstName,
-                lastname: lastName,
-                password,
-                role,
-                permissions: selectedPermissions
-            }));
-            setUsername('');
-            setFirstName('');
-            setLastName('');
-            setPassword('');
-            setRole('');
-            setSelectedPermissions([]);
-            setPreset('');
+            if (selectedUser) {
+                dispatch(updateUserRequest({
+                    ...selectedUser,
+                    username,
+                    firstname: firstName,
+                    lastname: lastName,
+                    password,
+                    role,
+                    permissions: selectedPermissions
+                }));
+            }
         } else {
-            dispatch(setError('All fields are required.'));
+            // Handle validation errors
+            console.log('Please fill in all required fields');
         }
     };
+
+    if (!selectedUser) {
+        return <div>No user selected</div>;
+    }
 
     return (
         <div>
+            <h5>Edit User</h5>
             <InputGroup className="mb-3">
-                <InputGroup.Text><BsFillPersonFill /></InputGroup.Text>
+                <InputGroup.Text>Username</InputGroup.Text>
                 <Form.Control
                     value={username}
                     type="text"
-                    placeholder="Username"
                     onChange={(e) => setUsername(e.target.value)}
                     required
                 />
             </InputGroup>
             <InputGroup className="mb-3">
-                <InputGroup.Text><BsFillPersonFill /></InputGroup.Text>
+                <InputGroup.Text>First Name</InputGroup.Text>
                 <Form.Control
                     value={firstName}
                     type="text"
-                    placeholder="First Name"
                     onChange={(e) => setFirstName(e.target.value)}
                     required
                 />
             </InputGroup>
             <InputGroup className="mb-3">
-                <InputGroup.Text><BsFillPersonFill /></InputGroup.Text>
+                <InputGroup.Text>Last Name</InputGroup.Text>
                 <Form.Control
                     value={lastName}
                     type="text"
-                    placeholder="Last Name"
                     onChange={(e) => setLastName(e.target.value)}
                     required
                 />
             </InputGroup>
             <InputGroup className="mb-3">
-                <InputGroup.Text><BsFillKeyFill /></InputGroup.Text>
+                <InputGroup.Text>Password</InputGroup.Text>
                 <Form.Control
                     value={password}
                     type="password"
-                    placeholder="Password"
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
@@ -147,9 +156,9 @@ function RegisterUser() {
                     />
                 ))}
             </FormGroup>
-            <Button type="button" onClick={handleAddUser}>Register</Button>
+            <Button type="button" onClick={handleUpdateUser}>Update</Button>
         </div>
     );
 }
 
-export default RegisterUser;
+export default EditUser;

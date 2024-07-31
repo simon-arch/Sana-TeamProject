@@ -5,16 +5,7 @@ export const normalizeEnumValues = (input: string): string => {
         .replace(/^./, (str) => str.toUpperCase());
 };
 
-export enum Role {
-    Developer = 'Developer',
-    UserManager = 'UserManager',
-}
+export const hasPermission = (permissions: string[], ...requiredPermissions: string[]): boolean => {
+    return requiredPermissions.every(permission => permissions.includes(permission));
+};
 
-export enum Permission {
-    ViewUsers = 'VIEW_USERS',
-    ManageUserRoles = 'ManageUserRoles',
-    ManageUserPermissions = 'ManageUserPermissions',
-    CreateUsers = 'CreateUsers',
-    UpdateUsers = 'UpdateUsers',
-    DeleteUsers = 'DeleteUsers'
-}

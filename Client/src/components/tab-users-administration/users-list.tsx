@@ -1,16 +1,27 @@
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {useEffect} from "react";
-import {getUsers} from "../../store/slices/userSlice.ts";
-import {Dropdown, Table} from "react-bootstrap";
+import {getSelectedUser, getUsers} from "../../store/slices/userSlice.ts";
+import {Button, Dropdown, Table} from "react-bootstrap";
+import {hasPermission} from "../../store/helper.ts";
+import OffCanvas from "../offcanvas.tsx";
+import EditUser from "./edit-user.tsx";
+
 
 const UsersList: React.FC = () => {
     const dispatch = useDispatch();
     const users = useSelector((state: RootState) => state.users.users);
+    const permissions = useSelector((state: RootState) => state.accountInfo.user.permissions);
+    const canDeleteUsers = hasPermission(permissions, "DeleteUsers");
+    const canEditUsers = hasPermission(permissions, "UpdateUsers", "ManageUserPermissions", "ManageUserRoles");
 
     useEffect(() => {
         dispatch(getUsers());
     }, [dispatch]);
+
+    const handleEditClick = (userId: number) => {
+        dispatch(getSelectedUser(userId));
+    };
 
     return (
         <>
@@ -25,6 +36,7 @@ const UsersList: React.FC = () => {
                     <th>Register date</th>
                     <th>Last update</th>
                     <th>Last login</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -50,6 +62,16 @@ const UsersList: React.FC = () => {
                         <td>lorem ipsum</td>
                         <td>lorem ipsum</td>
                         <td>lorem ipsum</td>
+                        <td>
+                            {canEditUsers &&
+                                <OffCanvas title="Edit User" placement="end"
+                                           trigger={<Button onClick={() => handleEditClick(user.id)}>Edit</Button>}>
+                                    <EditUser/>
+                                </OffCanvas>
+                            }
+
+                            {canDeleteUsers && <Button>Delete</Button>}
+                        </td>
                     </tr>
 
                 ))}

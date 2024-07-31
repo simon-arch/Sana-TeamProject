@@ -24,7 +24,7 @@ const data: Config = config as Config;
 
 function RoleManager() {
     const dispatch = useDispatch();
-    const users = useSelector((state: RootState) => state.users);
+    const users = useSelector((state: RootState) => state.users.users);
     const permissions = useSelector((state: RootState) => state.permissions);
     const [selectedUser, setSelectedUser] = useState<User>();
     const [targetCheckboxes, setTargetCheckboxes] = useState<Record<string, boolean>>({});

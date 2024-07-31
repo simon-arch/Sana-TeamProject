@@ -19,8 +19,8 @@ import {logout} from './store/slices/accountSlice.ts';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from './store';
 import RoleManager from './components/tab-rolemanager/rolemanager.tsx';
-// import RegisterUser from "./components/tab-users-administration/register-user.tsx";
 import AdministrationWindow from "./components/tab-users-administration/administration-window.tsx";
+import {hasPermission} from "./store/helper.ts";
 
 
 function App() {
@@ -32,14 +32,7 @@ function App() {
 
     const {isLoggedIn, user} = useSelector((state: RootState) => state.accountInfo);
     const permissions = user.permissions || [];
-
-    const hasPermission = (requiredPermissions: string | string[]) => {
-        if (Array.isArray(requiredPermissions)) {
-            return requiredPermissions.every(permission => permissions.includes(permission));
-        }
-        return permissions.includes(requiredPermissions);
-    };
-
+    const canViewUsers = hasPermission(permissions, "ViewUsers");
 
     return (
         <>
@@ -62,13 +55,12 @@ function App() {
                             {isLoggedIn && (
                                 <>
                                     <li className="menu-category">Main Menu</li>
-                                    {hasPermission(["CreateUsers", "UpdateUsers", "DeleteUsers", "ManageUserRoles", "ManageUserPermissions"]) && (
+                                    {canViewUsers && (
                                         <li>
                                             <OffCanvas title="Users Administration" placement="start"
                                                        className="w-100"
                                                        trigger={<span className="menu-entry"><BsFillQuestionCircleFill
                                                            className="menu-icon"/>Users Administration</span>}>
-                                                {/*<RegisterUser/>*/}
                                                 <AdministrationWindow/>
                                             </OffCanvas>
                                         </li>
