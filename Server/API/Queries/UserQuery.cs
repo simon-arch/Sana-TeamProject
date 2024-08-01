@@ -12,19 +12,19 @@ namespace Server.API.Queries
         public UserQuery()
         {
             Field<UserGraphType>("get")
-                .Argument<IdGraphType>("id")
+                .Argument<StringGraphType>("username")
                 .ResolveAsync(async context =>
                 {
-                    context.WithPermission(Permission.ViewUsers);
+                    context.WithPermission(Permission.VIEW_USERS);
 
-                    int id = context.GetArgument<int>("id");
-                    return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(id);
+                    var username = context.GetArgument<string>("username");
+                    return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username);
                 });
 
             Field<ListGraphType<UserGraphType>>("get_all")
                 .ResolveAsync(async context =>
                 {
-                    context.WithPermission(Permission.ViewUsers);
+                    context.WithPermission(Permission.VIEW_USERS);
 
                     return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync();
                 });

@@ -8,12 +8,6 @@ namespace Server.Services
 {
     public class TokenService(IConfiguration configuration)
     {
-        private class TokenIdPair
-        {
-            public required Guid Id { get; init; }
-            public required string Token { get; init; }
-        }
-
         private readonly JwtSecurityTokenHandler _tokenHandler = new();
 
         public static TokenValidationParameters GetValidationParameters(IConfiguration config)
@@ -77,7 +71,7 @@ namespace Server.Services
             return _tokenHandler.WriteToken(token);
         }
 
-        private TokenIdPair GenerateRefreshToken()
+        private (Guid id, string token) GenerateRefreshToken()
         {
             Guid tokenId = Guid.NewGuid();
 
@@ -99,19 +93,15 @@ namespace Server.Services
 
             var token = _tokenHandler.CreateToken(tokenDescriptor);
 
-            return new TokenIdPair
-            {
-                Id = tokenId,
-                Token = _tokenHandler.WriteToken(token)
-            };
+            return (tokenId, _tokenHandler.WriteToken(token));
         }
 
         public Guid SetRefreshTokenToCookie(HttpContext context)
         {
             var expiration = double.Parse(configuration["Jwt:RefreshExpireDays"]!);
-            var tokenIdPair = GenerateRefreshToken();
+            var (id, token) = GenerateRefreshToken();
 
-            context.Response.Cookies.Append("jwt", tokenIdPair.Token,
+            context.Response.Cookies.Append("jwt", token,
                 new CookieOptions
                 {
                     HttpOnly = true,
@@ -119,13 +109,10 @@ namespace Server.Services
                     MaxAge = TimeSpan.FromDays(expiration)
                 });
 
-            return tokenIdPair.Id;
+            return id;
         }
 
         public string? GetRefreshTokenFromCookie(HttpContext context) =>
             context.Request.Cookies["jwt"];
-
-        public void DeleteRefreshTokenFromCookie(HttpContext context) =>
-            context.Response.Cookies.Delete("jwt");
     }
 }

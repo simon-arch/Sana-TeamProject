@@ -4,8 +4,7 @@ namespace Server.Models
 {
     public class User
     {
-        public int Id { get; set; }
-        public required string Username { get; set; }
+        public required string Username { get; init; }
         public required string PasswordHash { get; set; }
         public Guid? TokenId { get; set; }
         public required string FirstName { get; set; }

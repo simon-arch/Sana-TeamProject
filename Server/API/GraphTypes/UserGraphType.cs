@@ -9,7 +9,7 @@ namespace Server.API.Types
         {
             Name = "user";
 
-            Field(u => u.Id);
+            Field(u => u.Username);
             Field(u => u.FirstName);
             Field(u => u.LastName);
             Field(u => u.Role);

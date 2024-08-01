@@ -8,10 +8,20 @@ namespace Server.API.Queries
         public AuthQuery()
         {
             Field<ListGraphType<EnumerationGraphType<Role>>>("roles")
-                .Resolve(context => Enum.GetValues(typeof(Role)));
+                .Resolve(context =>
+                {
+                    context.Authorize();
+
+                    return Enum.GetValues(typeof(Role));
+                });
 
             Field<ListGraphType<EnumerationGraphType<Permission>>>("permissions")
-                .Resolve(context => Enum.GetValues(typeof(Permission)));
+                .Resolve(context =>
+                {
+                    context.Authorize();
+
+                    return Enum.GetValues(typeof(Permission));
+                });
         }
     }
 }

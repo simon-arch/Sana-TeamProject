@@ -43,14 +43,25 @@ namespace Server.API.Mutations
                 .ResolveAsync(async context =>
                 {
                     var user = context.GetArgument<User>("user");
+                    var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+
+                    var duplicate = await userRepository.GetAsync(user.Username);
+
+                    if (duplicate != null)
+                    {
+                        throw new ExecutionError("User with this username already exists")
+                        {
+                            Code = ResponseCode.BadRequest
+                        };
+                    }  
 
                     user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
-                    user.Id = await context.RequestServices!.GetRequiredService<IUserRepository>().InsertAsync(user);
+                    await userRepository.InsertAsync(user);
 
                     return user;
                 });
 
-            Field<StringGraphType>("refresh")
+            Field<ListGraphType<StringGraphType>>("refresh")
                 .ResolveAsync(async context =>
                 {
                     var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
