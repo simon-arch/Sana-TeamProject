@@ -21,7 +21,7 @@ namespace Server.Data.Repositories
                 FROM Users
                 WHERE {condition}";
 
-            return _sql.QuerySingleAsync<User?>(query);
+            return _sql.QueryFirstOrDefaultAsync<User>(query);
         }
 
         public Task<IEnumerable<User>> GetAllAsync()

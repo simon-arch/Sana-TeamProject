@@ -1,7 +1,5 @@
 using Dapper;
 using GraphQL;
-using GraphQL.MicrosoftDI;
-using GraphQL.Types;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Server.API;
 using Server.Authorization;
@@ -29,8 +27,6 @@ internal class Program
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-        builder.Services.AddSingleton<ISchema ,RootSchema>(services => new(new SelfActivatingServiceProvider(services)));
-
         builder.Services.AddCors(options => options
             .AddDefaultPolicy(policy => policy
                 .WithOrigins("https://localhost:5173")
@@ -46,21 +42,17 @@ internal class Program
 
         builder.Services.AddGraphQL(builder => builder
             .AddSystemTextJson()
-            .AddAuthorization(settings =>
-            {
-                foreach (Permission permission in Enum.GetValues(typeof(Permission)))
-                {
-                    settings.AddPolicy(permission.ToString(), policy =>
-                        policy.RequireClaim("permissions", permission.ToString()));
-                }
-            }));
+            .AddSelfActivatingSchema<RootSchema>());
 
         var app = builder.Build();
 
         app.UseRouting();
         app.UseCors();
         app.UseAuthentication();
-        app.UseGraphQL();
+        app.UseGraphQL("/api", options =>
+        {
+            options.ValidationErrorsReturnBadRequest = false;
+        });
 
         app.Run();
     }
