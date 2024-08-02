@@ -3,6 +3,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/index.ts';
 import { Table } from 'react-bootstrap';
+import { Capitalize } from "../tab-roles/usercard.tsx";
 
 const AccountInfo: React.FC = () => {
     const account = useSelector((state: RootState) => state.accountInfo);
@@ -21,7 +22,7 @@ const AccountInfo: React.FC = () => {
                 </tr>
                 <tr>
                 <td><span>Role:</span></td>
-                <td className="ps-2">{account.user.role}</td>
+                <td className="ps-2">{Capitalize(account.user.role)}</td>
                 </tr>
                 <tr>
                 <td><span>Permissions:</span></td>

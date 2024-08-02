@@ -5,32 +5,13 @@ import { getAccessToken, setAccountInfo, setError } from '../slices/accountSlice
 import { sendRequest } from './helpers/request';
 
 const loginEpic = (action$: any) =>
-{
-    return action$.pipe(
-        ofType(getAccessToken.type),
-        mergeMap((action: any) => {
-            const { username, password } = action.payload;
-            return from(sendRequest(
-                `mutation {
-                    auth {
-                        login(username: "${username}", password: "${password}")
-                    }
-                }`, '')
-            ).pipe(
-                mergeMap(response => response.json()),
-                mergeMap((data) => {
-                    return of(setAccountInfo(data.data.auth.login));
-                }),
-                catchError((error) => {
-                    console.error('Error fetching user info:', error);
-                    return of(setError('Error fetching user info.'));
-                })
-            );
-        })
-    );
-}
-
-
-
+  action$.pipe(
+    ofType(getAccessToken.type),
+    mergeMap((action: any) => from(sendRequest(`mutation { auth { login(username: "${action.payload.username}", password: "${action.payload.password}") } }`, ''))
+    .pipe(
+        mergeMap((data) => of(setAccountInfo(data.data.auth.login))),
+        catchError((error) => of(setError(error.message))))
+    )
+);
 
 export default loginEpic;
