@@ -1,4 +1,5 @@
-﻿using GraphQL;
+﻿using Azure;
+using GraphQL;
 using GraphQL.Types;
 using Server.API.Types;
 using Server.Authorization;
@@ -6,26 +7,27 @@ using Server.Data.Repositories;
 
 namespace Server.API.Queries
 {
-    [Authorize]
     public class UserQuery : ObjectGraphType
     {
         public UserQuery()
         {
-            this.AuthorizeWithPolicy(Permission.ViewUsers.ToString());
-
             Field<UserGraphType>("get")
-                .Argument<IdGraphType>("id")
+                .Argument<StringGraphType>("username")
                 .ResolveAsync(async context =>
                 {
-                    var user = context.User;
+                    context.WithPermission(Permission.VIEW_USERS);
 
-                    int id = context.GetArgument<int>("id");
-                    return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(id);
+                    var username = context.GetArgument<string>("username");
+                    return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username);
                 });
 
             Field<ListGraphType<UserGraphType>>("get_all")
                 .ResolveAsync(async context =>
-                    await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync());
+                {
+                    context.WithPermission(Permission.VIEW_USERS);
+
+                    return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync();
+                });
         }
     }
 }

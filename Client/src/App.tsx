@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from './store';
 import RoleManager from './components/tab-rolemanager/rolemanager.tsx';
 
-
+import config from "../config.json"
 
 function App() {
     const dispatch = useDispatch<AppDispatch>();
@@ -44,12 +44,12 @@ function App() {
                                     <li className="menu-category">Main Menu</li>
                                     <li><OffCanvas title="Placeholder Tab" placement="start" trigger = {<span className="menu-entry"><BsFillQuestionCircleFill className="menu-icon"/>Placeholder</span>}/></li>
                                     <li>
-                                        <OffCanvas permission="ManageUserPermissions" title="Permissions Tab" placement="start" trigger = {<span className="menu-entry"><BsPencilSquare className="menu-icon"/>Permissions</span>}>
+                                        <OffCanvas permission={config.permissions["MANAGE_USER_PERMISSIONS"]} title="Permissions Tab" placement="start" trigger = {<span className="menu-entry"><BsPencilSquare className="menu-icon"/>Permissions</span>}>
                                             <RoleManager></RoleManager>
                                         </OffCanvas> 
                                     </li>
                                     <li>
-                                        <OffCanvas permission={["ViewUsers", "ManageUserRoles"]} title="Roles Tab" placement="start" trigger = {<span className="menu-entry"><BsListColumns className="menu-icon"/>Roles</span>} id="role-menu">
+                                        <OffCanvas permission={[config.permissions["VIEW_USERS"], config.permissions["MANAGE_USER_ROLES"]]} title="Roles Tab" placement="start" trigger = {<span className="menu-entry"><BsListColumns className="menu-icon"/>Roles</span>} id="role-menu">
                                             <RoleMenu></RoleMenu>
                                         </OffCanvas>
                                     </li>

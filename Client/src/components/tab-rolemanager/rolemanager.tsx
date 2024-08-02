@@ -30,7 +30,7 @@ const data: Config = config as Config;
 
 function RoleManager() {
     const dispatch = useDispatch();
-    const userId = useSelector((state: RootState) => state.accountInfo.user.id);
+    const username = useSelector((state: RootState) => state.accountInfo.user.username);
 
     const usersState = useSelector((state: RootState) => state.users);
     const uStatus = usersState.status;
@@ -80,9 +80,9 @@ function RoleManager() {
         return (<Alert variant='danger' className="text-center mx-2">Error fetching data.</Alert>)
 
     const handleSetUser = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const id = Number(event.target.value);
+        const username = event.target.value;
         dispatch(getUsers());
-        const user = users.find(user => user.id === id);
+        const user = users.find(user => user.username === username);
     
         if (user) {
             setSelectedUser(user);
@@ -101,7 +101,7 @@ function RoleManager() {
     };
 
     const handleConfirm = () => {
-        dispatch(setUserPermissions({id: selectedUser!.id, permissions: convertPayload(targetCheckboxes)}));
+        dispatch(setUserPermissions({username: selectedUser!.username, permissions: convertPayload(targetCheckboxes)}));
         setSourceCheckboxes(targetCheckboxes);
     };
 
@@ -123,17 +123,17 @@ function RoleManager() {
             <div className="roleManager-container row my-1">
                 <div className="container-form">
                     <Form.Select className="roleManager-select form-select-sm"
-                        value={selectedUser?.id}
+                        value={selectedUser?.username}
                         onChange={handleSetUser}>
                         {users.map(user => (
-                            <option key={user.id} value={user.id}>
+                            <option key={user.username} value={user.username}>
                                 {user.firstname} {user.lastname}
                             </option>
                         ))}
                     </Form.Select>
                 </div>
                 {
-                        selectedUser?.id == userId ? 
+                        selectedUser?.username == username ? 
                         (
                             <>
                                 <div className="container-preset">
@@ -193,7 +193,7 @@ function RoleManager() {
                                     <input className="mx-2" 
                                         type="checkbox"
                                         checked={targetCheckboxes[perm] || false}
-                                        disabled={selectedUser?.id == userId}
+                                        disabled={selectedUser?.username == username}
                                         name={perm}
                                         id={perm}
                                         onChange={() => handleCheckboxChange(perm)} />

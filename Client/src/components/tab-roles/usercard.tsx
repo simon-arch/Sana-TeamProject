@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { User, setUserRole } from "../../store/slices/userSlice";
+import config from "../../../config.json"
 
 interface Props {
     user: User
@@ -17,14 +18,14 @@ export function Capitalize(value: string) {
 
 function UserCard(props: Props) {
     const dispatch = useDispatch();
-    const userId = useSelector((state: RootState) => state.accountInfo.user.id);
+    const username = useSelector((state: RootState) => state.accountInfo.user.username);
 
     const [isEdited, setEdited] = useState<boolean>(false);
     const [role, setRole] = useState<string>(props.user.role);
     const [sourceRole, setSource] = useState<string>(props.user.role);
 
     const permissions = useSelector((state: RootState) => state.accountInfo.user.permissions);
-    const canManageRoles = permissions.includes('ManageUserRoles');
+    const canManageRoles = permissions.includes(config.permissions["MANAGE_USER_ROLES"]);
 
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newRole = event.target.value;
@@ -36,7 +37,7 @@ function UserCard(props: Props) {
     const handleConfirm = () => {
         setSource(role);
         setEdited(false);
-        dispatch(setUserRole({id: props.user.id, role: role}));
+        dispatch(setUserRole({id: props.user.username, role: role}));
     }
 
     const handleReset = () => {
@@ -51,7 +52,7 @@ function UserCard(props: Props) {
                 {canManageRoles && (
                     <>
                         <td>
-                            <Form.Select name={props.user.firstname} value={role} disabled={props.user.id == userId} className="roleMenu-select form-select-sm" style={{ margin: "auto" }} onChange={handleChange}>
+                            <Form.Select name={props.user.firstname} value={role} disabled={props.user.username === username} className="roleMenu-select form-select-sm" style={{ margin: "auto" }} onChange={handleChange}>
                                 {props.avaliableRoles.map((value, key) => (
                                     <option key={key} value={value}>
                                         {Capitalize(value)}
@@ -61,7 +62,7 @@ function UserCard(props: Props) {
                         </td>
                         <td>
                             {
-                                props.user.id == userId ? (<></>) : (
+                                props.user.username !== username && (
                                 <>
                                     <Button variant="success" className="roleMenu-button-edit" disabled={!isEdited} onClick={handleConfirm}><BsCheck2 /></Button>
                                     <Button variant="warning" className="roleMenu-button-edit" disabled={!isEdited} onClick={handleReset}><BsArrowCounterclockwise /></Button>

@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { sendRequest } from "../epics/helpers/request";
 
 export interface User {
-    id: number;
+    username: string;
     firstname: string;
     lastname: string;
     role: string;
@@ -31,7 +31,7 @@ const userSlice = createSlice(
             },
             setUsers(state, action) {
                 state.users = Object.keys(action.payload).map(index => ({
-                    id: action.payload[index].id,
+                    username: action.payload[index].username,
                     firstname: action.payload[index].firstName,
                     lastname: action.payload[index].lastName,
                     role: action.payload[index].role,
@@ -43,16 +43,16 @@ const userSlice = createSlice(
                 state;
                 sendRequest(`mutation {
                                 user {
-                                    set_role(id:${action.payload.id}, role:${action.payload.role}) { id }
+                                    set_role(username:${action.payload.username}, role:${action.payload.role}) { username }
                                 }
-                        }`, localStorage.getItem('authToken') || '');
+                        }`);
             },
             setUserPermissions(_, action) {
                 sendRequest(`mutation {
                                 user {
-                                    set_permissions(id:${action.payload.id}, permissions:[${action.payload.permissions}]) { id }
+                                    set_permissions(username:"${action.payload.username}", permissions:[${action.payload.permissions}]) { username }
                                 }
-                        }`, localStorage.getItem('authToken') || '');
+                        }`);
             },
             setError(state, action) {
                 state.status = 'error',

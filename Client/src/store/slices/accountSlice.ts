@@ -5,22 +5,17 @@ import { User } from './userSlice';
 export interface AccountState {
     user: User;
     error: string | null;
-    token: string;
     isLoggedIn: boolean | null;
 }
 
 export const initialState: AccountState = {
     user: <User>{},
-    token: '',
     error: null,
     isLoggedIn: null,
 };
 
 interface JWTData {
-    id: number;
-    role: string;
-    firstname: string;
-    lastname: string;
+    sub: string;
     permissions: string[];
 }
 
@@ -31,13 +26,9 @@ const accountSlice = createSlice({
         //@ts-ignore
         getAccessToken(state, payload) {},
         setAccountInfo: (state, action: PayloadAction<string>) => {
-            state.token = action.payload;
             localStorage.setItem('authToken', action.payload);
             const data: JWTData = jwtDecode(action.payload) as JWTData;
-            state.user.id = data.id;
-            state.user.firstname = data.firstname;
-            state.user.lastname = data.lastname;
-            state.user.role = data.role;
+            state.user.username = data.sub;
             state.user.permissions = (Array.isArray(data.permissions)) ? data.permissions : [data.permissions];
             state.error = null;
             state.isLoggedIn = true;

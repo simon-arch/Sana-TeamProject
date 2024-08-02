@@ -1,16 +1,12 @@
 using Dapper;
 using GraphQL;
-using GraphQL.MicrosoftDI;
-using GraphQL.Types;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Server.API;
 using Server.Authorization;
 using Server.Data;
 using Server.Data.Helpers;
 using Server.Data.Repositories;
 using Server.Services;
-using System.Text;
 
 internal class Program
 {
@@ -18,56 +14,45 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Services.AddHttpContextAccessor();
+
         builder.Services.AddSingleton<TokenService>();
 
         builder.Services.AddSingleton<DbProvider>();
+
         SqlMapper.AddTypeHandler(typeof(Permission[]), new JsonTypeHandler());
 
-        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        SqlMapper.AddTypeHandler(typeof(Guid), new GuidTypeHandler());
+        SqlMapper.RemoveTypeMap(typeof(Guid));
 
-        builder.Services.AddSingleton<ISchema ,RootSchema>(services => new(new SelfActivatingServiceProvider(services)));
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
 
         builder.Services.AddCors(options => options
             .AddDefaultPolicy(policy => policy
                 .WithOrigins("https://localhost:5173")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
+                .AllowCredentials()
             )
         );
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
-            {
-                var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
-                options.TokenValidationParameters = new()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
-                };
-            });
+                options.TokenValidationParameters = TokenService.GetValidationParameters(builder.Configuration));
 
         builder.Services.AddGraphQL(builder => builder
             .AddSystemTextJson()
-            .AddAuthorization(settings =>
-            {
-                foreach (Permission permission in Enum.GetValues(typeof(Permission)))
-                {
-                    settings.AddPolicy(permission.ToString(), policy =>
-                        policy.RequireClaim("permissions", permission.ToString()));
-                }
-            }));
+            .AddSelfActivatingSchema<RootSchema>());
 
         var app = builder.Build();
 
         app.UseRouting();
         app.UseCors();
         app.UseAuthentication();
-        app.UseGraphQL();
+        app.UseGraphQL("/api", options =>
+        {
+            options.ValidationErrorsReturnBadRequest = false;
+        });
 
         app.Run();
     }
