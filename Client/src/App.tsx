@@ -14,7 +14,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from './store';
 import RoleManager from './components/tab-rolemanager/rolemanager.tsx';
 
-import config from "../config.json"
+import config from "../config.json";
+import useTokenRefresh from "./hooks/useTokenRefresh.ts";
 
 function App() {
     const dispatch = useDispatch<AppDispatch>();
@@ -24,6 +25,8 @@ function App() {
     }
 
     const { isLoggedIn } = useSelector((state: RootState) => state.accountInfo);
+
+    useTokenRefresh();
 
     return (
         <>

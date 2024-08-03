@@ -1,10 +1,10 @@
 import "../../assets/styles/tab-account.css";
-import React from 'react';
+import React, {FC} from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store/index.ts';
+import { RootState } from '../../store';
 import { Table } from 'react-bootstrap';
 
-const AccountInfo: React.FC = () => {
+const AccountInfo: FC = () => {
     const account = useSelector((state: RootState) => state.accountInfo);
     return (
         <div className="account-data">

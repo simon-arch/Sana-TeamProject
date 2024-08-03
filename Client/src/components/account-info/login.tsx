@@ -1,16 +1,16 @@
 import "../../assets/styles/tab-account.css";
-import React, { useState } from 'react';
-import { useDispatch, useSelector} from 'react-redux';
+import React, {useState} from 'react';
 import { getAccessToken, setError} from '../../store/slices/accountSlice.ts';
-import { RootState } from "../../store";
 import { Button, Form, InputGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { BsFillPersonFill, BsFillKeyFill } from "react-icons/bs";
+import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 
 const Login = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const error = useSelector((state: RootState) => state.accountInfo.error);
+
+    const error = useAppSelector(state => state.accountInfo.error);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

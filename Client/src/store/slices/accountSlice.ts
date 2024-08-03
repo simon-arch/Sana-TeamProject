@@ -24,7 +24,7 @@ const accountSlice = createSlice({
     initialState,
     reducers: {
         //@ts-ignore
-        getAccessToken(state, payload) {},
+        getAccessToken(state, action) {},
         setAccountInfo: (state, action: PayloadAction<string>) => {
             localStorage.setItem('authToken', action.payload);
             const data: JWTData = jwtDecode(action.payload) as JWTData;

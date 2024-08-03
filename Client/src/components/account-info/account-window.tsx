@@ -1,14 +1,14 @@
 import "../../assets/styles/tab-account.css";
-import React, { useEffect } from 'react';
+import React, {FC, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/index.ts';
+import { RootState } from '../../store';
 import Login from "./login.tsx";
 import OffCanvas from "../offcanvas.tsx";
 import AccountInfo from "./account-info.tsx";
 import { Button } from "react-bootstrap";
 import { setAccountInfo } from "../../store/slices/accountSlice.ts";
 
-const AccountWindow: React.FC = () => {
+const AccountWindow: FC = () => {
     const dispatch = useDispatch();
     const { firstname } = useSelector((state: RootState) => state.accountInfo.user);
     const { isLoggedIn } = useSelector((state: RootState) => state.accountInfo);

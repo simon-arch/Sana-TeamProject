@@ -55,7 +55,7 @@ const userSlice = createSlice(
                         }`);
             },
             setError(state, action) {
-                state.status = 'error',
+                state.status = 'error'
                 state.error = action.payload.error
             }
         }
