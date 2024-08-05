@@ -1,4 +1,4 @@
-import config from '../../../../config.json'
+import config from '../../../../config.json';
 
 export const sendRequest = async (query: string) => {
   const response = await fetch(config.apiEndpoint, {
@@ -12,7 +12,7 @@ export const sendRequest = async (query: string) => {
       query: query
     })
   });
-  
+
   const json = await response.json();
 
   if (json.errors) {

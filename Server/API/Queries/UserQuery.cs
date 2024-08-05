@@ -1,5 +1,4 @@
-﻿using Azure;
-using GraphQL;
+﻿using GraphQL;
 using GraphQL.Types;
 using Server.API.Types;
 using Server.Authorization;

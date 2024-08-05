@@ -4,7 +4,7 @@ namespace Server.Data
 {
     public class DbProvider(IConfiguration configuration)
     {
-        public SqlConnection Connection { get; } = 
-            new SqlConnection(configuration.GetConnectionString("Default"));
+        public SqlConnection Connection =>
+            new(configuration.GetConnectionString("Default"));
     }
 }

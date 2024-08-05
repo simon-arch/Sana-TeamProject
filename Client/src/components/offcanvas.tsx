@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import {useAppSelector} from "../hooks/redux.ts";
 
 interface Props extends PropsWithChildren<any> {
     children?: React.ReactElement; // content that will be displayed inside a canvas body.
@@ -25,8 +26,12 @@ function OffCanvas({
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const permissions = useSelector((state: RootState) => state.accountInfo.user.permissions);
-    var isAvailable = true;
+    const {user, status} = useAppSelector(state => state.accountInfo);
+    const permissions = user.permissions;
+    console.log(status);
+
+
+    let isAvailable = true;
     if (permission != "any") {
         if (typeof permission === "string") {
             isAvailable = permissions.includes(permission);

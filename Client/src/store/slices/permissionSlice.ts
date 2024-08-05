@@ -25,8 +25,8 @@ const permissionSlice = createSlice(
                 state.permissions = action.payload.map((perm: string) => perm );
             },
             setError(state, action) {
-                state.status = 'error',
-                state.error = action.payload.error
+                state.status = 'error';
+                state.error = action.payload.error;
             }
         }
     }

@@ -43,14 +43,14 @@ const userSlice = createSlice(
                 state;
                 sendRequest(`mutation {
                                 user {
-                                    set_role(username:${action.payload.username}, role:${action.payload.role}) { username }
+                                    set_role(username:"${action.payload.username}", role:${action.payload.role}) { username role }
                                 }
                         }`);
             },
             setUserPermissions(_, action) {
                 sendRequest(`mutation {
                                 user {
-                                    set_permissions(username:"${action.payload.username}", permissions:[${action.payload.permissions}]) { username }
+                                    set_permissions(username:"${action.payload.username}", permissions:[${action.payload.permissions}]) { username permissions }
                                 }
                         }`);
             },

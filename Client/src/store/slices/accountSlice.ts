@@ -4,12 +4,14 @@ import { User } from './userSlice';
 
 export interface AccountState {
     user: User;
+    status: 'idle' | 'loading' | 'error';
     error: string | null;
     isLoggedIn: boolean | null;
 }
 
 export const initialState: AccountState = {
     user: <User>{},
+    status: 'loading',
     error: null,
     isLoggedIn: null,
 };
@@ -25,13 +27,22 @@ const accountSlice = createSlice({
     reducers: {
         //@ts-ignore
         getAccessToken(state, action) {},
-        setAccountInfo: (state, action: PayloadAction<string>) => {
+        setTokenPayload: (state, action: PayloadAction<string>) => {
             localStorage.setItem('authToken', action.payload);
             const data: JWTData = jwtDecode(action.payload) as JWTData;
             state.user.username = data.sub;
-            state.user.permissions = (Array.isArray(data.permissions)) ? data.permissions : [data.permissions];
             state.error = null;
             state.isLoggedIn = true;
+        },
+        getAccountInfo(state, action) {
+            state.status = 'loading';
+        },
+        setAccountInfo(state, action) {
+            state.user.firstname = action.payload.firstName;
+            state.user.lastname = action.payload.lastName;
+            state.user.role = action.payload.role;
+            state.user.permissions = action.payload.permissions;
+            state.status = 'idle';
         },
         setError: (state, action: PayloadAction<string>) => {
             state.error = action.payload;
@@ -46,5 +57,13 @@ const accountSlice = createSlice({
     },
 });
 
-export const { getAccessToken, setAccountInfo, setError, logout } = accountSlice.actions;
+export const {
+    getAccessToken,
+    setTokenPayload,
+    getAccountInfo,
+    setAccountInfo,
+    setError,
+    logout
+} = accountSlice.actions;
+
 export default accountSlice.reducer;
