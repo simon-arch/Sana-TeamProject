@@ -4,9 +4,9 @@ import {from, mergeMap, of} from "rxjs";
 import {catchError} from "rxjs/operators";
 import {getAccountInfo, logout, setAccountInfo, setError} from "../slices/accountSlice.ts";
 
-const AccountEpic = (action$) => action$.pipe(
+const AccountEpic = (action$: any) => action$.pipe(
     ofType(getAccountInfo.type),
-    mergeMap((action) => from(sendRequest(
+    mergeMap((action: any) => from(sendRequest(
         `query { user { get(username: "${action.payload}") { username, firstName, lastName, role, permissions } } }`
     ))
         .pipe(

@@ -5,6 +5,7 @@ import {useAppSelector} from "../../hooks/redux.ts";
 import {BsCheck2} from "react-icons/bs";
 import RoleField from "./RoleField.tsx";
 import PermissionSelect from "./PermissionSelect.tsx";
+import config from '../../../config.json';
 
 interface ModalProps {
     show: boolean;
@@ -45,7 +46,9 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                         </FormGroup>
                         <RoleField user={props.user} setEdited={setRoleEdited} isConfirm={isConfirm} setConfirm={setConfirm}  isEdited={roleEdited}/>
                         <PermissionSelect user={props.user} setEdited={setPermissionsEdited} isConfirm={isConfirm} setConfirm={setConfirm} isEdited={permissionsEdited}/>
-                        {props.user.username !== account.username
+                        {(props.user.username !== account.username 
+                            && (account.permissions.includes(config.permissions.MANAGE_USER_ROLES) 
+                            || account.permissions.includes(config.permissions.MANAGE_USER_PERMISSIONS)))
                             &&
                             <div className="text-end mt-4">
                                 <Button variant="success"

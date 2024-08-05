@@ -4,6 +4,7 @@ import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {setUserRole, User} from "../../store/slices/userSlice.ts";
 import {BsArrowCounterclockwise} from "react-icons/bs";
 import {Capitalize} from "../../helpers/format.ts";
+import config from '../../../config.json';
 
 interface RoleFieldProps {
     user: User,
@@ -54,9 +55,9 @@ const RoleField = (props : RoleFieldProps) => {
     return (
         <FormGroup className="mb-2">
             <FormLabel>Role</FormLabel>
-            {props.user.username === account.username
+            {props.user.username === account.username || !account.permissions.includes(config.permissions.MANAGE_USER_ROLES) 
                 ?
-                <FormControl name="role" type="text" value={Capitalize(account.role)} readOnly/>
+                <FormControl name="role" type="text" value={Capitalize(props.user.role)!} readOnly/>
                 :
                 <div className="d-flex gap-2">
                     <FormSelect value={role} onChange={handleChange}>

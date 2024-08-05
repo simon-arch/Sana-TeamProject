@@ -30,7 +30,7 @@ const UseTokenRefresh = () => {
             if (!token) return null;
 
             const decodedToken = jwtDecode(token);
-            return decodedToken.exp * 1000;
+            return decodedToken.exp! * 1000;
         }
 
         async function checkAndRefresh() {

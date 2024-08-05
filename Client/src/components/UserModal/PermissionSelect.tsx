@@ -96,7 +96,7 @@ const PermissionSelect = (props: Props) => {
             <FormLabel className="d-flex justify-content-between">
                 <span>Permissions</span>
                 <div className="w-50 d-flex gap-2">
-                    {props.user.username !== account.username && (
+                    {(props.user.username !== account.username && account.permissions.includes(config.permissions.MANAGE_USER_ROLES)) && (
                         <>
                             <Form.Select className="roleManager-select form-select-sm" value={preset} onChange={handlePresetChange}>
                                 <option value="" disabled>Optional preset...</option>
@@ -118,7 +118,7 @@ const PermissionSelect = (props: Props) => {
                                 <input className="mx-2"
                                        type="checkbox"
                                        checked= {targetCheckboxes[perm] || false}
-                                       disabled={props.user.username == account.username}
+                                       disabled={props.user.username == account.username || !account.permissions.includes(config.permissions.MANAGE_USER_ROLES) }
                                        name={perm}
                                        id={perm}
                                        onChange={() => handleCheckboxChange(perm)}/>

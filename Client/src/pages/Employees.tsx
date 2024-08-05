@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../hooks/redux.ts";
 import {getUsers, User} from "../store/slices/userSlice.ts";
-import {FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Pagination, Table} from "react-bootstrap";
+import {FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Table} from "react-bootstrap";
 import {HiMagnifyingGlass} from "react-icons/hi2";
 import UserModal from "../components/UserModal/UserModal.tsx";
 import {getRoles} from "../store/slices/roleSlice.ts";
@@ -10,9 +10,17 @@ import {Capitalize} from "../helpers/format.ts";
 
 const Employees = () => {
     const dispatch = useAppDispatch();
+    const usersRaw = useAppSelector(state => state.users.users);
 
+    useEffect(() => {
+        setUsers(usersRaw);
+    }, [dispatch, usersRaw])
+
+    const [users, setUsers] = useState<User[]>(usersRaw);
     const [show, setShow] = useState(false);
-    const [user, setUser] = useState<User>(null);
+    const [user, setUser] = useState<User>(null!);
+    const [sort, setSort] = useState("name");
+    const [prompt, setPrompt] = useState("");
 
     const openModal = (user : User) => {
         setShow(true);
@@ -20,17 +28,33 @@ const Employees = () => {
     }
 
     useEffect(() => {
+        const source = [...users];
+        switch (sort) {
+            case "name":
+                source.sort((a, b) => a.username.localeCompare(b.username));
+                break;
+            case "role":
+                source.sort((a, b) => a.role.localeCompare(b.role));
+                break;
+        }
+        setUsers(source);
+    }, [dispatch, sort]);
+
+    useEffect(() => {
         dispatch(getRoles());
         dispatch(getPermissions());
     }, [dispatch]);
-
-    const users = useAppSelector(state => state.users.users);
-
 
     useEffect(() => {
         dispatch(getUsers());
     }, [dispatch, show]);
 
+    useEffect(() => {
+        setSort("name");
+        setUsers(usersRaw);
+        const source = [...usersRaw].filter(user => user.username.startsWith(prompt));
+        setUsers(source);
+    }, [prompt])
 
     return (
         <div className="p-3">
@@ -42,15 +66,14 @@ const Employees = () => {
             <div className="my-3 d-flex gap-4">
                 <InputGroup className="w-25">
                     <InputGroup.Text><HiMagnifyingGlass/></InputGroup.Text>
-                    <FormControl type="text" placeholder="Quick search..."/>
+                    <FormControl type="text" placeholder="Quick search..." value={prompt} onChange={(e) => setPrompt(e.target.value)}/>
                 </InputGroup>
                 <FormGroup className="w-25 d-flex align-items-center">
                     <FormLabel className="text-secondary my-0 me-2"><small>Sort by</small></FormLabel>
-                    <FormSelect className="w-75">
-                        <option value="none">None</option>
+                    <FormSelect className="w-75" value={sort} onChange={(e) => setSort(e.target.value)}>
                         <option value="name">Name</option>
                         <option value="role">Role</option>
-                        <option value="role">Status</option>
+                        <option value="status">Status [NOT IMPLEMENTED]</option>
                     </FormSelect>
                 </FormGroup>
             </div>
@@ -58,7 +81,6 @@ const Employees = () => {
             <Table hover className="border shadow rounded mb-5">
                 <thead>
                 <tr>
-                    <td></td>
                     <td className="px-3 text-start text-secondary bg-light">Name</td>
                     <td className="px-3 text-start text-secondary bg-light">Role</td>
                     <td className="text-secondary bg-light">Status</td>
@@ -68,7 +90,6 @@ const Employees = () => {
                 <tbody>
                 {users.map((user, index) => (
                 <tr key={index}>
-                    <td></td>
                     <td className="p-3 text-start">{user.firstname} {user.lastname}</td>
                     <td className="p-3 text-start">{Capitalize(user.role)}</td>
                     <td className="p-3">
@@ -78,8 +99,8 @@ const Employees = () => {
                 </tr>))}
                 </tbody>
             </Table>
-            {/*placeholder*/}
-            <div className="d-flex justify-content-between">
+            {/*placeholder
+                <div className="d-flex justify-content-between">
                 <Pagination>
                     <Pagination.First/>
                     <Pagination.Prev/>
@@ -92,7 +113,7 @@ const Employees = () => {
                     <Pagination.Last/>
                 </Pagination>
                 <small className="text-secondary">Displaying 10 of 100</small>
-            </div>
+            </div> */}
         </div>
     );
 };

@@ -34,6 +34,7 @@ const accountSlice = createSlice({
             state.error = null;
             state.isLoggedIn = true;
         },
+        //@ts-ignore
         getAccountInfo(state, action) {
             state.status = 'loading';
         },
