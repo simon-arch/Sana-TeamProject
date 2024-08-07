@@ -72,7 +72,7 @@ const userSlice = createSlice(
                 state.status = "idle";
             },
 
-            deleteUser(state) {
+            deleteUser(state, action: PayloadAction<{ username: string }>) {
                 state.status = 'loading';
             },
             deleteUserSuccess(state, action: PayloadAction<string>) {

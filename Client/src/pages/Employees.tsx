@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../hooks/redux.ts";
 import {deleteUser, getUsers, User} from "../store/slices/userSlice.ts";
 import {Button, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Table} from "react-bootstrap";
@@ -35,8 +35,9 @@ const Employees = () => {
         setShowRegisterModal(true);
     };
 
-    const handleDeleteUser = (username: string) => {
-        dispatch(deleteUser(username));
+    const handleDeleteUser = (user: User) => {
+        // console.log("Deleting user:", user.username);
+        dispatch(deleteUser(user.username));
     }
 
     useEffect(() => {
@@ -117,7 +118,7 @@ const Employees = () => {
                         <td className="p-3">
                             <button onClick={() => openModal(user)} className="btn border py-0 px-2">...</button>
                             {(user.username !== account.username && account.permissions.includes(config.permissions.DELETE_USER)) &&
-                                <Button onClick={() => handleDeleteUser(user.username)} variant="danger" className="py-0 px-2 ms-2" >X</Button>
+                                <Button onClick={() => handleDeleteUser(user)} variant="danger" className="py-0 px-2 ms-2" >X</Button>
                             }
 
                         </td>

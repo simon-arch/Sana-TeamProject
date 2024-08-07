@@ -50,8 +50,7 @@ export const userInfoEpic = createEpic(
 export const registerUserEpic = createEpic(
     registerRequest.type,
     (action: any) => {
-        const { username, password, firstname, lastname, role, permissions } = action.payload;
-        console.log('Register request action:', action);
+        const {username, password, firstname, lastname, role, permissions} = action.payload;
         return `
         mutation {
             auth {
@@ -73,30 +72,23 @@ export const registerUserEpic = createEpic(
             }
         }`;
     },
-    (data) => {
-        console.log('Register response data:', data);
-        const newUser = data.data.auth.register;
-        return  registerSuccess(newUser);
-    },
-    (error) => {
-        console.error('Register error:', error);
-        return setError(error.message);
-    }
+    data => registerSuccess(data.data.auth.register),
+    error => setError(error.message)
 );
 
 
 export const deleteUserEpic = createEpic(
     deleteUser.type,
-    (action: any) => `
-    mutation {
-        user {
-            delete(username: "${action.payload.username}") { username }
-        }
-    }`,
-    data => {
-        console.log(data);
-        return deleteUserSuccess(data.data.user.delete_user.username);
+    (action: any) => {
+        const username = action.payload;
+        return `mutation {
+                    user {
+                        delete_user(username: "${username}") { username }
+                    }
+            }`;
     },
+
+    data => deleteUserSuccess(data.data.user.delete_user.username),
     error => setError(error.message)
 );
 

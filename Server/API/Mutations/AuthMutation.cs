@@ -45,9 +45,7 @@ public sealed class AuthMutation : ObjectGraphType
                 context.WithPermission(Permission.REGISTER_USER);
 
                 var user = context.GetArgument<User>("user");
-                Console.WriteLine($"Received user argument: {new { user.Username, user.FirstName, user.LastName, user.Role, user.Permissions }}");
                 var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
-
                 var duplicate = await userRepository.GetAsync(user.Username);
 
                 if (duplicate != null)
@@ -60,8 +58,6 @@ public sealed class AuthMutation : ObjectGraphType
 
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
                 await context.RequestServices!.GetRequiredService<IUserRepository>().InsertAsync(user);
-                Console.WriteLine($"User registered: {new {user.Username, user.FirstName, user.LastName, user.Role, user.Permissions }}");
-
                 return user;
             });
 

@@ -55,12 +55,10 @@ public sealed class UserMutation : ObjectGraphType
                 context.WithPermission(Permission.DELETE_USER);
 
                 var username = context.GetArgument<string>("username");
-
                 var user = await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username)
                            ?? throw new ExecutionError("User not found") { Code = ResponseCode.BadRequest };
 
                 await context.RequestServices!.GetRequiredService<IUserRepository>().DeleteAsync(user.Username);
-
                 return user;
             });
 
