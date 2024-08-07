@@ -1,16 +1,19 @@
 import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../hooks/redux.ts";
-import {getUsers, User} from "../store/slices/userSlice.ts";
-import {FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Table} from "react-bootstrap";
+import {deleteUser, getUsers, User} from "../store/slices/userSlice.ts";
+import {Button, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Table} from "react-bootstrap";
 import {HiMagnifyingGlass} from "react-icons/hi2";
 import UserModal from "../components/UserModal/UserModal.tsx";
 import {getRoles} from "../store/slices/roleSlice.ts";
 import {getPermissions} from "../store/slices/permissionSlice.ts";
 import {Capitalize} from "../helpers/format.ts";
+import config from '../../config.json';
+import RegisterUserModal from "../components/UserModal/RegisterUserModal.tsx";
 
 const Employees = () => {
     const dispatch = useAppDispatch();
     const usersRaw = useAppSelector(state => state.users.users);
+    const account = useAppSelector<User>(state => state.accountInfo.user);
 
     useEffect(() => {
         setUsers(usersRaw);
@@ -19,12 +22,23 @@ const Employees = () => {
     const [users, setUsers] = useState<User[]>(usersRaw);
     const [show, setShow] = useState(false);
     const [user, setUser] = useState<User>(null!);
+    const [newUser, setNewUser] = useState<User>();
+    const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [sort, setSort] = useState("name");
     const [prompt, setPrompt] = useState("");
 
-    const openModal = (user : User) => {
+    const openModal = (user: User) => {
         setShow(true);
         setUser(user);
+    }
+
+    const openRegisterModal = () => {
+        setShowRegisterModal(true);
+        setNewUser(newUser);
+    };
+
+    const handleDeleteUser = (username: string) => {
+        dispatch(deleteUser(username));
     }
 
     useEffect(() => {
@@ -63,21 +77,28 @@ const Employees = () => {
                 <p className="text-secondary">Complete list of employees</p>
             </div>
             {/*placeholder*/}
-            <div className="my-3 d-flex gap-4">
-                <InputGroup className="w-25">
-                    <InputGroup.Text><HiMagnifyingGlass/></InputGroup.Text>
-                    <FormControl type="text" placeholder="Quick search..." value={prompt} onChange={(e) => setPrompt(e.target.value)}/>
-                </InputGroup>
-                <FormGroup className="w-25 d-flex align-items-center">
-                    <FormLabel className="text-secondary my-0 me-2"><small>Sort by</small></FormLabel>
-                    <FormSelect className="w-75" value={sort} onChange={(e) => setSort(e.target.value)}>
-                        <option value="name">Name</option>
-                        <option value="role">Role</option>
-                        <option value="status">Status [NOT IMPLEMENTED]</option>
-                    </FormSelect>
-                </FormGroup>
+            <div className="my-3 d-flex justify-content-between">
+                <div className="d-flex w-75 gap-4">
+                    <InputGroup className="w-25">
+                        <InputGroup.Text><HiMagnifyingGlass/></InputGroup.Text>
+                        <FormControl type="text" placeholder="Quick search..." value={prompt}
+                                     onChange={(e) => setPrompt(e.target.value)}/>
+                    </InputGroup>
+                    <FormGroup className="w-25 d-flex align-items-center">
+                        <FormLabel className="text-secondary my-0 me-2"><small>Sort by</small></FormLabel>
+                        <FormSelect className="w-75" value={sort} onChange={(e) => setSort(e.target.value)}>
+                            <option value="name">Name</option>
+                            <option value="role">Role</option>
+                            <option value="status">Status [NOT IMPLEMENTED]</option>
+                        </FormSelect>
+                    </FormGroup>
+                </div>
+                {(account.permissions.includes(config.permissions.REGISTER_USER)) &&
+                    <Button onClick={() => openRegisterModal()}>Add +</Button>
+                }
             </div>
             <UserModal show={show} onHide={() => setShow(false)} user={user}/>
+            <RegisterUserModal show={showRegisterModal} onHide={() => setShowRegisterModal(false)} newUser={newUser} />
             <Table hover className="border shadow rounded mb-5">
                 <thead>
                 <tr>
@@ -89,14 +110,20 @@ const Employees = () => {
                 </thead>
                 <tbody>
                 {users.map((user, index) => (
-                <tr key={index}>
-                    <td className="p-3 text-start">{user.firstname} {user.lastname}</td>
-                    <td className="p-3 text-start">{Capitalize(user.role)}</td>
-                    <td className="p-3">
-                        <span className="px-3 py-1 text-success rounded-pill border border-success">active</span>
-                    </td>
-                    <td className="p-3"><button onClick={() => openModal(user)} className="btn border py-0 px-2">...</button></td>
-                </tr>))}
+                    <tr key={index}>
+                        <td className="p-3 text-start">{user.firstname} {user.lastname}</td>
+                        <td className="p-3 text-start">{Capitalize(user.role)}</td>
+                        <td className="p-3">
+                            <span className="px-3 py-1 text-success rounded-pill border border-success">active</span>
+                        </td>
+                        <td className="p-3">
+                            <button onClick={() => openModal(user)} className="btn border py-0 px-2">...</button>
+                            {(user.username !== account.username && account.permissions.includes(config.permissions.DELETE_USER)) &&
+                                <Button onClick={() => handleDeleteUser(user.username)} variant="danger" className="py-0 px-2 ms-2" >X</Button>
+                            }
+
+                        </td>
+                    </tr>))}
                 </tbody>
             </Table>
             {/*placeholder

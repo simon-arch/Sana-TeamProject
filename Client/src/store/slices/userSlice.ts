@@ -1,8 +1,9 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import { sendRequest } from "../epics/helpers/request";
 
 export interface User {
     username: string;
+    password: string;
     firstname: string;
     lastname: string;
     role: string;
@@ -32,6 +33,7 @@ const userSlice = createSlice(
             setUsers(state, action) {
                 state.users = Object.keys(action.payload).map(index => ({
                     username: action.payload[index].username,
+                    password: action.payload[index].password,
                     firstname: action.payload[index].firstName,
                     lastname: action.payload[index].lastName,
                     role: action.payload[index].role,
@@ -54,6 +56,23 @@ const userSlice = createSlice(
                                 }
                         }`);
             },
+            registerRequest(state, action: PayloadAction<User>) {
+                state.status = 'loading';
+                console.log('State request:', action.payload);
+            },
+            registerSuccess(state, action: PayloadAction<User>) {
+                state.users.push(action.payload);
+                state.status = 'idle';
+                console.log('User added to state:', action.payload);
+            },
+
+            deleteUser(state) {
+                state.status = 'loading';
+            },
+            deleteUserSuccess(state, action: PayloadAction<string>) {
+                state.users = state.users.filter(user => user.username !== action.payload);
+                state.status = 'idle';
+            },
             setError(state, action) {
                 state.status = 'error'
                 state.error = action.payload.error
@@ -67,6 +86,10 @@ export const {
     setUsers,
     setUserRole,
     setUserPermissions,
+    registerRequest,
+    registerSuccess,
+    deleteUser,
+    deleteUserSuccess,
     setError
 } = userSlice.actions;
 
