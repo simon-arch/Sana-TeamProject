@@ -65,7 +65,6 @@ export const registerUserEpic = createEpic(
                 }) 
                 { 
                     username 
-                    password
                     firstName 
                     lastName 
                     role 
@@ -74,11 +73,12 @@ export const registerUserEpic = createEpic(
             }
         }`;
     },
-    data => {
+    (data) => {
         console.log('Register response data:', data);
-        return registerSuccess(data.data.user.register);
+        const newUser = data.data.auth.register;
+        return  registerSuccess(newUser);
     },
-    error => {
+    (error) => {
         console.error('Register error:', error);
         return setError(error.message);
     }

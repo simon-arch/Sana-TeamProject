@@ -4,8 +4,8 @@ import { sendRequest } from "../epics/helpers/request";
 export interface User {
     username: string;
     password: string;
-    firstname: string;
-    lastname: string;
+    firstName: string;
+    lastName: string;
     role: string;
     permissions: string[];
 }
@@ -18,7 +18,7 @@ export interface UserState {
 
 const initialState: UserState = {
     users: [],
-    status: 'loading',
+    status: 'idle',
     error: null
 };
 
@@ -61,9 +61,15 @@ const userSlice = createSlice(
                 console.log('State request:', action.payload);
             },
             registerSuccess(state, action: PayloadAction<User>) {
-                state.users.push(action.payload);
-                state.status = 'idle';
-                console.log('User added to state:', action.payload);
+                state.users.push({
+                    username: action.payload.username,
+                    password: action.payload.password,
+                    firstname: action.payload.firstName,
+                    lastname: action.payload.lastName,
+                    role: action.payload.role,
+                    permissions: action.payload.permissions,
+                });
+                state.status = "idle";
             },
 
             deleteUser(state) {

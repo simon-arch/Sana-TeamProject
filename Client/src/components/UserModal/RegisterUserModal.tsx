@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Button, FormCheck, FormControl, FormGroup, FormLabel, FormSelect, Modal} from "react-bootstrap";
 import {BsCheck2} from "react-icons/bs";
-import {registerRequest, registerSuccess, setError, User} from "../../store/slices/userSlice.ts";
+import {registerRequest, setError} from "../../store/slices/userSlice.ts";
 import {useAppDispatch} from "../../hooks/redux.ts";
 
 import {getPermissions} from "../../store/slices/permissionSlice.ts";
@@ -16,8 +16,6 @@ interface ModalProps {
     show: boolean,
 
     onHide(): void,
-
-    newUser?: User | undefined
 }
 
 const data: Config = config as Config;
@@ -61,14 +59,20 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
         e.preventDefault();
         if (username && firstName && lastName && password && role) {
             dispatch(registerRequest({
-                username,
+                username: username,
                 firstname: firstName,
                 lastname: lastName,
-                password,
-                role,
+                password: password,
+                role: role,
                 permissions: selectedPermissions
             }));
-            console.log('User registered', username, firstName, lastName, password, role, selectedPermissions);
+            setUsername('');
+            setFirstName('');
+            setLastName('');
+            setPassword('');
+            setRole('');
+            setSelectedPermissions([]);
+            setPreset('');
             props.onHide();
         } else {
             dispatch(setError('All fields are required.'));

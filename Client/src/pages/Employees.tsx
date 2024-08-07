@@ -22,7 +22,6 @@ const Employees = () => {
     const [users, setUsers] = useState<User[]>(usersRaw);
     const [show, setShow] = useState(false);
     const [user, setUser] = useState<User>(null!);
-    const [newUser, setNewUser] = useState<User>();
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [sort, setSort] = useState("name");
     const [prompt, setPrompt] = useState("");
@@ -34,7 +33,6 @@ const Employees = () => {
 
     const openRegisterModal = () => {
         setShowRegisterModal(true);
-        setNewUser(newUser);
     };
 
     const handleDeleteUser = (username: string) => {
@@ -98,7 +96,7 @@ const Employees = () => {
                 }
             </div>
             <UserModal show={show} onHide={() => setShow(false)} user={user}/>
-            <RegisterUserModal show={showRegisterModal} onHide={() => setShowRegisterModal(false)} newUser={newUser} />
+            <RegisterUserModal show={showRegisterModal} onHide={() => setShowRegisterModal(false)} />
             <Table hover className="border shadow rounded mb-5">
                 <thead>
                 <tr>
