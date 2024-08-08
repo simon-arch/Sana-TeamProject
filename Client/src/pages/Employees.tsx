@@ -52,7 +52,7 @@ const Employees = () => {
     useEffect(() => {
         setSort("name");
         setUsers(usersRaw);
-        const source = [...usersRaw].filter(user => user.username.startsWith(prompt));
+        const source = [...usersRaw].filter(user => `${user.firstname} ${user.lastname}`.toLowerCase().startsWith(prompt));
         setUsers(source);
     }, [prompt])
 

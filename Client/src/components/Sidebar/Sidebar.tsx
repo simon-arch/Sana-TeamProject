@@ -1,10 +1,10 @@
 import {FC, useEffect} from 'react';
-import {BsDoorOpenFill, BsFillJournalBookmarkFill, BsFillPersonLinesFill, BsPeopleFill, BsQuestionOctagon} from "react-icons/bs";
+import {BsDoorOpenFill, BsEnvelopeFill, BsFillPersonLinesFill, BsPeopleFill, BsQuestionOctagon, BsUiChecksGrid} from "react-icons/bs";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {Link} from "react-router-dom";
 import {getAccountInfo, logout} from "../../store/slices/accountSlice.ts";
 import {Capitalize} from '../../helpers/format.ts';
-import { Badge } from 'react-bootstrap';
+import {Badge} from 'react-bootstrap';
 
 const Sidebar : FC = () => {
     const dispatch = useAppDispatch();
@@ -30,7 +30,7 @@ const Sidebar : FC = () => {
             <ul className="list-unstyled">
                 <div className="p-3">
                     <li className="my-1">
-                        <BsFillJournalBookmarkFill className="me-1"/>
+                        <BsUiChecksGrid className="me-1"/>
                         <Link to="/" className="text-decoration-none text-black">Dashboard</Link>
                     </li>
                     <li className="my-1">
@@ -48,8 +48,8 @@ const Sidebar : FC = () => {
                         <Link to="/employees" className="text-decoration-none text-black">Employees</Link>
                     </li>
                     <li className="my-1">
-                        <BsQuestionOctagon className="me-1"/>
-                        <Link to="/" className="text-decoration-none text-black">Placeholder</Link>
+                        <BsEnvelopeFill className="me-1"/>
+                        <Link to="/appeals" className="text-decoration-none text-black">Appeals</Link>
                     </li>
                 </div>
                 <hr className="mx-3 my-0"/>
