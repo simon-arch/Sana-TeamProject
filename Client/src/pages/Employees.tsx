@@ -10,7 +10,7 @@ import {Capitalize} from "../helpers/format.ts";
 
 const Employees = () => {
     const dispatch = useAppDispatch();
-    const usersRaw = useAppSelector(state => state.users.users);
+    const usersRaw = useAppSelector<User[]>(state => state.users.users);
 
     useEffect(() => {
         setUsers(usersRaw);

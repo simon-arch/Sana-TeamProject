@@ -27,6 +27,7 @@ internal class Program
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IAppealRepository, AppealRepository>();
+        builder.Services.AddScoped<ITimeStampRepository, TimeStampRepository>();
 
         builder.Services.AddCors(options => options
             .AddDefaultPolicy(policy => policy

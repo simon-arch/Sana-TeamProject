@@ -36,7 +36,7 @@ function App() {
                         </div>
                         <div className="col-10">
                             <Routes>
-                                <Route path="/" element={<Dashboard/>}/>
+                                <Route path="/dashboard" element={<Dashboard/>}/>
                                 <Route path="/employees" element={<Employees/>}/>
                                 <Route path="/appeals" element={<Appeals/>}/>
 

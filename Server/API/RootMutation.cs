@@ -12,6 +12,7 @@ namespace Server.API
             Field<AuthMutation>("auth").Resolve(context => new { });
             Field<UserMutation>("user").Resolve(context => new { });
             Field<AppealMutation>("appeal").Resolve(context => new { });
+            Field<TimeStampMutation>("timeStamp").Resolve(context => new { });
         }
     }
 }
