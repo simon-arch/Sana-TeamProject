@@ -1,10 +1,11 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import { sendRequest } from "../epics/helpers/request";
 
 export interface User {
     username: string;
-    firstname: string;
-    lastname: string;
+    password: string;
+    firstName: string;
+    lastName: string;
     role: string;
     permissions: string[];
 }
@@ -17,7 +18,7 @@ export interface UserState {
 
 const initialState: UserState = {
     users: [],
-    status: 'loading',
+    status: 'idle',
     error: null
 };
 
@@ -32,8 +33,9 @@ const userSlice = createSlice(
             setUsers(state, action) {
                 state.users = Object.keys(action.payload).map(index => ({
                     username: action.payload[index].username,
-                    firstname: action.payload[index].firstName,
-                    lastname: action.payload[index].lastName,
+                    password: action.payload[index].password,
+                    firstName: action.payload[index].firstName,
+                    lastName: action.payload[index].lastName,
                     role: action.payload[index].role,
                     permissions: action.payload[index].permissions
                 }));
@@ -54,6 +56,30 @@ const userSlice = createSlice(
                                 }
                         }`);
             },
+            //@ts-ignore
+            registerRequest(state, action: PayloadAction<User>) {
+                state.status = 'loading';
+            },
+            registerSuccess(state, action: PayloadAction<User>) {
+                state.users.push({
+                    username: action.payload.username,
+                    password: action.payload.password,
+                    firstName: action.payload.firstName,
+                    lastName: action.payload.lastName,
+                    role: action.payload.role,
+                    permissions: action.payload.permissions,
+                });
+                state.status = "idle";
+            },
+
+            //@ts-ignore
+            deleteUser(state, action: PayloadAction<{ username: string }>) {
+                state.status = 'loading';
+            },
+            deleteUserSuccess(state, action: PayloadAction<string>) {
+                state.users = state.users.filter(user => user.username !== action.payload);
+                state.status = 'idle';
+            },
             setError(state, action) {
                 state.status = 'error'
                 state.error = action.payload.error
@@ -67,6 +93,10 @@ export const {
     setUsers,
     setUserRole,
     setUserPermissions,
+    registerRequest,
+    registerSuccess,
+    deleteUser,
+    deleteUserSuccess,
     setError
 } = userSlice.actions;
 

@@ -34,11 +34,11 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                     <>
                         <FormGroup className="mb-2">
                             <FormLabel>First name</FormLabel>
-                            <FormControl type="text" readOnly value={props.user.firstname}/>
+                            <FormControl type="text" readOnly value={props.user.firstName}/>
                         </FormGroup>
                         <FormGroup className="mb-2">
                             <FormLabel>Last name</FormLabel>
-                            <FormControl type="text" readOnly value={props.user.lastname}/>
+                            <FormControl type="text" readOnly value={props.user.lastName}/>
                         </FormGroup>
                         <FormGroup className="mb-2">
                             <FormLabel>Username</FormLabel>

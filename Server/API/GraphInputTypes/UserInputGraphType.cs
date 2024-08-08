@@ -3,7 +3,7 @@ using Server.Models;
 
 namespace Server.API.GraphInputTypes
 {
-    public class UserInputGraphType : InputObjectGraphType<User>
+    public sealed class UserInputGraphType : InputObjectGraphType<User>
     {
         public UserInputGraphType()
         {

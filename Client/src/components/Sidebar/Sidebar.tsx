@@ -22,7 +22,7 @@ const Sidebar : FC = () => {
         <div className="h-100 border">
             {status != 'loading' &&
                 <div className="py-2 ps-3">
-                    <h5 className="m-0">{user.firstname} {user.lastname}</h5>
+                    <h5 className="m-0">{user.firstName} {user.lastName}</h5>
                     <p className="m-0 text-secondary text-capitalize"><Badge>{Capitalize(user.role)}</Badge></p>
                 </div>
             }

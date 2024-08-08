@@ -39,8 +39,8 @@ const accountSlice = createSlice({
             state.status = 'loading';
         },
         setAccountInfo(state, action) {
-            state.user.firstname = action.payload.firstName;
-            state.user.lastname = action.payload.lastName;
+            state.user.firstName = action.payload.firstName;
+            state.user.lastName = action.payload.lastName;
             state.user.role = action.payload.role;
             state.user.permissions = action.payload.permissions;
             state.status = 'idle';

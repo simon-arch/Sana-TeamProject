@@ -1,107 +1,106 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using Server.API.GraphInputTypes;
-using Server.API.Types;
+using Server.API.GraphTypes;
 using Server.Authorization;
 using Server.Data.Repositories;
 using Server.Models;
 using Server.Services;
 
-namespace Server.API.Mutations
+namespace Server.API.Mutations;
+
+public sealed class AuthMutation : ObjectGraphType
 {
-    public class AuthMutation : ObjectGraphType
+    public AuthMutation(IHttpContextAccessor accessor)
     {
-        public AuthMutation(IHttpContextAccessor accessor)
-        {
-            Field<StringGraphType>("login")
-                .Argument<StringGraphType>("username")
-                .Argument<StringGraphType>("password")
-                .ResolveAsync(async context =>
+        Field<StringGraphType>("login")
+            .Argument<StringGraphType>("username")
+            .Argument<StringGraphType>("password")
+            .ResolveAsync(async context =>
+            {
+                var username = context.GetArgument<string>("username");
+                var password = context.GetArgument<string>("password");
+
+                var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+
+                var user = await userRepository.GetAsync(username);
+
+                if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
                 {
-                    var username = context.GetArgument<string>("username");
-                    var password = context.GetArgument<string>("password");
+                    throw new ExecutionError("Wrong credentials") { Code = ResponseCode.Unauthorized };
+                }
 
-                    var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
 
-                    var user = await userRepository.GetAsync(username);
+                user.TokenId = tokenService.SetRefreshTokenToCookie(accessor.HttpContext!);
+                await userRepository.UpdateAsync(user);
 
-                    if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                return tokenService.GenerateAccessToken(user);
+            });
+
+        Field<UserGraphType>("register")
+            .Argument<UserInputGraphType>("user")
+            .ResolveAsync(async context =>
+            {
+                context.WithPermission(Permission.REGISTER_USER);
+
+                var user = context.GetArgument<User>("user");
+                var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                var duplicate = await userRepository.GetAsync(user.Username);
+
+                if (duplicate != null)
+                {
+                    throw new ExecutionError("User with this username already exists")
                     {
-                        throw new ExecutionError("Wrong credentials") { Code = ResponseCode.Unauthorized };
-                    }
+                        Code = ResponseCode.BadRequest
+                    };
+                }
 
-                    var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+                await context.RequestServices!.GetRequiredService<IUserRepository>().InsertAsync(user);
+                return user;
+            });
 
-                    user.TokenId = tokenService.SetRefreshTokenToCookie(accessor.HttpContext!);
-                    await userRepository.UpdateAsync(user);
+        Field<StringGraphType>("refresh")
+            .ResolveAsync(async context =>
+            {
+                var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
 
-                    return tokenService.GenerateAccessToken(user);
-                });
+                var token = tokenService.GetRefreshTokenFromCookie(accessor.HttpContext!)
+                            ?? throw new ExecutionError("Token not found") { Code = ResponseCode.BadRequest };
 
-            Field<UserGraphType>("register")
-                .Argument<UserInputGraphType>("user")
-                .ResolveAsync(async context =>
-                {
-                    var user = context.GetArgument<User>("user");
-                    var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                var tokenId = tokenService.ValidateRefreshToken(token)
+                              ?? throw new ExecutionError("Token was corrupted") { Code = ResponseCode.BadRequest };
 
-                    var duplicate = await userRepository.GetAsync(user.Username);
+                var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                var user = await userRepository.GetAsync(tokenId)
+                           ?? throw new ExecutionError("Invalid Token") { Code = ResponseCode.BadRequest };
 
-                    if (duplicate != null)
-                    {
-                        throw new ExecutionError("User with this username already exists")
-                        {
-                            Code = ResponseCode.BadRequest
-                        };
-                    }  
+                user.TokenId = tokenService.SetRefreshTokenToCookie(accessor.HttpContext!);
+                await userRepository.UpdateAsync(user);
 
-                    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
-                    await userRepository.InsertAsync(user);
+                return tokenService.GenerateAccessToken(user);
+            });
 
-                    return user;
-                });
+        Field<BooleanGraphType>("logout")
+            .ResolveAsync(async context =>
+            {
+                var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
 
-            Field<StringGraphType>("refresh")
-                .ResolveAsync(async context =>
-                {
-                    var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
+                var token = tokenService.GetRefreshTokenFromCookie(accessor.HttpContext!)
+                            ?? throw new ExecutionError("Token not found") { Code = ResponseCode.BadRequest };
 
-                    var token = tokenService.GetRefreshTokenFromCookie(accessor.HttpContext!)
-                        ?? throw new ExecutionError("Token not found") { Code = ResponseCode.BadRequest };
+                var tokenId = tokenService.ValidateRefreshToken(token)
+                              ?? throw new ExecutionError("Token was corrupted") { Code = ResponseCode.BadRequest };
 
-                    var tokenId = tokenService.ValidateRefreshToken(token)
-                        ?? throw new ExecutionError("Token was corrupted") { Code = ResponseCode.BadRequest };
+                var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                var user = await userRepository.GetAsync(tokenId)
+                           ?? throw new ExecutionError("Invalid token") { Code = ResponseCode.Unauthorized };
 
-                    var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
-                    var user = await userRepository.GetAsync(tokenId) 
-                        ?? throw new ExecutionError("Invalid Token") { Code = ResponseCode.BadRequest };
+                user.TokenId = null;
+                await userRepository.UpdateAsync(user);
 
-                    user.TokenId = tokenService.SetRefreshTokenToCookie(accessor.HttpContext!);
-                    await userRepository.UpdateAsync(user);
-
-                    return tokenService.GenerateAccessToken(user);
-                });
-
-            Field<BooleanGraphType>("logout")
-                .ResolveAsync(async context =>
-                {
-                    var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
-
-                    var token = tokenService.GetRefreshTokenFromCookie(accessor.HttpContext!)
-                        ?? throw new ExecutionError("Token not found") { Code = ResponseCode.BadRequest };
-
-                    var tokenId = tokenService.ValidateRefreshToken(token) 
-                        ?? throw new ExecutionError("Token was corrupted") { Code = ResponseCode.BadRequest };
-
-                    var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
-                    var user = await userRepository.GetAsync(tokenId) 
-                        ?? throw new ExecutionError("Invalid token") { Code = ResponseCode.Unauthorized };
-
-                    user.TokenId = null;
-                    await userRepository.UpdateAsync(user);
-
-                    return true;
-                });
-        }
+                return true;
+            });
     }
 }
