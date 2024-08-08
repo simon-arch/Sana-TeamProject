@@ -58,5 +58,15 @@ namespace Server.Data.Repositories
                 WHERE Id=@Id";
             return _sql.ExecuteAsync(query, timeStamp);
         }
+
+        public Task<TimeStamp?> GetLatestAsync(string username)
+        {
+            string query = @$"
+                SELECT TOP(1) Id, Username, TimeStart, TimeEnd, Source
+                FROM TimeStamps
+                WHERE Username = '{username}'
+                ORDER BY CASE WHEN TimeEnd IS NULL THEN 0 ELSE 1 END, TimeEnd DESC";
+            return _sql.QueryFirstOrDefaultAsync<TimeStamp>(query);
+        }
     }
 }

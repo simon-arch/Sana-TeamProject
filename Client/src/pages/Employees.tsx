@@ -10,7 +10,7 @@ import {Capitalize} from "../helpers/format.ts";
 
 const Employees = () => {
     const dispatch = useAppDispatch();
-    const usersRaw = useAppSelector(state => state.users.users);
+    const usersRaw = useAppSelector<User[]>(state => state.users.users);
 
     useEffect(() => {
         setUsers(usersRaw);
@@ -52,7 +52,7 @@ const Employees = () => {
     useEffect(() => {
         setSort("name");
         setUsers(usersRaw);
-        const source = [...usersRaw].filter(user => user.username.startsWith(prompt));
+        const source = [...usersRaw].filter(user => `${user.firstname} ${user.lastname}`.toLowerCase().startsWith(prompt));
         setUsers(source);
     }, [prompt])
 

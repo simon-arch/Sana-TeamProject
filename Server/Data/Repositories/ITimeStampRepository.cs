@@ -5,6 +5,7 @@ namespace Server.Data.Repositories
     public interface ITimeStampRepository
     {
         Task<TimeStamp?> GetAsync(int id);
+        Task<TimeStamp?> GetLatestAsync(string username);
         Task<IEnumerable<TimeStamp>> GetAsync(string username);
         Task<IEnumerable<TimeStamp>> GetAllAsync();
         Task<int> InsertAsync(TimeStamp timeStamp);

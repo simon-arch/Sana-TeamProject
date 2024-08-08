@@ -31,7 +31,7 @@ const Sidebar : FC = () => {
                 <div className="p-3">
                     <li className="my-1">
                         <BsFillJournalBookmarkFill className="me-1"/>
-                        <Link to="/" className="text-decoration-none text-black">Dashboard</Link>
+                        <Link to="/dashboard" className="text-decoration-none text-black">Dashboard</Link>
                     </li>
                     <li className="my-1">
                         <BsQuestionOctagon className="me-1"/>

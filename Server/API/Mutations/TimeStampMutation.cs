@@ -39,8 +39,8 @@ namespace Server.API.Mutations
 
                     var timeStampRepository = context.RequestServices!.GetRequiredService<ITimeStampRepository>();
 
-                    var timeStamp = await timeStampRepository.GetAsync(id)
-                        ?? throw new ExecutionError("Time Stamp not found") { Code = ResponseCode.BadRequest };
+                    _ = await timeStampRepository.GetAsync(id)
+                        ?? throw new ExecutionError("Time stamp not found") { Code = ResponseCode.BadRequest };
 
                     await timeStampRepository.DeleteAsync(id);
 
@@ -56,15 +56,15 @@ namespace Server.API.Mutations
                     context.Authorize();
 
                     var id = context.GetArgument<int>("id");
-                    var timeStart = context.GetArgument<DateTime>("timeStart");
-                    var timeEnd = context.GetArgument<DateTime>("timeEnd");
+                    var timeStart = context.GetArgument<DateTime?>("timeStart");
+                    var timeEnd = context.GetArgument<DateTime?>("timeEnd");
 
                     var timeStampRepository = context.RequestServices!.GetRequiredService<ITimeStampRepository>();
                     var timeStamp = await timeStampRepository.GetAsync(id)
                         ?? throw new ExecutionError("Time Stamp not found") { Code = ResponseCode.BadRequest };
 
-                    timeStamp.TimeStart = timeStart;
-                    timeStamp.TimeEnd = timeEnd;
+                    if (timeStart != null) timeStamp.TimeStart = (DateTime)timeStart;
+                    if (timeEnd != null) timeStamp.TimeEnd = (DateTime)timeEnd;
 
                     await timeStampRepository.UpdateAsync(timeStamp);
 

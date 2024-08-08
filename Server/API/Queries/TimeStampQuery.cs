@@ -32,6 +32,18 @@ namespace Server.API.Queries
 
                     return await context.RequestServices!.GetRequiredService<ITimeStampRepository>().GetAsync(username);
                 });
+
+            Field<TimeStampGraphType>("get_latest")
+                .Argument<StringGraphType>("username")
+                .ResolveAsync(async context =>
+                {
+                    context.Authorize();
+
+                    var username = context.GetArgument<string>("username");
+
+                    var res = await context.RequestServices!.GetRequiredService<ITimeStampRepository>().GetLatestAsync(username);
+                    return res;
+                });
         }
     }
 }
