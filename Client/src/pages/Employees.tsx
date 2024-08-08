@@ -62,7 +62,6 @@ const Employees = () => {
                 <h1>Employees</h1>
                 <p className="text-secondary">Complete list of employees</p>
             </div>
-            {/*placeholder*/}
             <div className="my-3 d-flex gap-4">
                 <InputGroup className="w-25">
                     <InputGroup.Text><HiMagnifyingGlass/></InputGroup.Text>

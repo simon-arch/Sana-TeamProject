@@ -2,8 +2,6 @@ import "../assets/styles/offcanvas.css";
 import React, { PropsWithChildren, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import { useSelector } from "react-redux";
-import { RootState } from "../store";
 import {useAppSelector} from "../hooks/redux.ts";
 
 interface Props extends PropsWithChildren<any> {

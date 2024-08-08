@@ -46,8 +46,6 @@ const Appeals = () => {
         }).catch(error => setError(Capitalize(error.message)!));
     };
 
-    console.log(appeals);
-
     return (
         <div className="p-3">
             <div className="mb-5">
@@ -133,22 +131,20 @@ const Appeals = () => {
                                         </Badge>
                                     </Card.Header>
                                     <Card.Body>
-                                    <Card.Title>
-                                        <div className="d-flex justify-content-between">
-                                            <span className="ms-3">{appeal.title}</span>
-                                            <span className="me-4">{Capitalize(appeal.type)}</span>
-                                        </div>
-                                    </Card.Title>
-                                        <Card.Text>
-                                            <Accordion>
-                                                <Accordion.Item eventKey="0">
-                                                    <Accordion.Header>Description</Accordion.Header>
-                                                    <Accordion.Body>
-                                                    {appeal.description}
-                                                    </Accordion.Body>
-                                                </Accordion.Item>
-                                            </Accordion>
-                                        </Card.Text>
+                                        <Card.Title>
+                                            <div className="d-flex justify-content-between">
+                                                <span className="ms-3">{appeal.title}</span>
+                                                <span className="me-4">{Capitalize(appeal.type)}</span>
+                                            </div>
+                                        </Card.Title>
+                                        <Accordion>
+                                            <Accordion.Item eventKey="0">
+                                                <Accordion.Header>Description</Accordion.Header>
+                                                <Accordion.Body>
+                                                {appeal.description}
+                                                </Accordion.Body>
+                                            </Accordion.Item>
+                                        </Accordion>
                                     </Card.Body>
                                 </Card>
                             )) }

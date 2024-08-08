@@ -32,8 +32,8 @@ const Stopwatch = () => {
         let response;
         try {
             response = await sendRequest(
-                `query { timeStamp { get_latest(username: "${username}") { id timeStart timeEnd } } }`);
-        } catch (e) {
+                `query { timeStamp { get_latest(username: "${username}") { id timeStart timeEnd } } }`).catch(e => console.log(e));
+        } catch (e: any) {
             console.log(e.message);
             return;
         }
@@ -44,7 +44,7 @@ const Stopwatch = () => {
         const start = new Date(stamp.timeStart+"+00:00");
         stamp.timeStart = formatTime(start);
 
-        if(stamp.timeEnd) {
+        if(!stamp.timeEnd) {
             stamp.timeEnd = getCurrentTime();
             setLastCheckin(new Date().toLocaleDateString());
             setCurrentStamp(stamp);
@@ -68,7 +68,7 @@ const Stopwatch = () => {
         try {
             responce = await sendRequest(
                 `mutation { timeStamp { add(timeStamp: { username: "${username}", timeStart: "${start.toISOString()}", source: SYSTEM }) { id } } }`);
-        } catch (e) {
+        } catch (e: any) {
             console.log(e.message);
             setCurrentStamp({id: 0, timeStart: formatTime(start), timeEnd: formatTime(start)});
             return;
@@ -79,7 +79,7 @@ const Stopwatch = () => {
     const finishCurrent = async () => {
         try {
             await sendRequest(`mutation { timeStamp { set_time(id: ${currentStamp.id}, timeEnd: "${new Date().toISOString()}") } }`);
-        } catch (e) {
+        } catch (e: any) {
             console.log(e.message);
             return;
         }

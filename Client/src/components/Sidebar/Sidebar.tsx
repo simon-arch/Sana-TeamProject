@@ -62,8 +62,8 @@ const Sidebar : FC = () => {
                         <Link to="/" className="text-decoration-none text-black">About</Link>
                     </li>
                     <li className="my-1" onClick={handleLogout}>
-                        <BsDoorOpenFill className="me-1"/>
-                        <Link to="/login" className="text-decoration-none text-black">Logout</Link>
+                        <BsDoorOpenFill className="me-1 text-danger"/>
+                        <Link to="/login" className="text-decoration-none text-danger">Logout</Link>
                     </li>
                 </div>
             </ul>
