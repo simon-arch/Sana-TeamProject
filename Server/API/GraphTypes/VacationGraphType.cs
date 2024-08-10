@@ -3,18 +3,19 @@ using Server.Models;
 
 namespace Server.API.GraphTypes
 {
-    public class AppealGraphType : ObjectGraphType<Appeal>
+    public class VacationGraphType : ObjectGraphType<Vacation>
     {
-        public AppealGraphType() 
+        public VacationGraphType() 
         {
-            Name = "appeal";
+            Name = "vacation";
 
             Field(a => a.Id);
             Field(a => a.Title);
             Field(a => a.Description, nullable: true);
-            Field(a => a.Type);
             Field(a => a.Status);
             Field(a => a.Sender);
+            Field(a => a.StartDate);
+            Field(a => a.EndDate);
         }
     }
 }

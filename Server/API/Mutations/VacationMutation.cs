@@ -8,22 +8,22 @@ using Server.Models;
 
 namespace Server.API.Mutations
 {
-    public class AppealMutation : ObjectGraphType
+    public class VacationMutation : ObjectGraphType
     {
-        public AppealMutation() 
+        public VacationMutation() 
         {
-            Field<AppealGraphType>("add")
-                .Argument<AppealInputGraphType>("appeal")
+            Field<VacationGraphType>("add")
+                .Argument<VacationInputGraphType>("vacation")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
                     
-                    var appeal = context.GetArgument<Appeal>("appeal");
-                    var appealRepository = context.RequestServices!.GetRequiredService<IAppealRepository>();
+                    var vacation = context.GetArgument<Vacation>("vacation");
+                    var vacationRepository = context.RequestServices!.GetRequiredService<IVacationRepository>();
 
-                    var id = await appealRepository.InsertAsync(appeal);
+                    var id = await vacationRepository.InsertAsync(vacation);
 
-                    return await appealRepository.GetAsync(id);
+                    return await vacationRepository.GetAsync(id);
                 });
 
             Field<BooleanGraphType>("remove")
@@ -34,12 +34,12 @@ namespace Server.API.Mutations
                     
                     var id = context.GetArgument<int>("id");
 
-                    await context.RequestServices!.GetRequiredService<IAppealRepository>().DeleteAsync(id);
+                    await context.RequestServices!.GetRequiredService<IVacationRepository>().DeleteAsync(id);
 
                     return true;
                 });
 
-            Field<AppealGraphType>("set_status")
+            Field<VacationGraphType>("set_status")
                 .Argument<IntGraphType>("id")
                 .Argument<EnumerationGraphType<Status>>("status")
                 .ResolveAsync(async context =>
@@ -48,15 +48,15 @@ namespace Server.API.Mutations
 
                     var id = context.GetArgument<int>("id");
                     var status = context.GetArgument<Status>("status");
-                    var appealRepository = context.RequestServices!.GetRequiredService<IAppealRepository>();
+                    var vacationRepository = context.RequestServices!.GetRequiredService<IVacationRepository>();
 
-                    var appeal = await appealRepository.GetAsync(id)
+                    var vacation = await vacationRepository.GetAsync(id)
                         ?? throw new ExecutionError("Appeal not found") { Code = ResponseCode.BadRequest };
 
-                    appeal.Status = status;
-                    await context.RequestServices!.GetRequiredService<IAppealRepository>().UpdateAsync(appeal);
+                    vacation.Status = status;
+                    await context.RequestServices!.GetRequiredService<IVacationRepository>().UpdateAsync(vacation);
 
-                    return appeal;
+                    return vacation;
                 });
         }
     }

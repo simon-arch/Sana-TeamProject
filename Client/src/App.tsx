@@ -7,7 +7,7 @@ import Sidebar from "./components/Sidebar/Sidebar.tsx";
 import {useEffect} from "react";
 import {setTokenPayload} from "./store/slices/accountSlice.ts";
 import Dashboard from "./pages/Dashboard.tsx";
-import Appeals from "./pages/Appeals.tsx";
+import Vacations from "./pages/Vacations.tsx";
 
 
 function App() {
@@ -38,9 +38,9 @@ function App() {
                             <Routes>
                                 <Route path="/dashboard" element={<Dashboard/>}/>
                                 <Route path="/employees" element={<Employees/>}/>
-                                <Route path="/appeals" element={<Appeals/>}/>
+                                <Route path="/vacations" element={<Vacations/>}/>
 
-                                <Route path="*" element={<Navigate to="/"/>}/> 
+                                <Route path="*" element={<Navigate to="/vacations"/>}/> 
                             </Routes>
                         </div>
                     </div>

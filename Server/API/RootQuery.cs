@@ -11,7 +11,7 @@ namespace Server.API
 
             Field<UserQuery>("user").Resolve(context => new { });
             Field<AuthQuery>("auth").Resolve(context => new { });
-            Field<AppealQuery>("appeal").Resolve(context => new { });
+            Field<VacationQuery>("vacation").Resolve(context => new { });
             Field<TimeStampQuery>("timeStamp").Resolve(context => new { });
         }
     }

@@ -6,36 +6,36 @@ using Server.Data.Repositories;
 
 namespace Server.API.Queries
 {
-    public class AppealQuery : ObjectGraphType
+    public class VacationQuery : ObjectGraphType
     {
-        public AppealQuery()
+        public VacationQuery()
         {
-            Field<AppealGraphType>("get_by_id")
+            Field<VacationGraphType>("get_by_id")
                 .Argument<IntGraphType>("id")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
                     var id = context.GetArgument<int>("id");
 
-                    return await context.RequestServices!.GetRequiredService<IAppealRepository>().GetAsync(id);
+                    return await context.RequestServices!.GetRequiredService<IVacationRepository>().GetAsync(id);
                 });
 
-            Field<ListGraphType<AppealGraphType>>("get_by_username")
+            Field<ListGraphType<VacationGraphType>>("get_by_username")
                 .Argument<StringGraphType>("username")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
                     var username = context.GetArgument<string>("username");
 
-                    return await context.RequestServices!.GetRequiredService<IAppealRepository>().GetAsync(username);
+                    return await context.RequestServices!.GetRequiredService<IVacationRepository>().GetAsync(username);
                 });
 
-            Field<ListGraphType<AppealGraphType>>("get_all")
+            Field<ListGraphType<VacationGraphType>>("get_all")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
 
-                    return await context.RequestServices!.GetRequiredService<IAppealRepository>().GetAllAsync();
+                    return await context.RequestServices!.GetRequiredService<IVacationRepository>().GetAllAsync();
                 });
         }
     }

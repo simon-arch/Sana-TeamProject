@@ -26,7 +26,7 @@ internal class Program
         SqlMapper.RemoveTypeMap(typeof(Guid));
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
-        builder.Services.AddScoped<IAppealRepository, AppealRepository>();
+        builder.Services.AddScoped<IVacationRepository, VacationRepository>();
         builder.Services.AddScoped<ITimeStampRepository, TimeStampRepository>();
 
         builder.Services.AddCors(options => options

@@ -49,7 +49,7 @@ const Sidebar : FC = () => {
                     </li>
                     <li className="my-1">
                         <BsEnvelopeFill className="me-1"/>
-                        <Link to="/appeals" className="text-decoration-none text-black">Appeals</Link>
+                        <Link to="/vacations" className="text-decoration-none text-black">Vacations</Link>
                     </li>
                 </div>
                 <hr className="mx-3 my-0"/>
