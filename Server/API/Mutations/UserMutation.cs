@@ -3,6 +3,7 @@ using GraphQL.Types;
 using Server.API.GraphTypes;
 using Server.Authorization;
 using Server.Data.Repositories;
+using Server.Models;
 using System.Security.Claims;
 
 namespace Server.API.Mutations;
@@ -83,5 +84,23 @@ public sealed class UserMutation : ObjectGraphType
                 return user;
             });
 
+        Field<UserGraphType>("set_state")
+            .Argument<StringGraphType>("username")
+            .Argument<EnumerationGraphType<State>>("state")
+            .ResolveAsync(async context =>
+            {
+                context.Authorize();
+
+                var username = context.GetArgument<string>("username");
+                var state = context.GetArgument<State>("state");
+
+                var user = await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username)
+                    ?? throw new ExecutionError("User not found") { Code = ResponseCode.BadRequest };
+
+                user.State = state;
+                await context.RequestServices!.GetRequiredService<IUserRepository>().UpdateAsync(user);
+
+                return user;
+            });
     }
 }

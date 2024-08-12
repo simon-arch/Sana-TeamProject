@@ -14,5 +14,6 @@ public sealed class UserGraphType : ObjectGraphType<User>
         Field(u => u.LastName);
         Field(u => u.Role);
         Field(u => u.Permissions);
+        Field(u => u.State);
     }
 }

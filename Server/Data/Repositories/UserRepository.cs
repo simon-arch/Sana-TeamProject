@@ -15,7 +15,7 @@ namespace Server.Data.Repositories
         private Task<User?> _GetAsync(string condition)
         {
             string query = $@"
-                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions
+                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State
                 FROM Users
                 WHERE {condition}";
 
@@ -25,7 +25,7 @@ namespace Server.Data.Repositories
         public Task<IEnumerable<User>> GetAllAsync()
         {
             string query = @"
-                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions
+                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State
                 FROM Users";
 
             return _sql.QueryAsync<User>(query);
@@ -34,8 +34,8 @@ namespace Server.Data.Repositories
         public Task InsertAsync(User user)
         {
             string query = @"
-                INSERT INTO Users (Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions)
-                VALUES (@Username, @PasswordHash, @TokenId, @FirstName, @LastName, @Role, @Permissions)";
+                INSERT INTO Users (Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State)
+                VALUES (@Username, @PasswordHash, @TokenId, @FirstName, @LastName, @Role, @Permissions, @State)";
 
             return _sql.ExecuteAsync(query, user);
         }
@@ -45,7 +45,7 @@ namespace Server.Data.Repositories
             string query = $@"
                 UPDATE Users
                 SET PasswordHash = @PasswordHash, TokenId = @TokenId, FirstName = @FirstName,
-                LastName = @LastName, Role = @Role, Permissions = @Permissions
+                LastName = @LastName, Role = @Role, Permissions = @Permissions, State = @State
                 WHERE Username = @Username";
 
             return _sql.ExecuteAsync(query, user);

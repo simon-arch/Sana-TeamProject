@@ -8,6 +8,7 @@ export interface User {
     lastName: string;
     role: string;
     permissions: string[];
+    state: 'AVALIABLE' | 'VACATION' | 'FIRED'
 }
 
 export interface UserState {
@@ -37,7 +38,8 @@ const userSlice = createSlice(
                     firstName: action.payload[index].firstName,
                     lastName: action.payload[index].lastName,
                     role: action.payload[index].role,
-                    permissions: action.payload[index].permissions
+                    permissions: action.payload[index].permissions,
+                    state: action.payload[index].state
                 }));
                 state.status = 'idle';
             },
@@ -68,6 +70,7 @@ const userSlice = createSlice(
                     lastName: action.payload.lastName,
                     role: action.payload.role,
                     permissions: action.payload.permissions,
+                    state: action.payload.state
                 });
                 state.status = "idle";
             },

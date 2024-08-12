@@ -35,7 +35,7 @@ export const userInfoEpic = createEpic(
     (action: any) => `
     query { 
         user { 
-            get(username: "${action.payload}") { username, firstName, lastName, role, permissions } 
+            get(username: "${action.payload}") { username, firstName, lastName, role, permissions, state } 
         } 
     }`,
     data => setAccountInfo(data.data.user.get),
@@ -60,14 +60,16 @@ export const registerUserEpic = createEpic(
                     firstName: "${firstName}", 
                     lastName: "${lastName}", 
                     role: ${role}, 
-                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')} 
+                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')},
+                    state: "AVALIABLE"
                 }) 
                 { 
                     username 
                     firstName 
                     lastName 
                     role 
-                    permissions 
+                    permissions
+                    state
                 }
             }
         }`;
@@ -97,7 +99,7 @@ export const getAllUsersEpic = createEpic(
     () => `
     query { 
         user { 
-            get_all { username, firstName, lastName, role, permissions } 
+            get_all { username, firstName, lastName, role, permissions, state } 
         } 
     }`,
     data => setUsers(data.data.user.get_all),

@@ -48,6 +48,9 @@ const Employees = () => {
             case "role":
                 source.sort((a, b) => a.role.localeCompare(b.role));
                 break;
+            case "status":
+                source.sort((a, b) => a.state.localeCompare(b.state));
+                break;
         }
         setUsers(source);
     }, [dispatch, sort]);
@@ -88,7 +91,7 @@ const Employees = () => {
                         <FormSelect className="w-75" value={sort} onChange={(e) => setSort(e.target.value)}>
                             <option value="name">Name</option>
                             <option value="role">Role</option>
-                            <option value="status">Status [NOT IMPLEMENTED]</option>
+                            <option value="status">Status</option>
                         </FormSelect>
                     </FormGroup>
                 </div>
@@ -113,7 +116,7 @@ const Employees = () => {
                         <td className="p-3 text-start">{user.firstName} {user.lastName}</td>
                         <td className="p-3 text-start">{Capitalize(user.role)}</td>
                         <td className="p-3">
-                            <span className="px-3 py-1 text-success rounded-pill border border-success">active</span>
+                            <span className="px-3 py-1 text-success rounded-pill border border-success">{Capitalize(user.state)}</span>
                         </td>
                         <td className="p-3">
                             <button onClick={() => openModal(user)} className="btn border py-0 px-2">...</button>

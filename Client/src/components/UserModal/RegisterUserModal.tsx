@@ -64,7 +64,8 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 lastName: lastName,
                 password: password,
                 role: role,
-                permissions: selectedPermissions
+                permissions: selectedPermissions,
+                state: 'AVALIABLE'
             }));
             setUsername('');
             setFirstName('');
