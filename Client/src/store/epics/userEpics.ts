@@ -13,7 +13,7 @@ import {
     getUsers,
     registerRequest,
     registerSuccess,
-    setUsers
+    setUsers, setUserState, setUserStateSuccess
 } from "../slices/userSlice.ts";
 import {getPermissions, setPermissions} from "../slices/permissionSlice.ts";
 import {getRoles, setRoles} from "../slices/roleSlice.ts";
@@ -77,7 +77,6 @@ export const registerUserEpic = createEpic(
     error => setError(error.message)
 );
 
-
 export const deleteUserEpic = createEpic(
     deleteUser.type,
     (action: any) => {
@@ -90,6 +89,21 @@ export const deleteUserEpic = createEpic(
     },
 
     data => deleteUserSuccess(data.data.user.delete_user.username),
+    error => setError(error.message)
+);
+
+export const setUserStateEpic = createEpic(
+    setUserState.type,
+    (action: any) => {
+        const username = action.payload.username;
+        const state = action.payload.state;
+        return `mutation {
+                    user {
+                        set_state(username: "${username}", state: ${state}) { username }
+                    }
+            }`;
+    },
+    data => setUserStateSuccess(data.data.user.set_state.username),
     error => setError(error.message)
 );
 
@@ -134,6 +148,7 @@ export const userEpics = [
     userInfoEpic,
     registerUserEpic,
     deleteUserEpic,
+    setUserStateEpic,
     getAllUsersEpic,
     permissionsEpic,
     rolesEpic

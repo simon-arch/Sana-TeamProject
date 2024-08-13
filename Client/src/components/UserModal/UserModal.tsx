@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {User, deleteUser} from "../../store/slices/userSlice.ts";
+import {User, deleteUser, setUserState,} from "../../store/slices/userSlice.ts";
 import {Button, Form, InputGroup, Modal} from "react-bootstrap";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {BsCheck2, BsXLg} from "react-icons/bs";
@@ -28,14 +28,19 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
 
     const handleConfirmDelete = () => {
         dispatch(deleteUser({ username: props.user.username }));
+        setShowConfirm(false);
         props.setShow(false);
     };
 
     const handleConfirmFiring = () => {
-        setState(config.userStatuses.FIRED);
-        handleUpdate();
+        dispatch(setUserState({
+            username: props.user.username,
+            state: config.userStatuses.FIRED
+        }));
+        setShowConfirm(false);
         props.setShow(false);
     };
+
 
     const [showConfirm, setShowConfirm] = useState(false);
     const handleClose = () => setShowConfirm(false);
@@ -45,7 +50,6 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
     const [lastName, setLastName] = useState('');
     const [role, setRole] = useState('');
     const [permissions, setPermissions] = useState<Record<string, boolean>>({});
-    const [state, setState] = useState('');
 
     const [firstNameEdited, setFirstNameEdited] = useState(false);
     const [lastNameEdited, setLastNameEdited] = useState(false);
@@ -62,10 +66,11 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                             lastName: "${lastName}"
                             role: ${role}
                             permissions: [${convertPayload(permissions)}]
-                            state: ${state}
                         } ) { username } } }`);
         props.setShow(false);
     }
+
+
 
     return (
         <Modal show={props.show}

@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import { sendRequest } from "../epics/helpers/request";
+import {sendRequest} from "../epics/helpers/request";
 
 export interface User {
     username: string;
@@ -28,7 +28,7 @@ const userSlice = createSlice(
         name: 'users',
         initialState,
         reducers: {
-            getUsers(state){
+            getUsers(state) {
                 state.status = 'loading';
             },
             setUsers(state, action) {
@@ -70,7 +70,7 @@ const userSlice = createSlice(
                     lastName: action.payload.lastName,
                     role: action.payload.role,
                     permissions: action.payload.permissions,
-                    state: action.payload.state
+                    state: ""
                 });
                 state.status = "idle";
             },
@@ -81,6 +81,19 @@ const userSlice = createSlice(
             },
             deleteUserSuccess(state, action: PayloadAction<string>) {
                 state.users = state.users.filter(user => user.username !== action.payload);
+                state.status = 'idle';
+            },
+            //@ts-ignore
+            setUserState(state, action: PayloadAction<{ username: string, state: string }>) {
+                state.status = 'loading';
+            },
+            setUserStateSuccess(state, action: PayloadAction<string>) {
+                state.users = state.users.map(user => {
+                    if (user.username === action.payload) {
+                        user.state = action.payload;
+                    }
+                    return user;
+                });
                 state.status = 'idle';
             },
             setError(state, action) {
@@ -100,6 +113,8 @@ export const {
     registerSuccess,
     deleteUser,
     deleteUserSuccess,
+    setUserState,
+    setUserStateSuccess,
     setError
 } = userSlice.actions;
 
