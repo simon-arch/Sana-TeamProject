@@ -11,7 +11,7 @@ namespace Server.API.Queries
         public VacationQuery()
         {
             Field<VacationGraphType>("get_by_id")
-                .Argument<IntGraphType>("id")
+                .Argument<NonNullGraphType<IntGraphType>>("id")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
@@ -21,7 +21,7 @@ namespace Server.API.Queries
                 });
 
             Field<ListGraphType<VacationGraphType>>("get_by_username")
-                .Argument<StringGraphType>("username")
+                .Argument<NonNullGraphType<StringGraphType>>("username")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();

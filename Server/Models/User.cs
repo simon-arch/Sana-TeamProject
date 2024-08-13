@@ -15,7 +15,7 @@ namespace Server.Models
     }
     public enum State
     {
-        Avaliable = 0,
+        Available = 0,
         Vacation = 1,
         Fired = 2
     }

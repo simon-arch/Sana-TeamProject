@@ -13,7 +13,7 @@ namespace Server.API.Mutations
         public TimeStampMutation()
         {
             Field<TimeStampGraphType>("add")
-                .Argument<TimeStampInputGraphType>("timeStamp")
+                .Argument<NonNullGraphType<TimeStampInputGraphType>>("timeStamp")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
@@ -30,7 +30,7 @@ namespace Server.API.Mutations
                 });
 
             Field<BooleanGraphType>("remove")
-                .Argument<IntGraphType>("id")
+                .Argument<NonNullGraphType<IntGraphType>>("id")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
@@ -48,7 +48,7 @@ namespace Server.API.Mutations
                 });
 
             Field<BooleanGraphType>("set_time")
-                .Argument<IntGraphType>("id")
+                .Argument<NonNullGraphType<IntGraphType>>("id")
                 .Argument<DateTimeGraphType>("timeStart")
                 .Argument<DateTimeGraphType>("timeEnd")
                 .ResolveAsync(async context =>

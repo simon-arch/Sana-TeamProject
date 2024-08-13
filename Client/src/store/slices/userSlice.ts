@@ -13,12 +13,14 @@ export interface User {
 
 export interface UserState {
     users: User[];
+    totalCount: number;
     status: 'idle' | 'loading' | 'error';
     error: string | null;
 }
 
 const initialState: UserState = {
     users: [],
+    totalCount: 0,
     status: 'idle',
     error: null
 };
@@ -28,19 +30,11 @@ const userSlice = createSlice(
         name: 'users',
         initialState,
         reducers: {
-            getUsers(state){
-                state.status = 'loading';
-            },
+            //@ts-ignore
+            getUsers(state, action){ state.status = 'loading'; },
             setUsers(state, action) {
-                state.users = Object.keys(action.payload).map(index => ({
-                    username: action.payload[index].username,
-                    password: action.payload[index].password,
-                    firstName: action.payload[index].firstName,
-                    lastName: action.payload[index].lastName,
-                    role: action.payload[index].role,
-                    permissions: action.payload[index].permissions,
-                    state: action.payload[index].state
-                }));
+                state.totalCount = action.payload.totalCount;
+                state.users = action.payload.results;
                 state.status = 'idle';
             },
             setUserRole(state, action) {
@@ -59,21 +53,12 @@ const userSlice = createSlice(
                         }`);
             },
             //@ts-ignore
-            registerRequest(state, action: PayloadAction<User>) {
-                state.status = 'loading';
-            },
-            registerSuccess(state, action: PayloadAction<User>) {
-                state.users.push({
-                    username: action.payload.username,
-                    password: action.payload.password,
-                    firstName: action.payload.firstName,
-                    lastName: action.payload.lastName,
-                    role: action.payload.role,
-                    permissions: action.payload.permissions,
-                    state: action.payload.state
-                });
-                state.status = "idle";
-            },
+            registerRequest(state, action: PayloadAction<User>) { state.status = 'loading'; },
+            registerSuccess(state) { state.status = "idle"; },
+
+            //@ts-ignore
+            updateRequest(state, action: PayloadAction<User>) { state.status = 'loading'; },
+            updateSuccess(state) { state.status = "idle"; },
 
             //@ts-ignore
             deleteUser(state, action: PayloadAction<{ username: string }>) {
@@ -100,7 +85,9 @@ export const {
     registerSuccess,
     deleteUser,
     deleteUserSuccess,
-    setError
+    setError,
+    updateRequest,
+    updateSuccess
 } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -14,8 +14,8 @@ public sealed class UserMutation : ObjectGraphType
     public UserMutation()
     {
         Field<UserGraphType>("set_role")
-            .Argument<StringGraphType>("username")
-            .Argument<EnumerationGraphType<Role>>("role")
+            .Argument<NonNullGraphType<StringGraphType>>("username")
+            .Argument<NonNullGraphType<EnumerationGraphType<Role>>>("role")
             .ResolveAsync(async context =>
             {
                 context.WithPermission(Permission.MANAGE_USER_ROLES);
@@ -43,8 +43,8 @@ public sealed class UserMutation : ObjectGraphType
             });
 
         Field<UserGraphType>("set_permissions")
-            .Argument<StringGraphType>("username")
-            .Argument<ListGraphType<EnumerationGraphType<Permission>>>("permissions")
+            .Argument<NonNullGraphType<StringGraphType>>("username")
+            .Argument<NonNullGraphType<ListGraphType<EnumerationGraphType<Permission>>>>("permissions")
             .ResolveAsync(async context =>
             {
                 context.WithPermission(Permission.MANAGE_USER_PERMISSIONS);
@@ -72,7 +72,7 @@ public sealed class UserMutation : ObjectGraphType
             });
         
         Field<UserGraphType>("delete_user")
-            .Argument<StringGraphType>("username")
+            .Argument<NonNullGraphType<StringGraphType>>("username")
             .ResolveAsync(async context =>
             {
                 context.WithPermission(Permission.DELETE_USER);

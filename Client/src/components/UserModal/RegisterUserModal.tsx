@@ -13,8 +13,8 @@ import {Config} from "./ModalComponents/PermissionSelect.tsx";
 
 interface ModalProps {
     show: boolean,
-
-    onHide(): void,
+    setShow(prevState: boolean): void,
+    setLocalStatus(prevState: 'idle' | 'loading' | 'error'): void
 }
 
 const data: Config = config as Config;
@@ -72,7 +72,8 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
             setRole('');
             setSelectedPermissions([]);
             setPreset('');
-            props.onHide();
+            props.setShow(false);
+            props.setLocalStatus('loading');
         } else {
             dispatch(setError('All fields are required.'));
         }
@@ -80,7 +81,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
 
     return (
         <Modal show={props.show}
-               onHide={props.onHide}
+                onHide={() => props.setShow(false)}
                centered
                size="xl">
             <Modal.Header closeButton>

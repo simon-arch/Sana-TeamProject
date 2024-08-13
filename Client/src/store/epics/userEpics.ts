@@ -13,7 +13,9 @@ import {
     getUsers,
     registerRequest,
     registerSuccess,
-    setUsers
+    setUsers,
+    updateRequest,
+    updateSuccess
 } from "../slices/userSlice.ts";
 import {getPermissions, setPermissions} from "../slices/permissionSlice.ts";
 import {getRoles, setRoles} from "../slices/roleSlice.ts";
@@ -93,14 +95,44 @@ export const deleteUserEpic = createEpic(
     error => setError(error.message)
 );
 
+export const updateUserEpic = createEpic(
+    updateRequest.type,
+    (action: any) => {
+        const user = action.payload;
+        return `mutation {
+            user {
+                update_user(
+                    user: {
+                        username: "${user.username}"
+                        firstName: "${user.firstName}"
+                        lastName: "${user.lastName}"
+                        role: ${user.role}
+                        permissions: [${(user.permissions)}]
+                    } ) { username } } }`;
+    },
+
+    _ => updateSuccess(),
+    error => setError(error.message)
+);
+
 export const getAllUsersEpic = createEpic(
     getUsers.type,
-    () => `
-    query { 
-        user { 
-            get_all { username, firstName, lastName, role, permissions, state } 
-        } 
-    }`,
+    (action) => {
+        const {pageNumber, pageSize, query} = action.payload;
+        return `
+            query { 
+                user { 
+                    get_all(
+                        page_number: ${pageNumber}
+                        page_size: ${pageSize}
+                        query: "${query ? query : ''}"
+                        ) {
+                       totalCount
+                       results { username firstName lastName role permissions state }
+                    } 
+                } 
+            }`;
+    },
     data => setUsers(data.data.user.get_all),
     error => setError(error.message)
 );
@@ -136,6 +168,7 @@ export const userEpics = [
     deleteUserEpic,
     getAllUsersEpic,
     permissionsEpic,
+    updateUserEpic,
     rolesEpic
 ];
 

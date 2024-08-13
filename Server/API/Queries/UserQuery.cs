@@ -3,6 +3,7 @@ using GraphQL.Types;
 using Server.API.GraphTypes;
 using Server.Authorization;
 using Server.Data.Repositories;
+using Server.Models;
 
 namespace Server.API.Queries;
 
@@ -11,7 +12,7 @@ public sealed class UserQuery : ObjectGraphType
     public UserQuery()
     {
         Field<UserGraphType>("get")
-            .Argument<StringGraphType>("username")
+            .Argument<NonNullGraphType<StringGraphType>>("username")
             .ResolveAsync(async context =>
             {
                 context.WithPermission(Permission.VIEW_USERS);
@@ -20,12 +21,20 @@ public sealed class UserQuery : ObjectGraphType
                 return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username);
             });
 
-        Field<ListGraphType<UserGraphType>>("get_all")
+        Field<ResultSetGraphType<User, UserGraphType>>("get_all")
+            .Argument<NonNullGraphType<IntGraphType>>("page_size")
+            .Argument<NonNullGraphType<IntGraphType>>("page_number")
+            .Argument<StringGraphType>("query")
             .ResolveAsync(async context =>
             {
                 context.WithPermission(Permission.VIEW_USERS);
 
-                return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync();
+                var pageNumber = context.GetArgument<int>("page_number");
+                var pageSize = context.GetArgument<int>("page_size");
+                var query = context.GetArgument<string?>("query");
+
+                return await context.RequestServices!.GetRequiredService<IUserRepository>()
+                    .GetAllAsync(pageNumber, pageSize, query);
             });
     }
 }

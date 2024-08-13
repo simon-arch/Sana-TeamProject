@@ -7,8 +7,6 @@ public sealed class UserGraphType : ObjectGraphType<User>
 {
     public UserGraphType()
     {
-        Name = "user";
-
         Field(u => u.Username);
         Field(u => u.FirstName);
         Field(u => u.LastName);

@@ -31,7 +31,7 @@ const VacationCard = (props: Props) => {
             </Card.Header>
             <Card.Body>
                 <Row>
-                    <Col md={3}>
+                    <Col md={4}>
                         <Table hover className="border rounded">
                             <tbody>
                                 <tr>
@@ -49,7 +49,7 @@ const VacationCard = (props: Props) => {
                             </tbody>
                         </Table>
                     </Col>
-                    <Col className="bg-white me-4 border rounded pt-2 mb-3">
+                    <Col style={{overflowY: "scroll", maxHeight: 125}} className="bg-white me-4 border rounded pt-2 mb-3">
                         {(props.vacation.description) ? (props.vacation.description) : ("No description provided.")}
                     </Col>
                 </Row>

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {User, deleteUser} from "../../store/slices/userSlice.ts";
+import {User, deleteUser, updateRequest} from "../../store/slices/userSlice.ts";
 import {Button, Form, InputGroup, Modal} from "react-bootstrap";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {BsCheck2, BsXLg} from "react-icons/bs";
@@ -8,12 +8,12 @@ import PermissionSelect from "./ModalComponents/PermissionSelect.tsx";
 import config from '../../../config.json';
 import FirstNameField from './ModalComponents/FirstNameField.tsx';
 import LastNameField from './ModalComponents/LastNameField.tsx';
-import { sendRequest } from '../../store/epics/helpers/request.ts';
 
 interface ModalProps {
     show: boolean;
     setShow(prevState : boolean) : void
     user: User,
+    setLocalStatus(prevState: 'idle' | 'loading' | 'error'): void
 }
 
 const convertPayload = (rec: Record<string, boolean>): string[] => {
@@ -26,14 +26,15 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
     const dispatch = useAppDispatch();
     const account = useAppSelector<User>(state => state.accountInfo.user);
 
-    const handleConfirm = () => {
+    const handleRequest = () => {
         dispatch(deleteUser({username: props.user.username}));
+        setConfirm(false);
         props.setShow(false);
     }
 
-    const [showConfirm, setShowConfirm] = useState(false);
-    const handleClose = () => setShowConfirm(false);
-    const handleShowConfirm = () => setShowConfirm(true);
+    const handleConfirm = () => setConfirm(true);
+
+    const [confirm, setConfirm] = useState(false);
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -46,17 +47,19 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
     const [permissionsEdited, setPermissionsEdited] = useState(false);
 
     const handleUpdate = () => {
-        sendRequest(`mutation {
-                user {
-                    update_user(
-                        user: {
-                            username: "${props.user.username}"
-                            firstName: "${firstName}"
-                            lastName: "${lastName}"
-                            role: ${role}
-                            permissions: [${convertPayload(permissions)}]
-                        } ) { username } } }`);
+        dispatch(updateRequest(
+            {
+                username: props.user.username,
+                password: '',
+                firstName: firstName,
+                lastName: lastName,
+                role: role,
+                permissions: convertPayload(permissions),
+                state: 'AVALIABLE'
+            }
+        ));
         props.setShow(false);
+        props.setLocalStatus('loading');
     }
 
     return (
@@ -90,23 +93,11 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                                         onClick={handleUpdate}><BsCheck2 className="me-1"/>Confirm</Button>
 
                             {(props.user.username !== account.username && account.permissions.includes(config.permissions.DELETE_USER)) &&
-                                <>
-                                    <Button onClick={() => handleShowConfirm()} variant="danger"><BsXLg className="me-1"/>Delete</Button>
-                                    <Modal show={showConfirm} onHide={handleClose} centered>
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>User Deletion</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>Are you sure you want to delete @{props.user.username}?</Modal.Body>
-                                        <Modal.Footer>
-                                            <Button variant="danger" onClick={handleConfirm}>
-                                                Yes, I am sure
-                                            </Button>
-                                            <Button variant="secondary" onClick={handleClose}>
-                                                Cancel
-                                            </Button>
-                                        </Modal.Footer>
-                                    </Modal>
-                                </>
+                                
+                                confirm
+                                    ? <Button onClick={() => handleRequest()} variant="danger"><BsXLg className="me-1"/>Are you sure?</Button>
+                                    : <Button onClick={() => handleConfirm()} variant="danger"><BsXLg className="me-1"/>Delete</Button>
+                                    
                             }</div>
                         }
                     </>

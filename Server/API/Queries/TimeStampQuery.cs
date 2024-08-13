@@ -11,7 +11,7 @@ namespace Server.API.Queries
         public TimeStampQuery() 
         {
             Field<TimeStampGraphType>("get_by_id")
-                .Argument<IntGraphType>("id")
+                .Argument<NonNullGraphType<IntGraphType>>("id")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
@@ -23,7 +23,7 @@ namespace Server.API.Queries
                 });
 
             Field<ListGraphType<TimeStampGraphType>>("get_by_username")
-                .Argument<StringGraphType>("username")
+                .Argument<NonNullGraphType<StringGraphType>>("username")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
@@ -34,7 +34,7 @@ namespace Server.API.Queries
                 });
 
             Field<TimeStampGraphType>("get_latest")
-                .Argument<StringGraphType>("username")
+                .Argument<NonNullGraphType<StringGraphType>>("username")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();

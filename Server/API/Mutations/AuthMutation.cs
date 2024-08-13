@@ -14,8 +14,8 @@ public sealed class AuthMutation : ObjectGraphType
     public AuthMutation(IHttpContextAccessor accessor)
     {
         Field<StringGraphType>("login")
-            .Argument<StringGraphType>("username")
-            .Argument<StringGraphType>("password")
+            .Argument<NonNullGraphType<StringGraphType>>("username")
+            .Argument<NonNullGraphType<StringGraphType>>("password")
             .ResolveAsync(async context =>
             {
                 var username = context.GetArgument<string>("username");
@@ -39,7 +39,7 @@ public sealed class AuthMutation : ObjectGraphType
             });
 
         Field<UserGraphType>("register")
-            .Argument<UserInputGraphType>("user")
+            .Argument<NonNullGraphType<UserInputGraphType>>("user")
             .ResolveAsync(async context =>
             {
                 context.WithPermission(Permission.REGISTER_USER);

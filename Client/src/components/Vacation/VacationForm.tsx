@@ -31,28 +31,30 @@ const VacationForm = () => {
     const [submit, setSubmit] = useState(false);
 
     const handleSubmit = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        if (startDate && endDate && title && startDate < endDate) {
-            event.preventDefault();
-            sendRequest(`mutation { 
-                            vacation { 
-                                add(vacation: { 
-                                title: "${title}", 
-                                description: """${description}""" , 
-                                startDate: "${startDate!.toISOString()}", 
-                                endDate: "${endDate!.toISOString()}", 
-                                sender: "${account.username}" }) 
-                            { id } 
-                        } }`)
+        event.preventDefault();
+        if (!title) { setError("Title is missing"); return; }
+        if (!startDate) { setError("Start date is missing"); return; }
+        if (!endDate) { setError("End date is missing"); return; }
+        if (startDate >= endDate) { setError("The end date cannot precede the start date"); return; }
+        sendRequest(`mutation { 
+                        vacation { 
+                            add(vacation: { 
+                            title: "${title}", 
+                            description: """${description}""" , 
+                            startDate: "${startDate!.toISOString()}", 
+                            endDate: "${endDate!.toISOString()}", 
+                            sender: "${account.username}" }) 
+                        { id } 
+                    } }`)
             .then(() => {
-                setTitle('');
-                setDescription('');
-                setStartDate(new Date());
-                setEndDate(new Date());
-                setError(null);
-                setSubmit(true);
-                getVacations();
-            }).catch(error => setError(Capitalize(error.message)!));
-        } else { setError("Input field error") }
+        setTitle('');
+        setDescription('');
+        setStartDate(new Date());
+        setEndDate(new Date());
+        setError(null);
+        setSubmit(true);
+        getVacations();
+        }).catch(error => setError(Capitalize(error.message)!));
     };
 
     return (
@@ -129,7 +131,7 @@ const VacationForm = () => {
                     </div>
                 </Alert>
             </Col>
-            <Col style={{overflowY: "scroll", height: "80vh"}} className="d-flex justify-content-center">
+            <Col style={{overflowY: "scroll", height: "84vh"}} className="d-flex justify-content-center">
                 <div className="w-100">
                     { vacations.map((vacation, index) => (
                         <VacationCard key={index} vacation={vacation}></VacationCard>

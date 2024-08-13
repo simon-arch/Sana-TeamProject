@@ -13,7 +13,7 @@ namespace Server.API.Mutations
         public VacationMutation() 
         {
             Field<VacationGraphType>("add")
-                .Argument<VacationInputGraphType>("vacation")
+                .Argument<NonNullGraphType<VacationInputGraphType>>("vacation")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
@@ -27,7 +27,7 @@ namespace Server.API.Mutations
                 });
 
             Field<BooleanGraphType>("remove")
-                .Argument<IntGraphType>("id")
+                .Argument<NonNullGraphType<IntGraphType>>("id")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
@@ -40,8 +40,8 @@ namespace Server.API.Mutations
                 });
 
             Field<VacationGraphType>("set_status")
-                .Argument<IntGraphType>("id")
-                .Argument<EnumerationGraphType<Status>>("status")
+                .Argument<NonNullGraphType<IntGraphType>>("id")
+                .Argument<NonNullGraphType<EnumerationGraphType<Status>>>("status")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
