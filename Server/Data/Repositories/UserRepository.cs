@@ -8,6 +8,9 @@ namespace Server.Data.Repositories
     {
         private readonly SqlConnection _sql = provider.Connection;
 
+        private Task<int> _CountAsync(string condition) =>
+            _sql.QuerySingleAsync<int>($"SELECT COUNT(*) FROM Users {condition}");
+
         public Task<User?> GetAsync(string username) => _GetAsync($"Username = '{username}'");
 
         public Task<User?> GetAsync(Guid tokenId) => _GetAsync($"TokenId = '{tokenId}'");
@@ -22,13 +25,24 @@ namespace Server.Data.Repositories
             return _sql.QueryFirstOrDefaultAsync<User>(query);
         }
 
-        public Task<IEnumerable<User>> GetAllAsync()
+        public async Task<ResultSet<User>> GetAllAsync(int pageNumber, int pageSize, string? query)
         {
-            string query = @"
-                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State
-                FROM Users";
+            var condition = query != null 
+                ? $"WHERE CONCAT(FirstName, ' ', LastName) LIKE '{query}%'" 
+                : string.Empty;
 
-            return _sql.QueryAsync<User>(query);
+            string sql = @$"
+                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State 
+                FROM Users
+                {condition}
+                ORDER BY (SELECT NULL)
+                OFFSET {(pageNumber - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
+
+            return new ResultSet<User>
+            {
+                TotalCount = await _CountAsync(condition),
+                Results = await _sql.QueryAsync<User>(sql)
+            };
         }
 
         public Task InsertAsync(User user)

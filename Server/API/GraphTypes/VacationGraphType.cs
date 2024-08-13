@@ -7,8 +7,6 @@ namespace Server.API.GraphTypes
     {
         public VacationGraphType() 
         {
-            Name = "vacation";
-
             Field(a => a.Id);
             Field(a => a.Title);
             Field(a => a.Description, nullable: true);

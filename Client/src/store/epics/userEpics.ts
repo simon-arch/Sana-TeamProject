@@ -60,8 +60,7 @@ export const registerUserEpic = createEpic(
                     firstName: "${firstName}", 
                     lastName: "${lastName}", 
                     role: ${role}, 
-                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')},
-                    state: "AVALIABLE"
+                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')}
                 }) 
                 { 
                     username 
@@ -96,12 +95,22 @@ export const deleteUserEpic = createEpic(
 
 export const getAllUsersEpic = createEpic(
     getUsers.type,
-    () => `
-    query { 
-        user { 
-            get_all { username, firstName, lastName, role, permissions, state } 
-        } 
-    }`,
+    (action) => {
+        const {pageNumber, pageSize, query} = action.payload;
+        return `
+            query { 
+                user { 
+                    get_all(
+                        page_number: ${pageNumber}
+                        page_size: ${pageSize}
+                        query: "${query ? query : ''}"
+                        ) {
+                       totalCount
+                       results { username firstName lastName role permissions state }
+                    } 
+                } 
+            }`;
+    },
     data => setUsers(data.data.user.get_all),
     error => setError(error.message)
 );

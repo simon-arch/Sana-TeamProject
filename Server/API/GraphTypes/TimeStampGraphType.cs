@@ -7,8 +7,6 @@ namespace Server.API.GraphTypes
     {
         public TimeStampGraphType() 
         {
-            Name = "timeStamp";
-
             Field(ts => ts.Id);
             Field(ts => ts.Username);
             Field(ts => ts.TimeStart);

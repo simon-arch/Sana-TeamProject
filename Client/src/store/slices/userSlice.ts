@@ -13,12 +13,14 @@ export interface User {
 
 export interface UserState {
     users: User[];
+    totalCount: number;
     status: 'idle' | 'loading' | 'error';
     error: string | null;
 }
 
 const initialState: UserState = {
     users: [],
+    totalCount: 0,
     status: 'idle',
     error: null
 };
@@ -28,19 +30,12 @@ const userSlice = createSlice(
         name: 'users',
         initialState,
         reducers: {
-            getUsers(state){
+            getUsers(state, action){
                 state.status = 'loading';
             },
             setUsers(state, action) {
-                state.users = Object.keys(action.payload).map(index => ({
-                    username: action.payload[index].username,
-                    password: action.payload[index].password,
-                    firstName: action.payload[index].firstName,
-                    lastName: action.payload[index].lastName,
-                    role: action.payload[index].role,
-                    permissions: action.payload[index].permissions,
-                    state: action.payload[index].state
-                }));
+                state.totalCount = action.payload.totalCount;
+                state.users = action.payload.results;
                 state.status = 'idle';
             },
             setUserRole(state, action) {
