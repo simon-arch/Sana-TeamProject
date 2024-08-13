@@ -7,6 +7,7 @@
         MANAGE_USER_PERMISSIONS = 2,
         REGISTER_USER = 3,
         DELETE_USER = 4,
-        REVIEW_VACATIONS = 5
+        REVIEW_VACATIONS = 5,
+        FIRING_USERS = 6
     }
 }

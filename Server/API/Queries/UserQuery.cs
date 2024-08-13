@@ -3,6 +3,7 @@ using GraphQL.Types;
 using Server.API.GraphTypes;
 using Server.Authorization;
 using Server.Data.Repositories;
+using Server.Models;
 
 namespace Server.API.Queries;
 
@@ -24,8 +25,22 @@ public sealed class UserQuery : ObjectGraphType
             .ResolveAsync(async context =>
             {
                 context.WithPermission(Permission.VIEW_USERS);
+                
+                bool canViewFullList = context.HasPermission(Permission.DELETE_USER) ||
+                                       context.HasPermission(Permission.FIRING_USERS);
 
-                return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync();
+                if (canViewFullList)
+                {
+                    return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync();
+                }
+                else
+                {
+                    return (await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync())
+                        .Where(user => user.State != State.Fired)
+                        .ToList();
+                }
             });
+
+
     }
 }

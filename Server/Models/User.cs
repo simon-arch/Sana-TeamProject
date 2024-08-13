@@ -11,7 +11,7 @@ namespace Server.Models
         public required string LastName { get; set; }
         public required Role Role { get; set; }
         public required Permission[] Permissions { get; set; }
-        public required State State { get; set; }
+        public required State State { get; set; } = State.Avaliable;
     }
     public enum State
     {
