@@ -70,7 +70,7 @@ const userSlice = createSlice(
                     lastName: action.payload.lastName,
                     role: action.payload.role,
                     permissions: action.payload.permissions,
-                    state: ""
+                    state: action.payload.state
                 });
                 state.status = "idle";
             },

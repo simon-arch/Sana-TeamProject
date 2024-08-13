@@ -50,7 +50,8 @@ export const userInfoEpic = createEpic(
 export const registerUserEpic = createEpic(
     registerRequest.type,
     (action: any) => {
-        const {username, password, firstName, lastName, role, permissions} = action.payload;
+        const {username, password, firstName, lastName, role, permissions, state} = action.payload;
+        console.log(username, password, firstName, lastName, role, permissions, state);
         return `
         mutation {
             auth {
@@ -60,7 +61,8 @@ export const registerUserEpic = createEpic(
                     firstName: "${firstName}", 
                     lastName: "${lastName}", 
                     role: ${role}, 
-                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')}
+                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')},
+                    state: ${state}
                 }) 
                 { 
                     username 
