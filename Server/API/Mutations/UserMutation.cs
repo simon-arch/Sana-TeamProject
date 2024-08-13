@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using Server.API.GraphInputTypes;
 using Server.API.GraphTypes;
 using Server.Authorization;
 using Server.Data.Repositories;
@@ -82,6 +83,33 @@ public sealed class UserMutation : ObjectGraphType
 
                 await context.RequestServices!.GetRequiredService<IUserRepository>().DeleteAsync(user.Username);
                 return user;
+            });
+
+        Field<UserGraphType>("update_user")
+            .Argument<NonNullGraphType<UserUpdateInputGraphType>>("user")
+            .ResolveAsync(async context =>
+            {
+                context.Authorize();
+
+                var requestUser = context.GetArgument<User>("user");
+
+                var oldUser = await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(requestUser.Username)
+                    ?? throw new ExecutionError("User not found") { Code = ResponseCode.BadRequest };
+
+                var newUser = new User
+                {
+                    Username = requestUser.Username,
+                    PasswordHash = oldUser.PasswordHash,
+                    TokenId = oldUser.TokenId,
+                    FirstName = requestUser.FirstName,
+                    LastName = requestUser.LastName,
+                    Role = requestUser.Role,
+                    Permissions = requestUser.Permissions,
+                    State = oldUser.State
+                };
+
+                await context.RequestServices!.GetRequiredService<IUserRepository>().UpdateAsync(newUser);
+                return newUser;
             });
 
         Field<UserGraphType>("set_state")
