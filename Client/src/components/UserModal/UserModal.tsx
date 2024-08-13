@@ -26,10 +26,16 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
     const dispatch = useAppDispatch();
     const account = useAppSelector<User>(state => state.accountInfo.user);
 
-    const handleConfirm = () => {
-        dispatch(deleteUser({username: props.user.username}));
+    const handleConfirmDelete = () => {
+        dispatch(deleteUser({ username: props.user.username }));
         props.setShow(false);
-    }
+    };
+
+    const handleConfirmFiring = () => {
+        setState(config.userStatuses.FIRED);
+        handleUpdate();
+        props.setShow(false);
+    };
 
     const [showConfirm, setShowConfirm] = useState(false);
     const handleClose = () => setShowConfirm(false);
@@ -39,6 +45,7 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
     const [lastName, setLastName] = useState('');
     const [role, setRole] = useState('');
     const [permissions, setPermissions] = useState<Record<string, boolean>>({});
+    const [state, setState] = useState('');
 
     const [firstNameEdited, setFirstNameEdited] = useState(false);
     const [lastNameEdited, setLastNameEdited] = useState(false);
@@ -55,6 +62,7 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                             lastName: "${lastName}"
                             role: ${role}
                             permissions: [${convertPayload(permissions)}]
+                            state: ${state}
                         } ) { username } } }`);
         props.setShow(false);
     }
@@ -80,8 +88,8 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                         <RoleField setRole={setRole} role={role} user={props.user} setEdited={setRoleEdited} isEdited={roleEdited}/>
                         <PermissionSelect setPermissions={setPermissions} permissions={permissions} user={props.user} setEdited={setPermissionsEdited} isEdited={permissionsEdited}/>
 
-                        {(props.user.username !== account.username 
-                            && (account.permissions.includes(config.permissions.MANAGE_USER_ROLES) 
+                        {(props.user.username !== account.username
+                            && (account.permissions.includes(config.permissions.MANAGE_USER_ROLES)
                             || account.permissions.includes(config.permissions.MANAGE_USER_PERMISSIONS)))
                             &&
                             <div className="mt-4 d-flex justify-content-between">
@@ -89,7 +97,8 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                                         disabled={!(firstNameEdited || lastNameEdited || roleEdited || permissionsEdited)}
                                         onClick={handleUpdate}><BsCheck2 className="me-1"/>Confirm</Button>
 
-                            {(props.user.username !== account.username && account.permissions.includes(config.permissions.DELETE_USER)) &&
+                                {(props.user.username !== account.username &&
+                                        (props.user.state.includes(config.userStatuses.FIRED) && account.permissions.includes(config.permissions.DELETE_USER))) &&
                                 <>
                                     <Button onClick={() => handleShowConfirm()} variant="danger"><BsXLg className="me-1"/>Delete</Button>
                                     <Modal show={showConfirm} onHide={handleClose} centered>
@@ -98,7 +107,7 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                                         </Modal.Header>
                                         <Modal.Body>Are you sure you want to delete @{props.user.username}?</Modal.Body>
                                         <Modal.Footer>
-                                            <Button variant="danger" onClick={handleConfirm}>
+                                            <Button variant="danger" onClick={handleConfirmDelete}>
                                                 Yes, I am sure
                                             </Button>
                                             <Button variant="secondary" onClick={handleClose}>
@@ -107,7 +116,29 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                                         </Modal.Footer>
                                     </Modal>
                                 </>
-                            }</div>
+                            }
+                                {(props.user.username !== account.username &&
+                                        (!props.user.state.includes(config.userStatuses.FIRED) && account.permissions.includes(config.permissions.FIRING_USERS))) &&
+                                    <>
+                                        <Button onClick={() => handleShowConfirm()} variant="warning"><BsXLg className="me-1"/>Fire</Button>
+                                        <Modal show={showConfirm} onHide={handleClose} centered>
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>User Firing</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>Are you sure you want to fire @{props.user.username}?</Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="danger" onClick={handleConfirmFiring}>
+                                                    Yes, I am sure
+                                                </Button>
+                                                <Button variant="secondary" onClick={handleClose}>
+                                                    Cancel
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                    </>
+                                }
+
+                            </div>
                         }
                     </>
                 )}

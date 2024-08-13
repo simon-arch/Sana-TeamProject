@@ -8,7 +8,7 @@ export interface User {
     lastName: string;
     role: string;
     permissions: string[];
-    state: 'AVALIABLE' | 'VACATION' | 'FIRED'
+    state: string;
 }
 
 export interface UserState {

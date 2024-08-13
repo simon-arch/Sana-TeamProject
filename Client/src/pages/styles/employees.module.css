@@ -4,7 +4,7 @@
     padding: 4px 13px;
 }
 
-.badge-avaliable {
+.badge-available {
     color: white;
     border-color: #198754;
     background-color: #198754;
@@ -13,6 +13,12 @@
 .badge-vacation {
     border-color: #ffc107;
     background-color: #ffc107;
+}
+
+.badge-fired {
+    color: white;
+    border-color: #f63f51;
+    background-color: #f63f51;
 }
 
 .table-header td {

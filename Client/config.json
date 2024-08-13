@@ -14,5 +14,11 @@
         "DELETE_USER": "DELETE_USER",
         "REVIEW_VACATIONS": "REVIEW_VACATIONS",
         "FIRING_USERS": "FIRING_USERS"
+    },
+
+    "userStatuses": {
+        "AVAILABLE": "AVAILABLE",
+        "VACATION": "VACATION",
+        "FIRED": "FIRED"
     }
 }
