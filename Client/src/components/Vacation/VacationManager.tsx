@@ -26,7 +26,7 @@ const VacationManager = () => {
 
     return (
         <div>
-            <div className="w-75">
+            <div className="col-8">
             <ToggleButtonGroup type="checkbox" defaultValue={filter} onChange={handleChangeFilter} className="mb-2">
                 <ToggleButton variant="outline-success" id="tbg-check-1" value={1}>
                     Approved
@@ -41,10 +41,10 @@ const VacationManager = () => {
                 { vacations.map((appeal, index) => (
                     filter.includes(statuses.indexOf(appeal.status) + 1) && (
                             <VacationCard key={index} vacation={appeal}>
+                                Sent by <span style={{fontStyle: "italic"}}>{appeal.sender}</span>
                                 {
                                     appeal.status == 'PENDING' && (
                                         <div className="mt-3">
-                                            <h6>Sender: <span>{appeal.sender}</span></h6>
                                             <Button variant="success" onClick={() => setVacationStatus(appeal.id, 'APPROVED')}>Approve</Button>
                                             <Button className="ms-2" variant="danger" onClick={() => setVacationStatus(appeal.id, 'REJECTED')}>Reject</Button>
                                         </div>

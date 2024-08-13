@@ -52,22 +52,22 @@ const VacationForm = () => {
                 setSubmit(true);
                 getVacations();
             }).catch(error => setError(Capitalize(error.message)!));
-        } else { setError("Wrong input") }
+        } else { setError("Input field error") }
     };
 
     return (
         <Row>
             <Col md={4}>
                 <InputGroup>
-                <InputGroup.Text className="col-4"><BsType className="me-2"/>Title</InputGroup.Text>
-                <Form.Control
-                    className="rounded-0"
-                    type="text"
-                    name="title"
-                    placeholder="Title of your appeal"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    autoComplete="off"/>
+                    <InputGroup.Text className="col-4"><BsType className="me-2"/>Title</InputGroup.Text>
+                        <Form.Control
+                            className="rounded-0"
+                            type="text"
+                            name="title"
+                            placeholder="Title of your appeal"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            autoComplete="off"/>
                 </InputGroup>
 
                 <InputGroup className="my-3">
@@ -115,7 +115,7 @@ const VacationForm = () => {
                                 <div>{error}</div>
                             </Tooltip>
                         }>
-                    <Button variant="primary" type="submit" onClick={(e) => handleSubmit(e)}>
+                    <Button variant="success" type="submit" onClick={(e) => handleSubmit(e)}>
                         Send
                     </Button>
                 </OverlayTrigger>
@@ -130,7 +130,7 @@ const VacationForm = () => {
                 </Alert>
             </Col>
             <Col style={{overflowY: "scroll", height: "80vh"}} className="d-flex justify-content-center">
-                <div className="w-75">
+                <div className="w-100">
                     { vacations.map((vacation, index) => (
                         <VacationCard key={index} vacation={vacation}></VacationCard>
                     )) }

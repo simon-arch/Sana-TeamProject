@@ -1,0 +1,21 @@
+.badge-approved {
+    background-color: #198754;
+    color: white;
+}
+
+.badge-pending {
+    background-color: #ffc107;
+}
+
+.badge-rejected {
+    background-color: #dc3545;
+    color: white;
+}
+
+.badge {
+    font-weight: 400;
+    font-size: 14px;
+    border-radius: 3px;
+    padding: 1px 10px;
+}
+  

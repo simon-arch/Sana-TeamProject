@@ -1,0 +1,22 @@
+.badge {
+    border-radius: 15px;
+    border: 1px solid;
+    padding: 4px 13px;
+}
+
+.badge-avaliable {
+    color: white;
+    border-color: #198754;
+    background-color: #198754;
+}
+
+.badge-vacation {
+    border-color: #ffc107;
+    background-color: #ffc107;
+}
+
+.table-header td {
+    padding: 8px 15px !important;
+    color: #6c757d !important;
+    background-color: #f8f9fa !important;
+}

@@ -43,6 +43,7 @@ const accountSlice = createSlice({
             state.user.lastName = action.payload.lastName;
             state.user.role = action.payload.role;
             state.user.permissions = action.payload.permissions;
+            state.user.state = action.payload.state;
             state.status = 'idle';
         },
         setError: (state, action: PayloadAction<string>) => {

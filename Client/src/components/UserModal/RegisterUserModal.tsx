@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, FormCheck, FormControl, FormGroup, FormLabel, FormSelect, Modal} from "react-bootstrap";
+import {Button, Dropdown, DropdownButton, Form, InputGroup, Modal} from "react-bootstrap";
 import {BsCheck2} from "react-icons/bs";
 import {registerRequest, setError} from "../../store/slices/userSlice.ts";
 import {useAppDispatch} from "../../hooks/redux.ts";
@@ -9,8 +9,7 @@ import {getRoles} from "../../store/slices/roleSlice.ts";
 import {RootState} from "../../store";
 import {useSelector} from "react-redux";
 import config from "../../../config.json";
-import {Config} from "./PermissionSelect.tsx";
-
+import {Config} from "./ModalComponents/PermissionSelect.tsx";
 
 interface ModalProps {
     show: boolean,
@@ -46,11 +45,10 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
         );
     };
 
-    const handlePresetChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedPreset = event.target.value;
-        setPreset(selectedPreset);
-        if (selectedPreset) {
-            const presetPermissions = data.presets[selectedPreset];
+    const handlePresetChange = (preset: string) => {
+        setPreset(preset);
+        if (preset) {
+            const presetPermissions = data.presets[preset];
             setSelectedPermissions(presetPermissions);
         }
     };
@@ -89,81 +87,97 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 <Modal.Title>Register New User</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <FormGroup className="mb-2">
-                    <FormLabel>First name</FormLabel>
-                    <FormControl
-                        type="text"
-                        name="firstname"
-                        value={firstName}
-                        onChange={e => setFirstName(e.target.value)}
-                        required
-                    />
-                </FormGroup>
-                <FormGroup className="mb-2">
-                    <FormLabel>Last name</FormLabel>
-                    <FormControl
-                        type="text"
-                        name="lastname"
-                        value={lastName}
-                        onChange={e => setLastName(e.target.value)}
-                        required
-                    />
-                </FormGroup>
-                <FormGroup className="mb-2">
-                    <FormLabel>Username</FormLabel>
-                    <FormControl
-                        type="text"
-                        name="username"
-                        value={username} onChange={e =>
-                        setUsername(e.target.value)}
-                        required
-                    />
-                </FormGroup>
-                <FormGroup className="mb-2">
-                    <FormLabel>Password</FormLabel>
-                    <FormControl
-                        type="password"
-                        name="password"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        required
-                    />
-                </FormGroup>
-                <FormGroup className="mb-2">
-                    <FormLabel>Role</FormLabel>
-                    <FormControl
-                        as="select"
-                        value={role}
-                        onChange={e => setRole(e.target.value)}
-                        required
-                    >
-                        <option value="">Select a role...</option>
-                        {roles.map(role => (
-                            <option key={role} value={role}>{role}</option>
-                        ))}
-                    </FormControl>
-                </FormGroup>
-                <FormGroup className="mb-3">
-                    <FormLabel>Permissions</FormLabel>
-                    <div className="container-preset">
-                        <FormSelect className="roleManager-select form-select-sm" value={preset}
-                                    onChange={handlePresetChange}>
-                            <option value="" disabled>Optional preset...</option>
-                            {Object.keys(data.presets).map(preset => (
-                                <option key={preset} value={preset}>{preset}</option>
+
+                <InputGroup className="my-1">
+                    <InputGroup.Text className="col-2">First name</InputGroup.Text>
+                    <Form.Control
+                            type="text"
+                            name="firstname"
+                            value={firstName}
+                            onChange={e => setFirstName(e.target.value)}
+                            autoComplete="off"
+                            required/>
+                </InputGroup>
+
+                <InputGroup className="my-1">
+                    <InputGroup.Text className="col-2">Last name</InputGroup.Text>
+                    <Form.Control
+                            type="text"
+                            name="lastname"
+                            value={lastName}
+                            onChange={e => setLastName(e.target.value)}
+                            autoComplete="off"
+                            required/>
+                </InputGroup>
+
+                <InputGroup className="my-1">
+                    <InputGroup.Text className="col-2">Username</InputGroup.Text>
+                    <Form.Control
+                            type="text"
+                            name="username"
+                            value={username} onChange={e =>
+                            setUsername(e.target.value)}
+                            autoComplete="off"
+                            required/>
+                </InputGroup>
+
+                <InputGroup className="my-1">
+                    <InputGroup.Text className="col-2">Password</InputGroup.Text>
+                    <Form.Control
+                            type="password"
+                            name="password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            autoComplete="off"
+                            required/>
+                </InputGroup>
+
+                <InputGroup className="mb-1">
+                    <DropdownButton
+                    variant="secondary col-2 text-start bg-light text-dark"
+                    title="Role">
+                        {roles.map((role, index) => (<Dropdown.Item key={index} onClick={() => setRole(role)}>{role}</Dropdown.Item>))}
+                    </DropdownButton>
+                    <Form.Control
+                            type="text"
+                            name="role"
+                            value={role}
+                            autoComplete="off"
+                            readOnly/>
+                </InputGroup>
+
+                <InputGroup className="mb-1">
+                    <DropdownButton
+                        variant="secondary col-2 text-start bg-light text-dark"
+                        title="Permissions">
+                            {Object.keys(data.presets).map((preset, index) => (
+                                <Dropdown.Item key={index} onClick={() => handlePresetChange(preset)}>{preset}</Dropdown.Item>
                             ))}
-                        </FormSelect>
-                    </div>
-                    {permissions.map(perm => (
-                        <FormCheck
-                            key={perm}
-                            type="checkbox"
-                            label={perm}
-                            checked={selectedPermissions.includes(perm)}
-                            onChange={() => handlePermissionChange(perm)}
-                        />
+                    </DropdownButton>
+                    <Form.Control
+                            type="text"
+                            name="preset"
+                            value={preset}
+                            autoComplete="off"
+                            readOnly/>
+                </InputGroup>
+
+                <table className="table text-start table-bordered">
+                    <tbody>
+                    {permissions.map((perm, index) => (
+                        <tr key={index}>
+                            <td>
+                                <input className="mx-2"
+                                        type="checkbox"
+                                        checked={selectedPermissions.includes(perm)}
+                                        onChange={() => handlePermissionChange(perm)}/>
+                                <label htmlFor={perm}>{perm}</label>
+                            </td>
+                        </tr>
                     ))}
-                </FormGroup>
+                    </tbody>
+                </table>
+
                 <div className="text-end mt-4">
                     <Button variant="success"
                             onClick={handleRegister}><BsCheck2 className="me-1"/>Register</Button>

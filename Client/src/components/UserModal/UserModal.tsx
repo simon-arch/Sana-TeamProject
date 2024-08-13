@@ -1,29 +1,67 @@
 import React, {useState} from 'react';
-import {User} from "../../store/slices/userSlice.ts";
-import {Button, FormControl, FormGroup, FormLabel, Modal} from "react-bootstrap";
-import {useAppSelector} from "../../hooks/redux.ts";
-import {BsCheck2} from "react-icons/bs";
-import RoleField from "./RoleField.tsx";
-import PermissionSelect from "./PermissionSelect.tsx";
+import {User, deleteUser} from "../../store/slices/userSlice.ts";
+import {Button, Form, InputGroup, Modal} from "react-bootstrap";
+import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
+import {BsCheck2, BsXLg} from "react-icons/bs";
+import RoleField from "./ModalComponents/RoleField.tsx";
+import PermissionSelect from "./ModalComponents/PermissionSelect.tsx";
 import config from '../../../config.json';
+import FirstNameField from './ModalComponents/FirstNameField.tsx';
+import LastNameField from './ModalComponents/LastNameField.tsx';
+import { sendRequest } from '../../store/epics/helpers/request.ts';
 
 interface ModalProps {
     show: boolean;
-    onHide() : void
+    setShow(prevState : boolean) : void
     user: User,
 }
 
+const convertPayload = (rec: Record<string, boolean>): string[] => {
+    return Object.entries(rec)
+        .filter(([_, val]) => val)
+        .map(([key]) => key);
+};
+
 const UserModal = (props : ModalProps) : React.JSX.Element => {
+    const dispatch = useAppDispatch();
     const account = useAppSelector<User>(state => state.accountInfo.user);
 
+    const handleConfirm = () => {
+        dispatch(deleteUser({username: props.user.username}));
+        props.setShow(false);
+    }
+
+    const [showConfirm, setShowConfirm] = useState(false);
+    const handleClose = () => setShowConfirm(false);
+    const handleShowConfirm = () => setShowConfirm(true);
+
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [role, setRole] = useState('');
+    const [permissions, setPermissions] = useState<Record<string, boolean>>({});
+
+    const [firstNameEdited, setFirstNameEdited] = useState(false);
+    const [lastNameEdited, setLastNameEdited] = useState(false);
     const [roleEdited, setRoleEdited] = useState(false);
     const [permissionsEdited, setPermissionsEdited] = useState(false);
 
-    const [isConfirm, setConfirm] = useState(false);
+    const handleUpdate = () => {
+        sendRequest(`mutation {
+                user {
+                    update_user(
+                        user: {
+                            username: "${props.user.username}"
+                            firstName: "${firstName}"
+                            lastName: "${lastName}"
+                            role: ${role}
+                            permissions: [${convertPayload(permissions)}]
+                        } ) { username } } }`);
+        props.setShow(false);
+    }
 
     return (
         <Modal show={props.show}
-               onHide={props.onHide}
+               onHide={() => props.setShow(false)}
                centered
                size="xl">
             <Modal.Header closeButton>
@@ -32,29 +70,44 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
             <Modal.Body>
                 {props.user && (
                     <>
-                        <FormGroup className="mb-2">
-                            <FormLabel>First name</FormLabel>
-                            <FormControl type="text" readOnly value={props.user.firstName}/>
-                        </FormGroup>
-                        <FormGroup className="mb-2">
-                            <FormLabel>Last name</FormLabel>
-                            <FormControl type="text" readOnly value={props.user.lastName}/>
-                        </FormGroup>
-                        <FormGroup className="mb-2">
-                            <FormLabel>Username</FormLabel>
-                            <FormControl type="text" readOnly value={props.user.username}/>
-                        </FormGroup>
-                        <RoleField user={props.user} setEdited={setRoleEdited} isConfirm={isConfirm} setConfirm={setConfirm}  isEdited={roleEdited}/>
-                        <PermissionSelect user={props.user} setEdited={setPermissionsEdited} isConfirm={isConfirm} setConfirm={setConfirm} isEdited={permissionsEdited}/>
+                        <InputGroup className="mb-1">
+                            <InputGroup.Text className="col-2">Username</InputGroup.Text>
+                            <Form.Control name="lastname" type="text" value={props.user.username} readOnly/>
+                        </InputGroup>
+
+                        <FirstNameField setFirstName={setFirstName} firstName={firstName} user={props.user} setEdited={setFirstNameEdited} isEdited={firstNameEdited}/>
+                        <LastNameField setLastName={setLastName} lastName={lastName} user={props.user} setEdited={setLastNameEdited} isEdited={lastNameEdited}/>
+                        <RoleField setRole={setRole} role={role} user={props.user} setEdited={setRoleEdited} isEdited={roleEdited}/>
+                        <PermissionSelect setPermissions={setPermissions} permissions={permissions} user={props.user} setEdited={setPermissionsEdited} isEdited={permissionsEdited}/>
+
                         {(props.user.username !== account.username 
                             && (account.permissions.includes(config.permissions.MANAGE_USER_ROLES) 
                             || account.permissions.includes(config.permissions.MANAGE_USER_PERMISSIONS)))
                             &&
-                            <div className="text-end mt-4">
+                            <div className="mt-4 d-flex justify-content-between">
                                 <Button variant="success"
-                                        disabled={!(roleEdited || permissionsEdited)}
-                                        onClick={() => setConfirm(true)}><BsCheck2 className="me-1"/>Confirm</Button>
-                            </div>
+                                        disabled={!(firstNameEdited || lastNameEdited || roleEdited || permissionsEdited)}
+                                        onClick={handleUpdate}><BsCheck2 className="me-1"/>Confirm</Button>
+
+                            {(props.user.username !== account.username && account.permissions.includes(config.permissions.DELETE_USER)) &&
+                                <>
+                                    <Button onClick={() => handleShowConfirm()} variant="danger"><BsXLg className="me-1"/>Delete</Button>
+                                    <Modal show={showConfirm} onHide={handleClose} centered>
+                                        <Modal.Header closeButton>
+                                            <Modal.Title>User Deletion</Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>Are you sure you want to delete @{props.user.username}?</Modal.Body>
+                                        <Modal.Footer>
+                                            <Button variant="danger" onClick={handleConfirm}>
+                                                Yes, I am sure
+                                            </Button>
+                                            <Button variant="secondary" onClick={handleClose}>
+                                                Cancel
+                                            </Button>
+                                        </Modal.Footer>
+                                    </Modal>
+                                </>
+                            }</div>
                         }
                     </>
                 )}

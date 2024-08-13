@@ -1,5 +1,7 @@
-import { Accordion, Badge, Card } from "react-bootstrap"
+import { Card, Col, Row, Table } from "react-bootstrap"
 import { Capitalize } from "../../helpers/format"
+
+import styles from "./vacation.module.css";
 
 export interface Vacation {
     id: Number,
@@ -21,30 +23,36 @@ const VacationCard = (props: Props) => {
         <Card bg="light"
             key={String(props.vacation.id)}
             text="black"
-            className="mb-2"
-            border={props.vacation.status == 'APPROVED' 
-                ? 'success' : props.vacation.status == 'PENDING' 
-                    ? 'warning' : 'danger'}>
-            <Card.Header className="d-flex gap-1">
-                <Badge style={{fontWeight: "500"}} text={props.vacation.status == 'PENDING' ? 'dark' : 'white'} 
-                    bg={props.vacation.status == 'APPROVED' 
-                        ? 'success' : props.vacation.status == 'PENDING' 
-                            ? 'warning' : 'danger'}>
+            className="mb-2">
+            <Card.Header>
+                <span className={`${styles["badge"]} ${styles[`badge-${props.vacation.status.toLowerCase()}`]}`}>
                     {Capitalize(props.vacation.status)}
-                </Badge>
+                </span>
             </Card.Header>
             <Card.Body>
-                <Card.Title>{props.vacation.title}</Card.Title>
-                    <Accordion>
-                    <Accordion.Item eventKey="0">
-                        <Accordion.Header>Description</Accordion.Header>
-                        <Accordion.Body>
-                            {(props.vacation.description) ? (props.vacation.description) : ("No description provided.")}
-                        </Accordion.Body>
-                    </Accordion.Item>
-                </Accordion>
-                From: {props.vacation.startDate.toString().split("T")[0]}<br/>
-                To: {props.vacation.endDate.toString().split("T")[0]}
+                <Row>
+                    <Col md={3}>
+                        <Table hover className="border rounded">
+                            <tbody>
+                                <tr>
+                                    <td>Title:</td>
+                                    <td>{props.vacation.title}</td>
+                                </tr>
+                                <tr>
+                                    <td>Start Date:</td>
+                                    <td>{props.vacation.startDate.toString().split("T")[0]}</td>
+                                </tr>
+                                <tr>
+                                    <td>End Date:</td>
+                                    <td>{props.vacation.endDate.toString().split("T")[0]}</td>
+                                </tr>
+                            </tbody>
+                        </Table>
+                    </Col>
+                    <Col className="bg-white me-4 border rounded pt-2 mb-3">
+                        {(props.vacation.description) ? (props.vacation.description) : ("No description provided.")}
+                    </Col>
+                </Row>
                 {props.children}
             </Card.Body>
         </Card>

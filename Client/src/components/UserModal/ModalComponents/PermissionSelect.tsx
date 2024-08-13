@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {setUserPermissions, User} from "../../store/slices/userSlice.ts";
-import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
-import config from "../../../config.json";
-import {Button, Form, FormGroup, FormLabel} from "react-bootstrap";
+import {useEffect, useState} from 'react';
+import {User} from "../../../store/slices/userSlice.ts";
+import {useAppSelector} from "../../../hooks/redux.ts";
+import config from "../../../../config.json";
+import {Button, Dropdown, DropdownButton, Form, InputGroup} from "react-bootstrap";
 import {BsArrowCounterclockwise} from "react-icons/bs";
 
 export interface Settings {
@@ -21,25 +21,16 @@ interface Props {
     user: User,
     isEdited: boolean,
     setEdited(prevState: boolean): void,
-    isConfirm: boolean,
-    setConfirm(prevState: boolean) : void
+    setPermissions(prevState: Record<string, boolean>): void,
+    permissions: Record<string, boolean>
 }
-
-const convertPayload = (rec: Record<string, boolean>): string[] => {
-    return Object.entries(rec)
-        .filter(([_, val]) => val)
-        .map(([key]) => key);
-};
 
 const data: Config = config as Config;
 
 const PermissionSelect = (props: Props) => {
-    const dispatch = useAppDispatch();
-
     const account = useAppSelector(state => state.accountInfo.user);
     const permissions = useAppSelector<string[]>(state => state.permissions.permissions);
 
-    const [targetCheckboxes, setTargetCheckboxes] = useState<Record<string, boolean>>({});
     const [sourceCheckboxes, setSourceCheckboxes] = useState<Record<string, boolean>>({});
     const [preset, setPreset] = useState<string>('');
 
@@ -49,8 +40,9 @@ const PermissionSelect = (props: Props) => {
             permissions.forEach(perm => {
                 target[perm] = props.user.permissions.includes(perm);
             });
-            setTargetCheckboxes(target);
+            props.setPermissions(target);
             setSourceCheckboxes(target);
+            props.setEdited(false);
         }
     }, [permissions, props.user]);
 
@@ -60,55 +52,51 @@ const PermissionSelect = (props: Props) => {
             permissions.forEach(perm => {
                 target[perm] = data.presets[preset].includes(perm);
             });
-            setTargetCheckboxes(target);
+            props.setPermissions(target);
         }
     }, [permissions, preset]);
 
-    const handlePresetChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setPreset(event.target.value);
+    const handlePresetChange = (preset: string) => {
+        setPreset(preset);
     };
 
     const handleCheckboxChange = (perm: string) => {
-        setTargetCheckboxes({ ...targetCheckboxes, [perm]: !targetCheckboxes[perm] })
+        props.setPermissions({ ...props.permissions, [perm]: !props.permissions[perm] })
     }
 
     useEffect(() => {
-        props.setEdited(JSON.stringify(targetCheckboxes) !== JSON.stringify(sourceCheckboxes));
-    }, [targetCheckboxes]);
+        props.setEdited(JSON.stringify(props.permissions) !== JSON.stringify(sourceCheckboxes));
+    }, [props.permissions]);
 
     const handleReset = () => {
-        setTargetCheckboxes(sourceCheckboxes);
+        props.setPermissions(sourceCheckboxes);
         setPreset("");
         props.setEdited(false);
     }
 
-    useEffect(() => {
-        if (props.isConfirm && props.isEdited) {
-            setSourceCheckboxes(targetCheckboxes);
-            props.setEdited(false);
-            props.setConfirm(false);
-            dispatch(setUserPermissions({username: props.user.username, permissions: convertPayload(targetCheckboxes)}));
-        }
-    }, [dispatch, props]);
-
     return (
-        <FormGroup className="mb-2">
-            <FormLabel className="d-flex justify-content-between">
-                <span>Permissions</span>
-                <div className="w-50 d-flex gap-2">
-                    {(props.user.username !== account.username && account.permissions.includes(config.permissions.MANAGE_USER_ROLES)) && (
-                        <>
-                            <Form.Select className="roleManager-select form-select-sm" value={preset} onChange={handlePresetChange}>
-                                <option value="" disabled>Optional preset...</option>
-                                {Object.keys(config.presets).map(preset => (
-                                    <option key={preset} value={preset}>{preset}</option>
-                                ))}
-                            </Form.Select>
+        <div>
+            <div>
+                    {(props.user.username !== account.username && account.permissions.includes(config.permissions.MANAGE_USER_PERMISSIONS)) && (
+                        <InputGroup className="mb-1">
+                            <DropdownButton
+                                variant="secondary text-start bg-light text-dark col-2"
+                                title="Permissions">
+                                    {Object.keys(config.presets).map(preset => (
+                                        <Dropdown.Item key={preset} onClick={() => handlePresetChange(preset)}>{preset}</Dropdown.Item>
+                                    ))}
+                            </DropdownButton>
+                            <Form.Control
+                                    placeholder={"Select custom preset..."}
+                                    type="text"
+                                    name="preset"
+                                    value={preset}
+                                    autoComplete="off"
+                                    readOnly/>
                             <Button variant="warning" disabled={!props.isEdited} onClick={handleReset}><BsArrowCounterclockwise/></Button>
-                        </>
+                        </InputGroup>
                     )}
-                </div>
-            </FormLabel>
+            </div>
             <div>
                 <table className="table text-start table-bordered">
                     <tbody>
@@ -117,7 +105,7 @@ const PermissionSelect = (props: Props) => {
                             <td>
                                 <input className="mx-2"
                                        type="checkbox"
-                                       checked= {targetCheckboxes[perm] || false}
+                                       checked= {props.permissions[perm] || false}
                                        disabled={props.user.username == account.username || !account.permissions.includes(config.permissions.MANAGE_USER_ROLES) }
                                        name={perm}
                                        id={perm}
@@ -129,7 +117,7 @@ const PermissionSelect = (props: Props) => {
                     </tbody>
                 </table>
             </div>
-        </FormGroup>
+        </div>
     );
 };
 

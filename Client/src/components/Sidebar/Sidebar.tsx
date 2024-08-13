@@ -59,7 +59,7 @@ const Sidebar : FC = () => {
                     </li>
                     <li className="my-1">
                         <BsFillPersonLinesFill className="me-1"/>
-                        <Link to="/" className="text-decoration-none text-black">About</Link>
+                        <Link to="/about" className="text-decoration-none text-black">About</Link>
                     </li>
                     <li className="my-1" onClick={handleLogout}>
                         <BsDoorOpenFill className="me-1 text-danger"/>

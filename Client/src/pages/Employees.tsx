@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../hooks/redux.ts";
-import {deleteUser, getUsers, User} from "../store/slices/userSlice.ts";
+import {getUsers, User} from "../store/slices/userSlice.ts";
 import {Button, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Table} from "react-bootstrap";
 import {HiMagnifyingGlass} from "react-icons/hi2";
 import UserModal from "../components/UserModal/UserModal.tsx";
@@ -9,6 +9,8 @@ import {getPermissions} from "../store/slices/permissionSlice.ts";
 import {Capitalize} from "../helpers/format.ts";
 import config from '../../config.json';
 import RegisterUserModal from "../components/UserModal/RegisterUserModal.tsx";
+
+import styles from "./styles/employees.module.css";
 
 const Employees = () => {
     const dispatch = useAppDispatch();
@@ -34,10 +36,6 @@ const Employees = () => {
     const openRegisterModal = () => {
         setShowRegisterModal(true);
     };
-
-    const handleDeleteUser = (user: User) => {
-        dispatch(deleteUser({username: user.username}));
-    }
 
     useEffect(() => {
         const source = [...users];
@@ -77,8 +75,6 @@ const Employees = () => {
                 <h1>Employees</h1>
                 <p className="text-secondary">Complete list of employees</p>
             </div>
-
-            {/*placeholder*/}
             <div className="my-3 d-flex justify-content-between">
                 <div className="d-flex w-75 gap-4">
                     <InputGroup className="w-25">
@@ -99,50 +95,31 @@ const Employees = () => {
                     (account.permissions.includes(config.permissions.REGISTER_USER)) &&
                         <Button onClick={() => openRegisterModal()}>Add +</Button>}
             </div>
-            <UserModal show={show} onHide={() => setShow(false)} user={user}/>
+            <UserModal show={show} user={user} setShow = {setShow}/>
             <RegisterUserModal show={showRegisterModal} onHide={() => setShowRegisterModal(false)} />
             <Table hover className="border shadow rounded mb-5">
                 <thead>
-                <tr>
-                    <td className="px-3 text-start text-secondary bg-light">Name</td>
-                    <td className="px-3 text-start text-secondary bg-light">Role</td>
-                    <td className="text-secondary bg-light">Status</td>
-                    <td className="text-secondary bg-light col-1">Action</td>
+                <tr className={styles["table-header"]}>
+                    <td>Name</td>
+                    <td>Role</td>
+                    <td>Status</td>
+                    <td className="col-1">Action</td>
                 </tr>
                 </thead>
                 <tbody>
                 {users.map((user, index) => (
                     <tr key={index}>
-                        <td className="p-3 text-start">{user.firstName} {user.lastName}</td>
-                        <td className="p-3 text-start">{Capitalize(user.role)}</td>
+                        <td className="p-3">{user.firstName} {user.lastName}</td>
+                        <td className="p-3">{Capitalize(user.role)}</td>
                         <td className="p-3">
-                            <span className="px-3 py-1 text-success rounded-pill border border-success">{Capitalize(user.state)}</span>
+                            <span className={`${styles["badge"]} ${styles[`badge-${user.state.toLowerCase()}`]}`}>{Capitalize(user.state)}</span>
                         </td>
                         <td className="p-3">
                             <button onClick={() => openModal(user)} className="btn border py-0 px-2">...</button>
-                            {(user.username !== account.username && account.permissions.includes(config.permissions.DELETE_USER)) &&
-                                <Button onClick={() => handleDeleteUser(user)} variant="danger" className="py-0 px-2 ms-2" >X</Button>
-                            }
-
                         </td>
                     </tr>))}
                 </tbody>
             </Table>
-            {/*placeholder
-                <div className="d-flex justify-content-between">
-                <Pagination>
-                    <Pagination.First/>
-                    <Pagination.Prev/>
-                    <Pagination.Item active>1</Pagination.Item>
-                    <Pagination.Item>2</Pagination.Item>
-                    <Pagination.Item>3</Pagination.Item>
-                    <Pagination.Ellipsis/>
-                    <Pagination.Item>10</Pagination.Item>
-                    <Pagination.Next/>
-                    <Pagination.Last/>
-                </Pagination>
-                <small className="text-secondary">Displaying 10 of 100</small>
-            </div> */}
         </div>
     );
 };

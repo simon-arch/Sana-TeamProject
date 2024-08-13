@@ -8,6 +8,7 @@ import {useEffect} from "react";
 import {setTokenPayload} from "./store/slices/accountSlice.ts";
 import Dashboard from "./pages/Dashboard.tsx";
 import Vacations from "./pages/Vacations.tsx";
+import About from "./pages/About.tsx";
 
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
                                 <Route path="/dashboard" element={<Dashboard/>}/>
                                 <Route path="/employees" element={<Employees/>}/>
                                 <Route path="/vacations" element={<Vacations/>}/>
+                                <Route path="/about" element={<About/>}/>
 
                                 <Route path="*" element={<Navigate to="/"/>}/> 
                             </Routes>

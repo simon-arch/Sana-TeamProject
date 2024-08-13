@@ -60,8 +60,7 @@ export const registerUserEpic = createEpic(
                     firstName: "${firstName}", 
                     lastName: "${lastName}", 
                     role: ${role}, 
-                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')},
-                    state: "AVALIABLE"
+                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')}
                 }) 
                 { 
                     username 
