@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
-import {User, deleteUser, updateRequest} from "../../store/slices/userSlice.ts";
+import {User, deleteUser, setUserState, updateRequest} from "../../store/slices/userSlice.ts";
 import {Button, Form, InputGroup, Modal} from "react-bootstrap";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {BsCheck2, BsXLg} from "react-icons/bs";
 import RoleField from "./ModalComponents/RoleField.tsx";
 import PermissionSelect from "./ModalComponents/PermissionSelect.tsx";
-import config from '../../../config.json';
 import FirstNameField from './ModalComponents/FirstNameField.tsx';
 import LastNameField from './ModalComponents/LastNameField.tsx';
+import config from '../../../config.json';
 
 interface ModalProps {
     show: boolean;
@@ -27,10 +27,14 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
     const account = useAppSelector<User>(state => state.accountInfo.user);
 
     const handleRequest = () => {
-        dispatch(deleteUser({username: props.user.username}));
+        props.user.state.includes(config.userStatuses.FIRED)
+            ? dispatch(deleteUser({username: props.user.username}))
+            : dispatch(setUserState({username: props.user.username, state: config.userStatuses.FIRED}))
+        
+        props.setLocalStatus('loading');
         setConfirm(false);
         props.setShow(false);
-    }
+    };
 
     const handleConfirm = () => setConfirm(true);
 
@@ -83,8 +87,8 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                         <RoleField setRole={setRole} role={role} user={props.user} setEdited={setRoleEdited} isEdited={roleEdited}/>
                         <PermissionSelect setPermissions={setPermissions} permissions={permissions} user={props.user} setEdited={setPermissionsEdited} isEdited={permissionsEdited}/>
 
-                        {(props.user.username !== account.username 
-                            && (account.permissions.includes(config.permissions.MANAGE_USER_ROLES) 
+                        {(props.user.username !== account.username
+                            && (account.permissions.includes(config.permissions.MANAGE_USER_ROLES)
                             || account.permissions.includes(config.permissions.MANAGE_USER_PERMISSIONS)))
                             &&
                             <div className="mt-4 d-flex justify-content-between">
@@ -92,13 +96,30 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                                         disabled={!(firstNameEdited || lastNameEdited || roleEdited || permissionsEdited)}
                                         onClick={handleUpdate}><BsCheck2 className="me-1"/>Confirm</Button>
 
-                            {(props.user.username !== account.username && account.permissions.includes(config.permissions.DELETE_USER)) &&
+                            {confirm
+                                ? <Button onClick={() => handleRequest()} variant="danger"><BsXLg className="me-1"/>Are you sure?</Button>
+                                : props.user.state.includes(config.userStatuses.FIRED)
+                                    ? account.permissions.includes(config.permissions.DELETE_USER)
+                                        && <Button onClick={() => handleConfirm()} variant="danger"><BsXLg className="me-1"/>Delete</Button>
+                                    : account.permissions.includes(config.permissions.FIRE_USER)
+                                        && <Button onClick={() => handleConfirm()} variant="danger"><BsXLg className="me-1"/>Fire</Button>
                                 
-                                confirm
-                                    ? <Button onClick={() => handleRequest()} variant="danger"><BsXLg className="me-1"/>Are you sure?</Button>
-                                    : <Button onClick={() => handleConfirm()} variant="danger"><BsXLg className="me-1"/>Delete</Button>
-                                    
-                            }</div>
+                                //                               FALSE    ┌─────────┐    TRUE              
+                                //                           ┌────────────┤ CONFIRM ├────────────┐         
+                                //                           │            └─────────┘            │         
+                                //                           │                                   │         
+                                //                     ┌─────▼─────┐                       ┌─────▼──────┐  
+                                //             TRUE ┌──┤ IS FIRED? ├──┐ FALSE              │SHOW CONFIRM│  
+                                //                  │  └───────────┘  │                    └────────────┘  
+                                //                  │                 │                                    
+                                //            ┌─────▼─────┐FALSE┌─────▼─────┐                              
+                                //    TRUE ┌──┤CAN DELETE?├──┬──┤ CAN FIRE? ├──┐ TRUE                      
+                                //         │  └───────────┘  │  └───────────┘  │                           
+                                //   ┌─────▼─────┐         ┌─▼─┐         ┌─────▼─────┐                     
+                                //   │SHOW DELETE│         │</>│         │ SHOW FIRE │                     
+                                //   └───────────┘         └───┘         └───────────┘   
+
+                            } </div>
                         }
                     </>
                 )}

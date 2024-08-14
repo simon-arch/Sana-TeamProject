@@ -12,6 +12,13 @@
         "MANAGE_USER_PERMISSIONS": "MANAGE_USER_PERMISSIONS",
         "REGISTER_USER": "REGISTER_USER",
         "DELETE_USER": "DELETE_USER",
-        "REVIEW_VACATIONS": "REVIEW_VACATIONS"
+        "REVIEW_VACATIONS": "REVIEW_VACATIONS",
+        "FIRE_USER": "FIRE_USER"
+    },
+
+    "userStatuses": {
+        "AVAILABLE": "AVAILABLE",
+        "VACATION": "VACATION",
+        "FIRED": "FIRED"
     }
 }

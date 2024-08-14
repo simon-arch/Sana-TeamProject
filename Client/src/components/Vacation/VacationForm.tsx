@@ -89,6 +89,7 @@ const VacationForm = () => {
                     <InputGroup.Text className="col-4"><BsJustify className="me-2"/>Start Date</InputGroup.Text>
                     <Form.Group>
                         <DatePicker
+                            name="startDate"
                             selected={startDate}
                             onChange={(date) => setStartDate(date!)}
                             className="form-control rounded-0"
@@ -101,6 +102,7 @@ const VacationForm = () => {
                     <InputGroup.Text className="col-4"><BsJustify className="me-2"/>End Date</InputGroup.Text>
                     <Form.Group>
                         <DatePicker
+                            name="endDate"
                             selected={endDate}
                             onChange={(date) => setEndDate(date!)}
                             className="form-control rounded-0"

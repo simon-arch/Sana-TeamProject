@@ -63,7 +63,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 password: password,
                 role: role,
                 permissions: selectedPermissions,
-                state: 'AVALIABLE'
+                state: config.userStatuses.AVAILABLE
             }));
             setUsername('');
             setFirstName('');
@@ -170,6 +170,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                             <td>
                                 <input className="mx-2"
                                         type="checkbox"
+                                        id={perm}
                                         checked={selectedPermissions.includes(perm)}
                                         onChange={() => handlePermissionChange(perm)}/>
                                 <label htmlFor={perm}>{perm}</label>

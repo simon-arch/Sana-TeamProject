@@ -104,12 +104,12 @@ const PermissionSelect = (props: Props) => {
                         <tr key={perm}>
                             <td>
                                 <input className="mx-2"
-                                       type="checkbox"
-                                       checked= {props.permissions[perm] || false}
-                                       disabled={props.user.username == account.username || !account.permissions.includes(config.permissions.MANAGE_USER_ROLES) }
-                                       name={perm}
-                                       id={perm}
-                                       onChange={() => handleCheckboxChange(perm)}/>
+                                    id={perm}
+                                    name={perm}
+                                    type="checkbox"
+                                    checked= {props.permissions[perm] || false}
+                                    disabled={props.user.username == account.username || !account.permissions.includes(config.permissions.MANAGE_USER_ROLES) }
+                                    onChange={() => handleCheckboxChange(perm)}/>
                                 <label htmlFor={perm}>{perm}</label>
                             </td>
                         </tr>

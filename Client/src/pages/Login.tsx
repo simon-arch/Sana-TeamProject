@@ -32,14 +32,17 @@ const Login = () : React.JSX.Element => {
                     <InputGroup className="mb-2">
                         <InputGroup.Text><BsFillPersonFill/></InputGroup.Text>
                         <Form.Control
+                            name="username"
                             value={username}
                             type="text"
                             placeholder="Username"
+                            autoComplete="off"
                             onChange={(e) => setUsername(e.target.value)}/>
                     </InputGroup>
                     <InputGroup>
                         <InputGroup.Text><BsFillKeyFill/></InputGroup.Text>
                         <Form.Control
+                            name="password"
                             value={password}
                             type="password"
                             placeholder="Password"

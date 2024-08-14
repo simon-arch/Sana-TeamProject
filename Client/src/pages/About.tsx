@@ -34,8 +34,8 @@ const About = () => {
                         <td>Permissions:</td>
                         <td>
                             <ul className="m-0 p-0">
-                                {account.permissions && account.permissions.map((permission, _) => (
-                                    <li className="list-group-item">{permission}</li>
+                                {account.permissions && account.permissions.map((permission, index) => (
+                                    <li key={index} className="list-group-item">{permission}</li>
                                 ))}
                             </ul>    
                         </td>

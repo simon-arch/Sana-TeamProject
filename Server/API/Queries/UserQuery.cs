@@ -28,13 +28,23 @@ public sealed class UserQuery : ObjectGraphType
             .ResolveAsync(async context =>
             {
                 context.WithPermission(Permission.VIEW_USERS);
+                
+                bool canViewFullList = context.HasPermission(Permission.DELETE_USER) ||
+                                       context.HasPermission(Permission.FIRE_USER);
 
                 var pageNumber = context.GetArgument<int>("page_number");
                 var pageSize = context.GetArgument<int>("page_size");
                 var query = context.GetArgument<string?>("query");
 
-                return await context.RequestServices!.GetRequiredService<IUserRepository>()
+                var resultSet = await context.RequestServices!.GetRequiredService<IUserRepository>()
                     .GetAllAsync(pageNumber, pageSize, query);
+                
+                if (!canViewFullList)
+                {
+                    resultSet.Results = resultSet.Results.Where(user => user.State != State.Fired);
+                }
+
+                return resultSet;
             });
     }
 }

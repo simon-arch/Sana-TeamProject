@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../hooks/redux.ts";
 import {getUsers, User} from "../store/slices/userSlice.ts";
-import {Button, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Spinner, Table} from "react-bootstrap";
+import {Badge, Button, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Spinner, Table} from "react-bootstrap";
 import {HiMagnifyingGlass} from "react-icons/hi2";
 import UserModal from "../components/UserModal/UserModal.tsx";
 import {getRoles} from "../store/slices/roleSlice.ts";
@@ -59,6 +59,11 @@ const Employees = () => {
     }, [debouncedQuery]);
 
     useEffect(() => {
+        const totalPages = Math.max(1, Math.ceil(userNumber / pageSize));
+        if (page > totalPages) setPage(totalPages);
+    }, [userNumber]);
+
+    useEffect(() => {
         const subscription = onSearch$.pipe(
             map((prompt: any) => prompt.trim()),
             debounceTime(400),
@@ -95,9 +100,9 @@ const Employees = () => {
     }, [status]);
 
     useEffect(() => {
-        console.log(localStatus);
-        if (localStatus == 'idle')
+        if (localStatus == 'idle') {
             updateUsers();
+        }
         else setLocalStatus('loading')
     }, [dispatch, page, debouncedQuery, localStatus]);
 
@@ -115,12 +120,12 @@ const Employees = () => {
                 <div className="d-flex w-75 gap-4">
                     <InputGroup className="w-25">
                         <InputGroup.Text><HiMagnifyingGlass/></InputGroup.Text>
-                        <FormControl type="text" placeholder="Quick search..." value={query}
+                        <FormControl name="search" type="text" placeholder="Quick search..." value={query}
                                      onChange={handleSearch}/>
                     </InputGroup>
                     <FormGroup className="w-25 d-flex align-items-center">
-                        <FormLabel className="text-secondary my-0 me-2"><small>Sort by</small></FormLabel>
-                        <FormSelect className="w-75" value={sort} onChange={(e) => setSort(e.target.value)}>
+                        <FormLabel htmlFor="sort" className="text-secondary my-0 me-2"><small>Sort by</small></FormLabel>
+                        <FormSelect id="sort" className="w-75" value={sort} onChange={(e) => setSort(e.target.value)}>
                             <option value="name">Name</option>
                             <option value="role">Role</option>
                             <option value="status">Status</option>
@@ -150,8 +155,12 @@ const Employees = () => {
                                     <tbody>
                                     {users.map((user, index) => (
                                         <tr key={index}>
-                                            <td className="p-3">{user.firstName} {user.lastName}</td>
-                                            <td className="p-3">{Capitalize(user.role)}</td>
+                                            <td className="p-3">
+                                                {user.firstName} {user.lastName} {user.username == account.username && <Badge>You</Badge>}
+                                            </td>
+                                            <td className="p-3">
+                                                {Capitalize(user.role)}
+                                            </td>
                                             <td className="p-3">
                                                 <span className={`${styles["badge"]} ${styles[`badge-${user.state.toLowerCase()}`]}`}>{Capitalize(user.state)}</span>
                                             </td>

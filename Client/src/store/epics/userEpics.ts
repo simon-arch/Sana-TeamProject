@@ -13,9 +13,11 @@ import {
     getUsers,
     registerRequest,
     registerSuccess,
-    setUsers,
     updateRequest,
-    updateSuccess
+    updateSuccess,
+    setUsers, 
+    setUserState, 
+    setUserStateSuccess
 } from "../slices/userSlice.ts";
 import {getPermissions, setPermissions} from "../slices/permissionSlice.ts";
 import {getRoles, setRoles} from "../slices/roleSlice.ts";
@@ -52,9 +54,8 @@ export const userInfoEpic = createEpic(
 export const registerUserEpic = createEpic(
     registerRequest.type,
     (action: any) => {
-        const {username, password, firstName, lastName, role, permissions} = action.payload;
-        return `
-        mutation {
+        const {username, password, firstName, lastName, role, permissions, state} = action.payload;
+        return `mutation {
             auth {
                 register(user: { 
                     username: "${username}", 
@@ -62,7 +63,8 @@ export const registerUserEpic = createEpic(
                     firstName: "${firstName}", 
                     lastName: "${lastName}", 
                     role: ${role}, 
-                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')}
+                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')},
+                    state: ${state}
                 }) 
                 { 
                     username 
@@ -78,7 +80,6 @@ export const registerUserEpic = createEpic(
     data => registerSuccess(data.data.auth.register),
     error => setError(error.message)
 );
-
 
 export const deleteUserEpic = createEpic(
     deleteUser.type,
@@ -114,6 +115,21 @@ export const updateUserEpic = createEpic(
     _ => updateSuccess(),
     error => setError(error.message)
 );
+
+export const setUserStateEpic = createEpic(
+    setUserState.type,
+    (action: any) => {
+        const username = action.payload.username;
+        const state = action.payload.state;
+        return `mutation {
+                    user {
+                        set_state(username: "${username}", state: ${state}) { username }
+                    }
+            }`;
+    },
+    data => setUserStateSuccess(data.data.user.set_state.username),
+    error => setError(error.message)
+)
 
 export const getAllUsersEpic = createEpic(
     getUsers.type,
@@ -166,6 +182,7 @@ export const userEpics = [
     userInfoEpic,
     registerUserEpic,
     deleteUserEpic,
+    setUserStateEpic,
     getAllUsersEpic,
     permissionsEpic,
     updateUserEpic,

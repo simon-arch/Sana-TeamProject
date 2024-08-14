@@ -29,5 +29,18 @@ namespace Server.Authorization
                 };
             }
         }
+        
+        public static bool HasPermission(this IResolveFieldContext context, Permission permission)
+        {
+            try
+            {
+                context.WithPermission(permission);
+                return true;
+            }
+            catch (ExecutionError)
+            {
+                return false;
+            }
+        }
     }
 }

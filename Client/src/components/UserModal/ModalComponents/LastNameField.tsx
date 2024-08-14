@@ -51,6 +51,7 @@ const LastNameField = (props : LastNameFieldProps) => {
                         type="text"
                         name="lastname"
                         value={props.lastName}
+                        autoComplete="off"
                         onChange={e => handleChange(e.target.value)}/>
                     <Button variant="warning" disabled={!props.isEdited} onClick={handleReset}>
                         <BsArrowCounterclockwise/>

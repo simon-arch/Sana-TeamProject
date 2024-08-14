@@ -11,12 +11,18 @@ namespace Server.Models
         public required string LastName { get; set; }
         public required Role Role { get; set; }
         public required Permission[] Permissions { get; set; }
-        public required State State { get; set; }
+        public required State State { get; set; } = State.Available;
     }
     public enum State
     {
         Available = 0,
         Vacation = 1,
         Fired = 2
+    }
+    
+    public enum WorkType
+    {
+        FullTime = 0,
+        PartTime = 1
     }
 }

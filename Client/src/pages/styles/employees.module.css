@@ -15,6 +15,12 @@
     background-color: #ffc107;
 }
 
+.badge-fired {
+    color: white;
+    border-color: #f63f51;
+    background-color: #f63f51;
+}
+
 .table-header td {
     padding: 8px 15px !important;
     color: #6c757d !important;

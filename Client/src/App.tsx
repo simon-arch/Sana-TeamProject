@@ -14,7 +14,8 @@ import About from "./pages/About.tsx";
 function App() {
     const dispatch = useAppDispatch();
 
-    const { isLoggedIn } = useAppSelector(state => state.accountInfo);
+    const isLoggedIn = useAppSelector(state => state.accountInfo.isLoggedIn);
+    const role = useAppSelector(state => state.accountInfo.user.role);
 
     useEffect(() => {
         if (!isLoggedIn) {
@@ -42,7 +43,13 @@ function App() {
                                 <Route path="/vacations" element={<Vacations/>}/>
                                 <Route path="/about" element={<About/>}/>
 
-                                <Route path="*" element={<Navigate to="/"/>}/> 
+                                <Route path="*" element={
+                                    <Navigate to={
+                                        role == "DEVELOPER" ? "/dashboard" :
+                                        role == "USER_MANAGER" ? "/employees" :
+                                        "/"
+                                    }/>
+                                }/> 
                             </Routes>
                         </div>
                     </div>
