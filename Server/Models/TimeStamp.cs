@@ -7,6 +7,7 @@
         public required DateTime TimeStart { get; set; }
         public DateTime? TimeEnd { get; set; }
         public required Source Source { get; set; }
+        public string? Editor { get; set; }
     }
     public enum Source
     {

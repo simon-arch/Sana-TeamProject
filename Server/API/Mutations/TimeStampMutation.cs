@@ -5,6 +5,7 @@ using Server.API.GraphTypes;
 using Server.Authorization;
 using Server.Data.Repositories;
 using Server.Models;
+using System.Security.Claims;
 
 namespace Server.API.Mutations
 {
@@ -51,6 +52,7 @@ namespace Server.API.Mutations
                 .Argument<NonNullGraphType<IntGraphType>>("id")
                 .Argument<DateTimeGraphType>("timeStart")
                 .Argument<DateTimeGraphType>("timeEnd")
+                .Argument<StringGraphType>("editor")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
@@ -58,6 +60,7 @@ namespace Server.API.Mutations
                     var id = context.GetArgument<int>("id");
                     var timeStart = context.GetArgument<DateTime?>("timeStart");
                     var timeEnd = context.GetArgument<DateTime?>("timeEnd");
+                    var username = context.GetArgument<string?>("editor");
 
                     var timeStampRepository = context.RequestServices!.GetRequiredService<ITimeStampRepository>();
                     var timeStamp = await timeStampRepository.GetAsync(id)
@@ -65,6 +68,10 @@ namespace Server.API.Mutations
 
                     if (timeStart != null) timeStamp.TimeStart = (DateTime)timeStart;
                     if (timeEnd != null) timeStamp.TimeEnd = (DateTime)timeEnd;
+                    if (username != null) {
+                        timeStamp.Editor = username;
+                        timeStamp.Source = Source.USER;
+                    }
 
                     await timeStampRepository.UpdateAsync(timeStamp);
 
