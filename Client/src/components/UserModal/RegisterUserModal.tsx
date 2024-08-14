@@ -10,6 +10,7 @@ import {RootState} from "../../store";
 import {useSelector} from "react-redux";
 import config from "../../../config.json";
 import {Config} from "./ModalComponents/PermissionSelect.tsx";
+import {getWorkTypes} from "../../store/slices/workTypeSlice.ts";
 
 interface ModalProps {
     show: boolean,
@@ -29,12 +30,18 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
     const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
     const [preset, setPreset] = useState<string>('');
 
+    const [workType, setWorkType] = useState('');
+    const [workingTime, setWorkingTime] = useState(1);
+    const [showWorkingTime, setShowWorkingTime] = useState(false);
+
     const roles: string[] = useSelector((state: RootState) => state.roles.roles);
     const permissions: string[] = useSelector((state: RootState) => state.permissions.permissions);
+    const workTypes: string[] = useSelector((state: RootState) => state.workTypes.workTypes);
 
     useEffect(() => {
         dispatch(getRoles());
         dispatch(getPermissions());
+        dispatch(getWorkTypes());
     }, [dispatch]);
 
     const handlePermissionChange = (perm: string) => {
@@ -53,6 +60,11 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
         }
     };
 
+    const handleWorkTypeChange = (workType: string) => {
+        setWorkType(workType);
+        setShowWorkingTime(workType === config.workType.FULL_TIME);
+    };
+
     const handleRegister = (e: React.FormEvent) => {
         e.preventDefault();
         if (username && firstName && lastName && password && role) {
@@ -63,7 +75,9 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 password: password,
                 role: role,
                 permissions: selectedPermissions,
-                state: config.userStatuses.AVAILABLE
+                state: config.userStatuses.AVAILABLE,
+                workType: workType,
+                workingTime: workingTime
             }));
             setUsername('');
             setFirstName('');
@@ -72,7 +86,10 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
             setRole('');
             setSelectedPermissions([]);
             setPreset('');
+            setWorkType('');
+            setWorkingTime(1);
             props.setShow(false);
+            setShowWorkingTime(false);
             props.setLocalStatus('loading');
         } else {
             dispatch(setError('All fields are required.'));
@@ -133,6 +150,33 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                             required/>
                 </InputGroup>
 
+                <InputGroup className="mb-1">
+                    <DropdownButton
+                        variant="secondary col-2 text-start bg-light text-dark"
+                        title="WorkType">
+                        {workTypes.map((workType, index) => (<Dropdown.Item key={index} onClick={() => handleWorkTypeChange(workType)}>{workType}</Dropdown.Item>))}
+                    </DropdownButton>
+                    <Form.Control
+                        type="text"
+                        name="workType"
+                        value={workType}
+                        autoComplete="off"
+                        readOnly/>
+                </InputGroup>
+
+                {showWorkingTime &&
+                <InputGroup className="formHours">
+                    <InputGroup.Text className="col-2">Working time</InputGroup.Text>
+                    <Form.Control
+                        type="number"
+                        step="0.5"
+                        min="1"
+                        max="12"
+                        value={workingTime}
+                        onChange={event => setWorkingTime(Number(event.target.value))}
+                    />
+                </InputGroup>
+                }
                 <InputGroup className="mb-1">
                     <DropdownButton
                     variant="secondary col-2 text-start bg-light text-dark"

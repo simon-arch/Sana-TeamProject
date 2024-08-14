@@ -44,6 +44,8 @@ const accountSlice = createSlice({
             state.user.role = action.payload.role;
             state.user.permissions = action.payload.permissions;
             state.user.state = action.payload.state;
+            state.user.workType = action.payload.workType;
+            state.user.workingTime = action.payload.workingTime;
             state.status = 'idle';
         },
         setError: (state, action: PayloadAction<string>) => {

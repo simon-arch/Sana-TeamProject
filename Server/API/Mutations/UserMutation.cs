@@ -105,7 +105,10 @@ public sealed class UserMutation : ObjectGraphType
                     LastName = requestUser.LastName,
                     Role = requestUser.Role,
                     Permissions = requestUser.Permissions,
-                    State = oldUser.State
+                    State = oldUser.State,
+                    WorkType = requestUser.WorkType,
+                    WorkingTime = requestUser.WorkingTime
+                    
                 };
 
                 await context.RequestServices!.GetRequiredService<IUserRepository>().UpdateAsync(newUser);

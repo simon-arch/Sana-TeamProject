@@ -21,6 +21,7 @@ import {
 } from "../slices/userSlice.ts";
 import {getPermissions, setPermissions} from "../slices/permissionSlice.ts";
 import {getRoles, setRoles} from "../slices/roleSlice.ts";
+import {getWorkTypes, setWorkTypes} from "../slices/workTypeSlice.ts";
 
 export const loginEpic = createEpic(
     getAccessToken.type,
@@ -39,7 +40,7 @@ export const userInfoEpic = createEpic(
     (action: any) => `
     query { 
         user { 
-            get(username: "${action.payload}") { username, firstName, lastName, role, permissions, state } 
+            get(username: "${action.payload}") { username, firstName, lastName, role, permissions, state, workType, workingTime } 
         } 
     }`,
     data => setAccountInfo(data.data.user.get),
@@ -54,7 +55,7 @@ export const userInfoEpic = createEpic(
 export const registerUserEpic = createEpic(
     registerRequest.type,
     (action: any) => {
-        const {username, password, firstName, lastName, role, permissions, state} = action.payload;
+        const {username, password, firstName, lastName, role, permissions, state, workType, workingTime} = action.payload;
         return `mutation {
             auth {
                 register(user: { 
@@ -64,7 +65,9 @@ export const registerUserEpic = createEpic(
                     lastName: "${lastName}", 
                     role: ${role}, 
                     permissions: ${JSON.stringify(permissions).replace(/"/g, '')},
-                    state: ${state}
+                    state: ${state},
+                    workType: ${workType},
+                    workingTime: ${workingTime}
                 }) 
                 { 
                     username 
@@ -73,6 +76,8 @@ export const registerUserEpic = createEpic(
                     role 
                     permissions
                     state
+                    workType
+                    workingTime
                 }
             }
         }`;
@@ -144,7 +149,7 @@ export const getAllUsersEpic = createEpic(
                         query: "${query ? query : ''}"
                         ) {
                        totalCount
-                       results { username firstName lastName role permissions state }
+                       results { username firstName lastName role permissions state workType workingTime }
                     } 
                 } 
             }`;
@@ -177,6 +182,18 @@ export const rolesEpic = createEpic(
     error => setError(error.message)
 );
 
+export const workTypesEpic = createEpic(
+    getWorkTypes.type,
+    () => `
+    query { 
+        auth { 
+            work_types 
+        } 
+    }`,
+    data => setWorkTypes(data.data.auth.work_types),
+    error => setError(error.message)
+);
+
 export const userEpics = [
     loginEpic,
     userInfoEpic,
@@ -186,7 +203,8 @@ export const userEpics = [
     getAllUsersEpic,
     permissionsEpic,
     updateUserEpic,
-    rolesEpic
+    rolesEpic,
+    workTypesEpic
 ];
 
 

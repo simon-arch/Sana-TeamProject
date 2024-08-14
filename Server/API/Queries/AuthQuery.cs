@@ -1,5 +1,6 @@
 ﻿using GraphQL.Types;
 using Server.Authorization;
+using Server.Models;
 
 namespace Server.API.Queries;
 
@@ -21,6 +22,13 @@ public sealed class AuthQuery : ObjectGraphType
                 context.Authorize();
 
                 return Enum.GetValues(typeof(Permission));
+            });
+        Field<ListGraphType<EnumerationGraphType<WorkType>>>("work_types")
+            .Resolve(context =>
+            {
+                context.Authorize();
+
+                return Enum.GetValues(typeof(WorkType));
             });
     }
 }

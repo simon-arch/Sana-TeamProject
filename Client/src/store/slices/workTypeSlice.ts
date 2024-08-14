@@ -1,28 +1,28 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface UserState {
-    roles: string[];
+    workTypes: string[];
     status: 'idle' | 'loading' | 'error';
     error: string | null
 }
 
 const initialState: UserState = {
-    roles: [],
+    workTypes: [],
     status: 'loading',
     error: null
 };
 
-const roleSlice = createSlice(
+const workTypeSlice = createSlice(
     {
-        name: 'roles',
+        name: 'work_types',
         initialState,
         reducers: {
-            getRoles(state){
+            getWorkTypes(state){
                 state.status = 'loading';
             },
-            setRoles(state, action) {
+            setWorkTypes(state, action) {
                 state.status = 'idle';
-                state.roles = action.payload.map((role: string) => role );
+                state.workTypes = action.payload.map((workType: string) => workType );
             },
             setError(state, action) {
                 state.status = 'error';
@@ -33,9 +33,9 @@ const roleSlice = createSlice(
 );
 
 export const {
-    getRoles,
-    setRoles,
+    getWorkTypes,
+    setWorkTypes,
     setError
-} = roleSlice.actions;
+} = workTypeSlice.actions;
 
-export default roleSlice.reducer;
+export default workTypeSlice.reducer;

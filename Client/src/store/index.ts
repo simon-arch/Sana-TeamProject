@@ -6,10 +6,12 @@ import {combineEpics, createEpicMiddleware} from 'redux-observable';
 import accountInfoSlice from './slices/accountSlice.ts';
 import permissionSlice from './slices/permissionSlice.ts';
 import {userEpics} from "./epics/userEpics.ts";
+import workTypeSlice from "./slices/workTypeSlice.ts";
 
 const rootReducer = combineReducers({
     users: userSlice,
     roles: roleSlice,
+    workTypes: workTypeSlice,
     permissions: permissionSlice,
     accountInfo: accountInfoSlice
 });

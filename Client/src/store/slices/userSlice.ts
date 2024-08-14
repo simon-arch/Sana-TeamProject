@@ -9,6 +9,8 @@ export interface User {
     role: string;
     permissions: string[];
     state: string;
+    workType: string;
+    workingTime: number;
 }
 
 export interface UserState {
@@ -54,8 +56,8 @@ const userSlice = createSlice(
                         }`);
             },
             //@ts-ignore
-            registerRequest(state, action: PayloadAction<User>) { state.status = 'loading'; },
-            registerSuccess(state) { state.status = "idle"; },
+            registerRequest(state, action: PayloadAction<User>) { state.status = 'loading';},
+            registerSuccess(state) { state.status = "idle";},
 
             //@ts-ignore
             updateRequest(state, action: PayloadAction<User>) { state.status = 'loading'; },

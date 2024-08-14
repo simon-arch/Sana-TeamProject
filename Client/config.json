@@ -20,5 +20,9 @@
         "AVAILABLE": "AVAILABLE",
         "VACATION": "VACATION",
         "FIRED": "FIRED"
+    },
+    "workType": {
+        "FULL_TIME": "FULL_TIME",
+        "PART_TIME": "PART_TIME"
     }
 }
