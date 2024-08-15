@@ -17,6 +17,7 @@ internal class Program
         builder.Services.AddHttpContextAccessor();
 
         builder.Services.AddSingleton<TokenService>();
+        builder.Services.AddHostedService<MidnightCleanupService>();
 
         builder.Services.AddSingleton<DbProvider>();
 

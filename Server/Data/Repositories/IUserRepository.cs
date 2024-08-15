@@ -6,7 +6,8 @@ namespace Server.Data.Repositories
     {
         Task<User?> GetAsync(string username);
         Task<User?> GetAsync(Guid tokenId);
-        Task<ResultSet<User>> GetAllAsync(int pageNumber, int pageSize, string? query);
+        Task<ResultSet<User>> GetAllAsync();
+        Task<ResultSet<User>> GetAllAsync(GetAllOptions options);
         Task InsertAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(string username);

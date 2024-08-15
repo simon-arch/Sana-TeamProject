@@ -2,6 +2,7 @@
 using GraphQL.Types;
 using Server.API.GraphTypes;
 using Server.Authorization;
+using Server.Data.Extensions;
 using Server.Data.Repositories;
 using Server.Models;
 
@@ -15,7 +16,7 @@ public sealed class UserQuery : ObjectGraphType
             .Argument<NonNullGraphType<StringGraphType>>("username")
             .ResolveAsync(async context =>
             {
-                context.WithPermission(Permission.VIEW_USERS);
+                context.Authorize();
 
                 var username = context.GetArgument<string>("username");
                 return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username);
@@ -29,22 +30,19 @@ public sealed class UserQuery : ObjectGraphType
             {
                 context.WithPermission(Permission.VIEW_USERS);
                 
-                bool canViewFullList = context.HasPermission(Permission.DELETE_USER) ||
+                bool canViewFired = context.HasPermission(Permission.DELETE_USER) ||
                                        context.HasPermission(Permission.FIRE_USER);
 
                 var pageNumber = context.GetArgument<int>("page_number");
                 var pageSize = context.GetArgument<int>("page_size");
                 var query = context.GetArgument<string?>("query");
 
-                var resultSet = await context.RequestServices!.GetRequiredService<IUserRepository>()
-                    .GetAllAsync(pageNumber, pageSize, query);
-                
-                if (!canViewFullList)
-                {
-                    resultSet.Results = resultSet.Results.Where(user => user.State != State.Fired);
-                }
-
-                return resultSet;
+                return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync(options => options
+                    .SetPageNumber(pageNumber)
+                    .SetPageSize(pageSize)
+                    .SetQuery(query)
+                    .IncludeFired(canViewFired)
+                );
             });
     }
 }
