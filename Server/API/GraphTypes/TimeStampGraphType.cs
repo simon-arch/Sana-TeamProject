@@ -12,6 +12,7 @@ namespace Server.API.GraphTypes
             Field(ts => ts.TimeStart);
             Field(ts => ts.TimeEnd, nullable: true);
             Field(ts => ts.Source);
+            Field(ts => ts.Editor, nullable: true);
         }
     }
 }

@@ -93,19 +93,14 @@ const userSlice = createSlice(
 );
 
 export const {
-    getUsers,
-    setUsers,
+    getUsers, setUsers,
     setUserRole,
     setUserPermissions,
-    registerRequest,
-    registerSuccess,
-    deleteUser,
-    deleteUserSuccess,
+    registerRequest, registerSuccess,
+    deleteUser, deleteUserSuccess,
     setError,
-    updateRequest,
-    updateSuccess,
-    setUserState,
-    setUserStateSuccess
+    updateRequest, updateSuccess,
+    setUserState, setUserStateSuccess
 } = userSlice.actions;
 
 export default userSlice.reducer;

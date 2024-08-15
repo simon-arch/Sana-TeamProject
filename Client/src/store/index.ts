@@ -7,13 +7,17 @@ import accountInfoSlice from './slices/accountSlice.ts';
 import permissionSlice from './slices/permissionSlice.ts';
 import {userEpics} from "./epics/userEpics.ts";
 import workTypeSlice from "./slices/workTypeSlice.ts";
+import timeStampSlice from './slices/timeStampSlice.ts';
+import {timeStampEpics} from './epics/timeStampEpics.ts';
+
 
 const rootReducer = combineReducers({
     users: userSlice,
     roles: roleSlice,
     workTypes: workTypeSlice,
     permissions: permissionSlice,
-    accountInfo: accountInfoSlice
+    accountInfo: accountInfoSlice,
+    timeStamps: timeStampSlice
 });
 
 const epicMiddleware = createEpicMiddleware();
@@ -24,7 +28,7 @@ export const setupStore = () => {
         middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(epicMiddleware)
     });
 
-    epicMiddleware.run(combineEpics(...userEpics));
+    epicMiddleware.run(combineEpics(...userEpics, ...timeStampEpics));
 
     return store;
 };

@@ -27,7 +27,7 @@ export const loginEpic = createEpic(
     getAccessToken.type,
     (action: any) => `
     mutation {
-        auth { 
+        auth {
             login(username: "${action.payload.username}", password: "${action.payload.password}") 
         } 
     }`,

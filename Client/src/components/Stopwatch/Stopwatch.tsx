@@ -13,20 +13,25 @@ interface TimeStamp {
     timeEnd: string | null
 }
 
+interface Props {
+    setStatus(prevState: 'loading' | 'idle' | 'error'): void,
+}
+
 const formatTime = (date : Date): string =>
     date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: "2-digit"});
 
 const getCurrentTime = (): string => formatTime(new Date());
 
-const Stopwatch = () => {
+const Stopwatch = (props: Props) => {
     const username = useAppSelector(state => state.accountInfo.user.username);
 
-    const [active, setActive] = useState(false);
     const [canSend, setCanSend] = useState(false);
 
     const [lastCheckin, setLastCheckin] = useState('');
     const [prevStamp, setPrevStamp] = useState<TimeStamp>({id: 0, timeEnd: null, timeStart: ""});
     const [currentStamp, setCurrentStamp] = useState<TimeStamp>({id: 0, timeEnd: null, timeStart: ""});
+
+    const [active, setActive] = useState(false);
 
     const getLatest = async () => {
         let response;
@@ -62,6 +67,7 @@ const Stopwatch = () => {
     }, []);
 
     const startNewStamp = async () => {
+        props.setStatus('loading');
         const start = new Date();
 
         let responce;
@@ -77,6 +83,7 @@ const Stopwatch = () => {
         setCurrentStamp({id, timeStart: formatTime(start), timeEnd: formatTime(start)});
     }
     const finishCurrent = async () => {
+        props.setStatus('loading');
         try {
             await sendRequest(`mutation { timeStamp { set_time(id: ${currentStamp.id}, timeEnd: "${new Date().toISOString()}") } }`);
         } catch (e: any) {
@@ -88,13 +95,13 @@ const Stopwatch = () => {
     useEffect(() => {
         if (active) {
             if (currentStamp.timeStart === '') {
-                startNewStamp().then();
+                startNewStamp().then(() => props.setStatus('idle'));
             }
             const timer = setInterval(() => setCurrentStamp({...currentStamp, timeEnd: getCurrentTime()}), 1000);
             return () => clearInterval(timer);
         }
         else if (canSend) {
-            finishCurrent().then();
+            finishCurrent().then(() => props.setStatus('idle'));
             setPrevStamp(currentStamp);
             setCurrentStamp({id: 0, timeEnd: null, timeStart: ""});
             setCanSend(false);
@@ -117,7 +124,7 @@ const Stopwatch = () => {
     }
 
     return (
-        <Card border={active ? "danger" : "success"}>
+        <Card className="mb-4" border={active ? "danger" : "success"}>
             <Card.Body className="d-flex justify-content-between align-items-center">
                 <h4>Ongoing session</h4>
                 <div className="d-flex align-items-center gap-3">

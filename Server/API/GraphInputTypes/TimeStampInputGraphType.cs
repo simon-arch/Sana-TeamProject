@@ -11,6 +11,7 @@ namespace Server.API.GraphInputTypes
             Field(ts => ts.TimeStart);
             Field(ts => ts.TimeEnd, nullable: true);
             Field(ts => ts.Source);
+            Field(ts => ts.Editor, nullable: true);
         }
     }
 }
