@@ -12,6 +12,7 @@
     public enum Source
     {
         SYSTEM = 0,
-        USER = 1
+        USER = 1,
+        TIMER = 2
     }
 }

@@ -36,7 +36,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
     }, [props.show, props.timeStamp]);
 
     const handleSubmit = () => {
-        if (startDate! <= endDate! && startDate && endDate) {
+        if (startDate! < endDate! && startDate && endDate) {
             dispatch(worktimeUpdate({
                 id: props.timeStamp.id, 
                 timeStart: startDate!.toISOString(), 
@@ -70,8 +70,8 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                     <InputGroup className="mt-2">
                         <InputGroup.Text className="col-6">Current Editor</InputGroup.Text>
                         <Form.Control className="text-center" readOnly type="text" value={
-                            props.timeStamp.source == "SYSTEM"
-                            ? "SYSTEM" : props.timeStamp.editor!
+                            props.timeStamp.source == "USER" 
+                            ? props.timeStamp.editor! : props.timeStamp.source
                         }/>
                     </InputGroup>
                     <Row className="d-flex justify-content-between my-2">

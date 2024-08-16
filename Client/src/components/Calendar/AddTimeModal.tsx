@@ -20,7 +20,7 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
     const [error, setError] = useState('');
 
     const handleSubmit = () => {
-        if (startDate! <= endDate! && startDate && endDate) {
+        if (startDate! < endDate! && startDate && endDate) {
             dispatch(worktimeCreate({
                 username: username,
                 timeStart: startDate!.toISOString(), 

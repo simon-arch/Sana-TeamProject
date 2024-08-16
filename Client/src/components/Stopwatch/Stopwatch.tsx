@@ -73,7 +73,7 @@ const Stopwatch = (props: Props) => {
         let responce;
         try {
             responce = await sendRequest(
-                `mutation { timeStamp { add(timeStamp: { username: "${username}", timeStart: "${start.toISOString()}", source: SYSTEM }) { id } } }`);
+                `mutation { timeStamp { add(timeStamp: { username: "${username}", timeStart: "${start.toISOString()}", source: TIMER }) { id } } }`);
         } catch (e: any) {
             console.log(e.message);
             setCurrentStamp({id: 0, timeStart: formatTime(start), timeEnd: formatTime(start)});

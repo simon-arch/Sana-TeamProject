@@ -1,12 +1,12 @@
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
 import { worktimeRequest } from '../../store/slices/timeStampSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { useEffect, useState } from 'react';
 import { TimeStamp } from '../../store/slices/timeStampSlice';
 import EditTimeModal from './EditTimeModal';
 import AddTimeModal from './AddTimeModal';
+import { Button, Table } from 'react-bootstrap';
+import { Localize } from '../../helpers/format';
+import { getTimeDifference } from '../../helpers/calculate';
 
 interface Props {
     status: 'loading' | 'idle' | 'error'
@@ -20,81 +20,81 @@ const Calendar = (props: Props) => {
     const status = useAppSelector(state => state.timeStamps.status);
     const timeStamps = useAppSelector<TimeStamp[]>(state => state.timeStamps.timeStamps);
 
-    const [events, setEvents] = useState([{}]);
-    const [slotMinutes, setSlotMinutes] = useState(60);
-    const [editedStamp, setEditedStamp] = useState<TimeStamp>();
+    const [editStamp, setEditStamp] = useState<TimeStamp>();
+    const [events, setEvents] = useState<TimeStamp[]>([]);
 
     const dispatch = useAppDispatch();
     
     useEffect(() => {
-        //dispatch(getUsers({pageNumber: 1, pageSize: 100}));
         if (props.status == 'idle') {
             dispatch(worktimeRequest(username));
         }
     }, [props.status, showEdit, showAdd])
 
-
     useEffect(() => {
         if (status == 'idle' && timeStamps) {
-            const newEvents = timeStamps.map(timeStamp => (
-                {
-                    title: `${timeStamp.username}${timeStamp.username == username && " (you)"}`,
-                    start: new Date(timeStamp.timeStart+"+00:00"),
-                    end: timeStamp.timeEnd ? new Date(timeStamp.timeEnd+"+00:00") : Date.now(),
-                    editor: timeStamp.editor,
-                    source: timeStamp.source,
-                    backgroundColor: timeStamp.source == "SYSTEM" ? "#6610f2" : "#dc3545",
-                    timeStamp: timeStamp
-                }
+            setEvents([...timeStamps].sort(
+                (b, a) => new Date(a.timeStart).getTime() - new Date(b.timeStart).getTime()
             ))
-        setEvents(newEvents);}
+        }
     }, [status, timeStamps]);
 
-    const handleEventClick = (context: any) => { 
-        setEditedStamp(context.event.extendedProps.timeStamp);
-        setShowEdit(true); 
+    const handleEdit = (event: TimeStamp) => {
+        if (event.timeEnd) {
+            setEditStamp(event); 
+            setShowEdit(true);
+        }
     }
-
-    const addButton = {
-        text: 'Add +',
-        click: () => setShowAdd(true)
-      };
-
-    const posZoom = {
-        text: '+',
-        click: () => setSlotMinutes(Math.max(15, slotMinutes - 15))
-      };
-
-    const negZoom = {
-        text: '-',
-        click: () => setSlotMinutes(Math.min(60, slotMinutes + 15))
-      };
 
     return (
         <div>
-            <FullCalendar
-                headerToolbar={{
-                    left: 'today prev,next addButton',
-                    center: 'title',
-                    right: 'negZoom,posZoom dayGridMonth,timeGridWeek,timeGridDay'
-                  }}
-                customButtons={{
-                    addButton: addButton,
-                    posZoom: posZoom,
-                    negZoom: negZoom
-                }}
-                allDayText=''
-                buttonIcons={false}
-                height={"80vh"}
-                plugins={[dayGridPlugin, timeGridPlugin]}
-                initialView="timeGridWeek"
-                events={events}
-                eventBorderColor="#212529"
-                slotDuration={`00:${slotMinutes}:00`}
-                nowIndicator={true}
-                eventClick={handleEventClick}/>
-            <EditTimeModal timeStamp={editedStamp!} setShow={setShowEdit} show={showEdit}/>
-            <AddTimeModal setShow={setShowAdd} show={showAdd}/>
+            <Button className="mb-2" onClick={() => setShowAdd(true)}>Add +</Button>
+            <div style={{overflowY: "scroll", height: "80vh"}}>
+                <Table hover className="border text-center">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Start</th>
+                            <th>Finish</th>
+                            <th>Worktime</th>
+                            <th>Source</th>
+                            <th>Editor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {events.map((event, index) => {
+                        const current = new Date(event.timeStart).toISOString().split('T')[0];
+                        const previous = index > 0 ? new Date(events[index - 1].timeStart).toISOString().split('T')[0] : null;
+
+                        return (
+                        <>
+                            {current !== previous && (
+                            <tr>
+                                <td colSpan={6} className="bg-light font-weight-bold">
+                                    {Localize(event.timeStart, "date")}
+                                </td>
+                            </tr>
+                            )}
+                            <tr onClick={() => { handleEdit(event) }}>
+                                <td>{events.length - index}</td>
+                                <td>{Localize(event.timeStart, "time")}</td>
+                                { event.timeEnd ? 
+                                    <td>{Localize(event.timeEnd, "time")}</td> :
+                                    <td className="fst-italic text-primary">in progress</td> }
+                                { event.timeEnd ? 
+                                    <td>{getTimeDifference(new Date(event.timeStart), new Date(event.timeEnd))}</td> :
+                                    <td className="fst-italic text-primary">in progress</td> }
+                                <td>{event.source}</td>
+                                <td>{event.editor || "none"}</td>
+                            </tr>
+                        </>
+                        );
+                    })}
+                    </tbody>
+                    <EditTimeModal timeStamp={editStamp!} setShow={setShowEdit} show={showEdit}/>
+                    <AddTimeModal setShow={setShowAdd} show={showAdd}/>
+                </Table>
+            </div>
         </div>
     );
 };
