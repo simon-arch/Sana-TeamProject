@@ -9,7 +9,7 @@ import {setTokenPayload} from "./store/slices/accountSlice.ts";
 import Dashboard from "./pages/Dashboard.tsx";
 import Vacations from "./pages/Vacations.tsx";
 import About from "./pages/About.tsx";
-
+import Organizer from "./pages/Organizer.tsx";
 
 function App() {
     const dispatch = useAppDispatch();
@@ -41,6 +41,7 @@ function App() {
                                 <Route path="/dashboard" element={<Dashboard/>}/>
                                 <Route path="/employees" element={<Employees/>}/>
                                 <Route path="/vacations" element={<Vacations/>}/>
+                                <Route path="/organizer" element={<Organizer/>}/>
                                 <Route path="/about" element={<About/>}/>
 
                                 <Route path="*" element={

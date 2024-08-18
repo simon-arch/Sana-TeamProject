@@ -13,6 +13,7 @@ namespace Server.API
             Field<AuthQuery>("auth").Resolve(context => new { });
             Field<VacationQuery>("vacation").Resolve(context => new { });
             Field<TimeStampQuery>("timeStamp").Resolve(context => new { });
+            Field<PlanQuery>("plan").Resolve(context => new { });
         }
     }
 }

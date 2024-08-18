@@ -1,23 +1,17 @@
 import {
-    getAccessToken,
-    setTokenPayload,
     setError,
-    getAccountInfo,
-    setAccountInfo,
+    getAccessToken, setTokenPayload,
+    getAccountInfo, setAccountInfo,
     logout
 } from '../slices/accountSlice';
 import {createEpic} from "./helpers/createEpic.ts";
 import {
-    deleteUser,
-    deleteUserSuccess,
+    deleteUser, deleteUserSuccess,
     getUsers,
-    registerRequest,
-    registerSuccess,
-    updateRequest,
-    updateSuccess,
+    registerRequest, registerSuccess,
+    updateRequest, updateSuccess,
     setUsers, 
-    setUserState, 
-    setUserStateSuccess
+    setUserState, setUserStateSuccess
 } from "../slices/userSlice.ts";
 import {getPermissions, setPermissions} from "../slices/permissionSlice.ts";
 import {getRoles, setRoles} from "../slices/roleSlice.ts";

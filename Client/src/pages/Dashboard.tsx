@@ -1,14 +1,15 @@
 import { useState } from "react";
-import Calendar from "../components/Calendar/Calendar.tsx";
 import Stopwatch from "../components/Stopwatch/Stopwatch.tsx";
+import WorkSessions from "../components/WorkSessions/WorkSessions.tsx";
+import { Status } from "../helpers/types.ts";
 
 const Dashboard = () => {
-    const [status, setStatus] = useState<'loading' | 'idle' | 'error'>('idle');
+    const [status, setStatus] = useState<Status>('idle');
 
     return (
         <div className="p-2 mb-3">
             <Stopwatch setStatus={setStatus}/>
-            <Calendar status={status}/>
+            <WorkSessions status={status}/>
         </div>
     );
 };

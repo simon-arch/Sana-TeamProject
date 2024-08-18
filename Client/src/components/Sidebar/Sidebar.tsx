@@ -1,5 +1,5 @@
 import {FC, useEffect} from 'react';
-import {BsDoorOpenFill, BsEnvelopeFill, BsFillPersonLinesFill, BsPeopleFill, BsQuestionOctagon, BsUiChecksGrid} from "react-icons/bs";
+import {BsCalendar3Range, BsDoorOpenFill, BsEnvelopeFill, BsFillPersonLinesFill, BsPeopleFill, BsQuestionOctagon, BsUiChecksGrid} from "react-icons/bs";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {Link} from "react-router-dom";
 import {getAccountInfo, logout} from "../../store/slices/accountSlice.ts";
@@ -42,6 +42,10 @@ const Sidebar : FC = () => {
                 <div className="p-3">
                     <li className="mb-2">
                         <small className="text-uppercase text-secondary" style={{fontSize: "0.7rem"}}>Main Menu</small>
+                    </li>
+                    <li className="my-1">
+                        <BsCalendar3Range className="me-1"/>
+                        <Link to="/organizer" className="text-decoration-none text-black">Organizer</Link>
                     </li>
                     <li className="my-1">
                         <BsPeopleFill className="me-1"/>

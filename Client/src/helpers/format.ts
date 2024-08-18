@@ -4,14 +4,9 @@ export function Capitalize(value: string) {
     return null;
 }
 
-export function Localize(value: Date, format: 'datetime' | 'date' | 'time' = 'datetime') {
+export function Localize(value: Date) {
     if (value) {
-        const date = new Date(value + "+00:00");
-        switch (format) {
-            case 'date': return date.toLocaleDateString();
-            case 'time': return date.toLocaleTimeString();
-            default: return date.toLocaleString();
-        }
+        return new Date(value + "+00:00");
     }
     return null;
 }

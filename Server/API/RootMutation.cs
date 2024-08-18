@@ -13,6 +13,7 @@ namespace Server.API
             Field<UserMutation>("user").Resolve(context => new { });
             Field<VacationMutation>("vacation").Resolve(context => new { });
             Field<TimeStampMutation>("timeStamp").Resolve(context => new { });
+            Field<PlanMutation>("plan").Resolve(context => new { });
         }
     }
 }

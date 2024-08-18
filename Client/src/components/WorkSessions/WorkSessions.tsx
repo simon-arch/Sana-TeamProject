@@ -2,17 +2,18 @@ import { worktimeRequest } from '../../store/slices/timeStampSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { useEffect, useState } from 'react';
 import { TimeStamp } from '../../store/slices/timeStampSlice';
-import EditTimeModal from './EditTimeModal';
-import AddTimeModal from './AddTimeModal';
+import EditTimeModal from './EditSessionModal';
+import AddTimeModal from './AddSessionModal';
 import { Button, Table } from 'react-bootstrap';
 import { Localize } from '../../helpers/format';
 import { getTimeDifference } from '../../helpers/calculate';
+import { Status } from '../../helpers/types';
 
 interface Props {
-    status: 'loading' | 'idle' | 'error'
+    status: Status
 }
 
-const Calendar = (props: Props) => {
+const WorkSessions = (props: Props) => {
     const [showEdit, setShowEdit] = useState(false);
     const [showAdd, setShowAdd] = useState(false);
 
@@ -71,15 +72,15 @@ const Calendar = (props: Props) => {
                             {current !== previous && (
                             <tr>
                                 <td colSpan={6} className="bg-light font-weight-bold">
-                                    {Localize(event.timeStart, "date")}
+                                    {Localize(event.timeStart)!.toLocaleDateString()}
                                 </td>
                             </tr>
                             )}
                             <tr onClick={() => { handleEdit(event) }}>
                                 <td>{events.length - index}</td>
-                                <td>{Localize(event.timeStart, "time")}</td>
+                                <td>{Localize(event.timeStart)!.toLocaleTimeString()}</td>
                                 { event.timeEnd ? 
-                                    <td>{Localize(event.timeEnd, "time")}</td> :
+                                    <td>{Localize(event.timeEnd)!.toLocaleTimeString()}</td> :
                                     <td className="fst-italic text-primary">in progress</td> }
                                 { event.timeEnd ? 
                                     <td>{getTimeDifference(new Date(event.timeStart), new Date(event.timeEnd))}</td> :
@@ -99,4 +100,4 @@ const Calendar = (props: Props) => {
     );
 };
 
-export default Calendar;
+export default WorkSessions;

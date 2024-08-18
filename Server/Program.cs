@@ -6,6 +6,7 @@ using Server.Authorization;
 using Server.Data;
 using Server.Data.Helpers;
 using Server.Data.Repositories;
+using Server.Models;
 using Server.Services;
 
 internal class Program
@@ -29,6 +30,7 @@ internal class Program
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IVacationRepository, VacationRepository>();
         builder.Services.AddScoped<ITimeStampRepository, TimeStampRepository>();
+        builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 
         builder.Services.AddCors(options => options
             .AddDefaultPolicy(policy => policy
