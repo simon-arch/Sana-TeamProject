@@ -19,8 +19,8 @@ const VacationForm = () => {
     }, []);
 
     const getVacations = () => {
-        sendRequest(`query { vacation { get_by_username(username:"${account.username}") { id, title, description, startDate, endDate, status } } } `)
-        .then(vacations => setVacations(vacations.data.vacation.get_by_username.reverse()));
+        sendRequest(`query { vacation { byUsername(username:"${account.username}") { id, title, description, startDate, endDate, status } } } `)
+        .then(vacations => setVacations(vacations.data.vacation["byUsername"].reverse()));
     }
 
     const [title, setTitle] = useState('');

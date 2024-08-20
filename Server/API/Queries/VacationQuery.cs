@@ -10,7 +10,7 @@ namespace Server.API.Queries
     {
         public VacationQuery()
         {
-            Field<VacationGraphType>("get_by_id")
+            Field<VacationGraphType>("byId")
                 .Argument<NonNullGraphType<IntGraphType>>("id")
                 .ResolveAsync(async context =>
                 {
@@ -20,7 +20,7 @@ namespace Server.API.Queries
                     return await context.RequestServices!.GetRequiredService<IVacationRepository>().GetAsync(id);
                 });
 
-            Field<ListGraphType<VacationGraphType>>("get_by_username")
+            Field<ListGraphType<VacationGraphType>>("byUsername")
                 .Argument<NonNullGraphType<StringGraphType>>("username")
                 .ResolveAsync(async context =>
                 {
@@ -30,7 +30,7 @@ namespace Server.API.Queries
                     return await context.RequestServices!.GetRequiredService<IVacationRepository>().GetAsync(username);
                 });
 
-            Field<ListGraphType<VacationGraphType>>("get_all")
+            Field<ListGraphType<VacationGraphType>>("vacations")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();

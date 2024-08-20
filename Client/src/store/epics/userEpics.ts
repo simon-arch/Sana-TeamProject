@@ -10,34 +10,44 @@ import {
     getUsers,
     registerRequest, registerSuccess,
     updateRequest, updateSuccess,
-    setUsers, 
-    setUserState, setUserStateSuccess
+    setUsers,
+    setUserState, setUserStateSuccess, User
 } from "../slices/userSlice.ts";
 import {getPermissions, setPermissions} from "../slices/permissionSlice.ts";
 import {getRoles, setRoles} from "../slices/roleSlice.ts";
 import {getWorkTypes, setWorkTypes} from "../slices/workTypeSlice.ts";
+import {PayloadAction} from "@reduxjs/toolkit";
 
 export const loginEpic = createEpic(
     getAccessToken.type,
-    (action: any) => `
+    action => `
     mutation {
         auth {
             login(username: "${action.payload.username}", password: "${action.payload.password}") 
         } 
     }`,
-    data => setTokenPayload(data.data.auth.login),
+    data => setTokenPayload(data.data.auth["login"]),
     error => setError(error.message)
 );
 
 export const userInfoEpic = createEpic(
     getAccountInfo.type,
-    (action: any) => `
+    action => `
     query { 
         user { 
-            get(username: "${action.payload}") { username, firstName, lastName, role, permissions, state, workType, workingTime } 
+            user(username: "${action.payload}") {
+                username
+                firstName
+                lastName
+                role
+                permissions
+                state
+                workType
+                workingTime
+            } 
         } 
     }`,
-    data => setAccountInfo(data.data.user.get),
+    data => setAccountInfo(data.data.user.user),
     error => {
         if (error.message === "Failed to fetch") {
             return logout();
@@ -48,31 +58,32 @@ export const userInfoEpic = createEpic(
 
 export const registerUserEpic = createEpic(
     registerRequest.type,
-    (action: any) => {
+    action => {
         const {username, password, firstName, lastName, role, permissions, state, workType, workingTime} = action.payload;
         return `mutation {
             auth {
-                register(user: { 
-                    username: "${username}", 
-                    password: "${password}", 
-                    firstName: "${firstName}", 
-                    lastName: "${lastName}", 
-                    role: ${role}, 
-                    permissions: ${JSON.stringify(permissions).replace(/"/g, '')},
-                    state: ${state},
-                    workType: ${workType},
-                    workingTime: ${workingTime}
-                }) 
-                { 
-                    username 
-                    firstName 
-                    lastName 
-                    role 
-                    permissions
-                    state
-                    workType
-                    workingTime
-                }
+                register(
+                    user: { 
+                        username: "${username}", 
+                        password: "${password}", 
+                        firstName: "${firstName}", 
+                        lastName: "${lastName}", 
+                        role: ${role}, 
+                        permissions: ${JSON.stringify(permissions).replace(/"/g, '')},
+                        state: ${state},
+                        workType: ${workType},
+                        workingTime: ${workingTime}
+                    }
+                    ) { 
+                        username 
+                        firstName 
+                        lastName 
+                        role 
+                        permissions
+                        state
+                        workType
+                        workingTime
+                    }
             }
         }`;
     },
@@ -82,73 +93,93 @@ export const registerUserEpic = createEpic(
 
 export const deleteUserEpic = createEpic(
     deleteUser.type,
-    (action: any) => {
+    action => {
         const username = action.payload.username;
         return `mutation {
                     user {
-                        delete_user(username: "${username}") { username }
+                        delete(username: "${username}") { username }
                     }
             }`;
     },
 
-    data => deleteUserSuccess(data.data.user.delete_user.username),
+    data => deleteUserSuccess(data.data.user.delete.username),
     error => setError(error.message)
 );
 
 export const updateUserEpic = createEpic(
     updateRequest.type,
-    (action: any) => {
+    (action: PayloadAction<User>) => {
         const user = action.payload;
         return `mutation {
             user {
-                update_user(
+                update(
                     user: {
                         username: "${user.username}"
                         firstName: "${user.firstName}"
                         lastName: "${user.lastName}"
                         role: ${user.role}
                         permissions: [${(user.permissions)}]
-                    } ) { username } } }`;
+                        }
+                    ) {
+                        username 
+                    } 
+                } 
+        }`;
     },
 
-    _ => updateSuccess(),
+    () => updateSuccess(),
     error => setError(error.message)
 );
 
 export const setUserStateEpic = createEpic(
     setUserState.type,
-    (action: any) => {
+    action => {
         const username = action.payload.username;
         const state = action.payload.state;
         return `mutation {
                     user {
-                        set_state(username: "${username}", state: ${state}) { username }
+                        setState(username: "${username}", state: ${state}) { username }
                     }
             }`;
     },
-    data => setUserStateSuccess(data.data.user.set_state.username),
+    data => setUserStateSuccess(data.data.user.setState.username),
     error => setError(error.message)
 )
 
 export const getAllUsersEpic = createEpic(
     getUsers.type,
-    (action) => {
+    action => {
         const {pageNumber, pageSize, query} = action.payload;
+        const hasParams = pageNumber || pageSize || query;
+        let { fields } = action.payload;
+        if (!fields) {
+            fields = `
+                username
+                firstName
+                lastName
+                role
+                permissions
+                state
+                workType
+                workingTime`;
+        }
         return `
             query { 
                 user { 
-                    get_all(
-                        page_number: ${pageNumber}
-                        page_size: ${pageSize}
-                        query: "${query ? query : ''}"
-                        ) {
-                       totalCount
-                       results { username firstName lastName role permissions state workType workingTime }
-                    } 
+                    users ${hasParams ? `(
+                        ${pageNumber ? `pageNumber: ${pageNumber}` : ''}
+                        ${pageSize ? `pageSize: ${pageSize}` : ''}
+                        ${query ? `query: "${query}"` : ''}
+                    )` : ""} {
+                            totalCount
+                            results {
+                                ${fields}
+                            }
+                        } 
                 } 
             }`;
     },
-    data => setUsers(data.data.user.get_all),
+    data => setUsers(data.data.user.users),
     error => setError(error.message)
 );
 
@@ -181,10 +212,10 @@ export const workTypesEpic = createEpic(
     () => `
     query { 
         auth { 
-            work_types 
+            workTypes 
         } 
     }`,
-    data => setWorkTypes(data.data.auth.work_types),
+    data => setWorkTypes(data.data.auth.workTypes),
     error => setError(error.message)
 );
 

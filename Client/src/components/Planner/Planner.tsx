@@ -10,14 +10,16 @@ import {Localize} from '../../helpers/format';
 import {getContrast, stringToHex} from '../../helpers/calculate';
 import {Dropdown, DropdownButton} from 'react-bootstrap';
 import {User, getUsers} from '../../store/slices/userSlice';
+import {Status} from "../../helpers/types.ts";
+import {sendRequest} from "../../store/epics/helpers/request.ts";
 
 const Planner = () => {
     const [showEdit, setShowEdit] = useState(false);
     const [showAdd, setShowAdd] = useState(false);
     const [showDrop, setShowDrop] = useState(false);
 
-    const username = useAppSelector(state => state.accountInfo.user.username);
-    const status = useAppSelector(state => state.plans.status);
+    const username = useAppSelector<string>(state => state.accountInfo.user.username);
+    const status = useAppSelector<Status>(state => state.plans.status);
     const plans = useAppSelector<Plan[]>(state => state.plans.plans);
 
     const [events, setEvents] = useState([{}]);
@@ -26,16 +28,16 @@ const Planner = () => {
     const [selectedUsers, setSelectedUsers] = useState<string[]>([username]);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const users = useAppSelector(state => state.users.users);
+    const users = useAppSelector<User[]>(state => state.users.users);
 
     const dispatch = useAppDispatch();
-    
-    useEffect(() => {
-        dispatch(planRequest(selectedUsers));
-    }, [showEdit, showAdd, selectedUsers])
 
     useEffect(() => {
-        dispatch(getUsers({pageNumber: 1, pageSize: 1000}));
+        dispatch(planRequest(selectedUsers));
+    }, [selectedUsers]);
+
+    useEffect(() => {
+        dispatch(getUsers({fields: `username`}));
     }, [])
 
     useEffect(() => {
@@ -53,7 +55,7 @@ const Planner = () => {
         setEvents(newEvents);}
     }, [status, plans, showEdit, showAdd]);
 
-    const handleEventClick = (context: any) => { 
+    const handleEventClick = context => {
         setEditedPlan(context.event.extendedProps.relation);
         setShowEdit(true); 
     }
@@ -108,7 +110,7 @@ const Planner = () => {
                                 checked={selectedUsers.includes(user.username)}
                                 readOnly
                                 className="me-2"/>
-                            {user.username}
+                            {user.username} {user.username === username && "(you)"}
                         </Dropdown.Item>
                         ))) : <Dropdown.Item disabled>No users found</Dropdown.Item>
                     }

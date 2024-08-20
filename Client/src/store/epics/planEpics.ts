@@ -9,11 +9,11 @@ import {createEpic} from "./helpers/createEpic.ts";
 
 export const planRequestEpic = createEpic(
     planRequest.type,
-    (action) => {
+    action => {
         const usernames = action.payload;
         return `query {
                 plan {
-                    get_by_usernames(usernames: [${usernames.map((username: string) => `"${username}"`).join(',')}]) {
+                    byUsernames(usernames: [${usernames.map((username: string) => `"${username}"`).join(',')}]) {
                         id
                         title
                         description
@@ -23,48 +23,74 @@ export const planRequestEpic = createEpic(
                     }
             } 
     }`},
-    data => planRequestResolve(data.data.plan.get_by_usernames),
+    data => planRequestResolve(data.data.plan["byUsernames"]),
     error => setError(error.message)
 );
 
 export const planUpdateEpic = createEpic(
     planUpdate.type,
-    (action) => {
+    action => {
         const { id, timeStart, title, description, timeEnd } = action.payload;
         return `mutation {
                 plan {
-                    set_time(id: ${id}, title: "${title}", description: "${description}", timeStart: "${timeStart}", timeEnd: "${timeEnd}")
+                    update(
+                        id: ${id}
+                        title: "${title}"
+                        description: "${description}"
+                        timeStart: "${timeStart}"
+                        timeEnd: "${timeEnd}"
+                    ) {
+                        id
+                        title
+                        description
+                        timeStart
+                        timeEnd
+                        owner  
+                    }
             } 
     }`},
-    _ => planUpdateResolve(),
+    data => planUpdateResolve(data.data.plan.update),
     error => setError(error.message)
 );
 
 export const planDeleteEpic = createEpic(
     planDelete.type,
-    (action) => {
+    action => {
         const id = action.payload;
         return `mutation {
                 plan {
-                    remove(id: ${id})
+                    remove(id: ${id}) { id }
             } 
     }`},
-    _ => planDeleteResolve(),
+    data => planDeleteResolve(data.data.plan.remove.id),
     error => setError(error.message)
 );
 
 export const planCreateEpic = createEpic(
     planCreate.type,
-    (action) => {
+    action => {
         const { title, description, timeStart, timeEnd, username } = action.payload;
         return `mutation {
                 plan {
-                    add(plan: {title: "${title}", description: "${description}", timeStart: "${timeStart}", timeEnd: "${timeEnd}", owner: "${username}"}) {
+                    add(
+                        plan: {
+                            title: "${title}"
+                            description: "${description}"
+                            timeStart: "${timeStart}"
+                            timeEnd: "${timeEnd}"
+                            owner: "${username}"
+                        }
+                    ) {
                         id
+                        title
+                        description
+                        timeStart
+                        timeEnd
+                        owner
                     }
             } 
     }`},
-    _ => planCreateResolve(),
+    data => planCreateResolve(data.data.plan.add),
     error => setError(error.message)
 );
 

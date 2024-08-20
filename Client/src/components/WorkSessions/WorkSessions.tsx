@@ -1,44 +1,62 @@
-import { worktimeRequest } from '../../store/slices/timeStampSlice';
+import {worktimeListClear, worktimeListRequest} from '../../store/slices/timeStampSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { TimeStamp } from '../../store/slices/timeStampSlice';
 import EditTimeModal from './EditSessionModal';
 import AddTimeModal from './AddSessionModal';
 import { Button, Table } from 'react-bootstrap';
 import { Localize } from '../../helpers/format';
 import { getTimeDifference } from '../../helpers/calculate';
-import { Status } from '../../helpers/types';
+import useInView from "../../hooks/useInView.ts";
+import {Status} from "../../helpers/types.ts";
 
-interface Props {
-    status: Status
-}
+const WorkSessions = () => {
 
-const WorkSessions = (props: Props) => {
     const [showEdit, setShowEdit] = useState(false);
     const [showAdd, setShowAdd] = useState(false);
 
     const username = useAppSelector(state => state.accountInfo.user.username);
-    const status = useAppSelector(state => state.timeStamps.status);
     const timeStamps = useAppSelector<TimeStamp[]>(state => state.timeStamps.timeStamps);
+    const status = useAppSelector<Status>(state => state.timeStamps.status);
+    const totalCount = useAppSelector<number>(state => state.timeStamps.totalCount);
 
     const [editStamp, setEditStamp] = useState<TimeStamp>();
     const [events, setEvents] = useState<TimeStamp[]>([]);
 
+    const [page, setPage] = useState(1);
+    const pageSize = 10;
+
+    const tableBottomRef = useRef<HTMLDivElement | null>(null);
+    const inView = useInView(tableBottomRef, {threshold: 0});
+    const [inViewDebounced, setInViewDebounced] = useState(false);
+
     const dispatch = useAppDispatch();
-    
-    useEffect(() => {
-        if (props.status == 'idle') {
-            dispatch(worktimeRequest(username));
-        }
-    }, [props.status, showEdit, showAdd])
 
     useEffect(() => {
-        if (status == 'idle' && timeStamps) {
-            setEvents([...timeStamps].sort(
-                (b, a) => new Date(a.timeStart).getTime() - new Date(b.timeStart).getTime()
-            ))
+        if (page === 1) {
+            dispatch(worktimeListClear());
         }
-    }, [status, timeStamps]);
+        dispatch(worktimeListRequest({username, pageSize, pageNumber: page}));
+    }, [page]);
+
+    useEffect(() => {
+        setInViewDebounced(inView);
+    }, [inView]);
+
+    useEffect(() => {
+        if (inViewDebounced && status === 'idle') {
+            setInViewDebounced(false);
+            if (page <  totalCount / pageSize) {
+                setPage(page + 1);
+            }
+        }
+    }, [inViewDebounced, status]);
+
+    useEffect(() => {
+        setEvents([...timeStamps].sort(
+            (b, a) => new Date(a.timeStart).getTime() - new Date(b.timeStart).getTime()
+        ))
+    }, [timeStamps]);
 
     const handleEdit = (event: TimeStamp) => {
         if (event.timeEnd) {
@@ -54,7 +72,6 @@ const WorkSessions = (props: Props) => {
                 <Table hover className="border text-center">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Start</th>
                             <th>Finish</th>
                             <th>Worktime</th>
@@ -68,7 +85,7 @@ const WorkSessions = (props: Props) => {
                         const previous = index > 0 ? new Date(events[index - 1].timeStart).toISOString().split('T')[0] : null;
 
                         return (
-                        <>
+                        <React.Fragment key={index}>
                             {current !== previous && (
                             <tr>
                                 <td colSpan={6} className="bg-light font-weight-bold">
@@ -77,7 +94,6 @@ const WorkSessions = (props: Props) => {
                             </tr>
                             )}
                             <tr onClick={() => { handleEdit(event) }}>
-                                <td>{events.length - index}</td>
                                 <td>{Localize(event.timeStart)!.toLocaleTimeString()}</td>
                                 { event.timeEnd ? 
                                     <td>{Localize(event.timeEnd)!.toLocaleTimeString()}</td> :
@@ -88,13 +104,14 @@ const WorkSessions = (props: Props) => {
                                 <td>{event.source}</td>
                                 <td>{event.editor || "none"}</td>
                             </tr>
-                        </>
+                        </React.Fragment>
                         );
                     })}
                     </tbody>
                     <EditTimeModal timeStamp={editStamp!} setShow={setShowEdit} show={showEdit}/>
                     <AddTimeModal setShow={setShowAdd} show={showAdd}/>
                 </Table>
+                <div ref={tableBottomRef} style={{height: 1}}/>
             </div>
         </div>
     );

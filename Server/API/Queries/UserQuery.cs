@@ -12,7 +12,7 @@ public sealed class UserQuery : ObjectGraphType
 {
     public UserQuery()
     {
-        Field<UserGraphType>("get")
+        Field<UserGraphType>("user")
             .Argument<NonNullGraphType<StringGraphType>>("username")
             .ResolveAsync(async context =>
             {
@@ -22,9 +22,9 @@ public sealed class UserQuery : ObjectGraphType
                 return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username);
             });
 
-        Field<ResultSetGraphType<User, UserGraphType>>("get_all")
-            .Argument<NonNullGraphType<IntGraphType>>("page_size")
-            .Argument<NonNullGraphType<IntGraphType>>("page_number")
+        Field<ResultSetGraphType<User, UserGraphType>>("users")
+            .Argument<IntGraphType>("pageSize")
+            .Argument<IntGraphType>("pageNumber")
             .Argument<StringGraphType>("query")
             .ResolveAsync(async context =>
             {
@@ -33,16 +33,23 @@ public sealed class UserQuery : ObjectGraphType
                 bool canViewFired = context.HasPermission(Permission.DELETE_USER) ||
                                        context.HasPermission(Permission.FIRE_USER);
 
-                var pageNumber = context.GetArgument<int>("page_number");
-                var pageSize = context.GetArgument<int>("page_size");
+                var pageNumber = context.GetArgument<int?>("pageNumber");
+                var pageSize = context.GetArgument<int?>("pageSize");
                 var query = context.GetArgument<string?>("query");
 
-                return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync(options => options
-                    .SetPageNumber(pageNumber)
-                    .SetPageSize(pageSize)
-                    .SetQuery(query)
-                    .IncludeFired(canViewFired)
-                );
+                var builder = new GetAllOptionsBuilder();
+
+                if (pageNumber != null && pageSize != null)
+                {
+                    builder.SetPagination((int)pageNumber, (int)pageSize);
+                }
+                if (query != null)
+                {
+                    builder.SetQuery(query);
+                }
+                builder.IncludeFired(canViewFired);
+
+                return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync(builder.Build());
             });
     }
 }

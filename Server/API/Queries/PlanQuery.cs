@@ -12,7 +12,7 @@ namespace Server.API.Queries
     {
         public PlanQuery() 
         {
-            Field<PlanGraphType>("get_by_id")
+            Field<PlanGraphType>("byId")
                 .Argument<NonNullGraphType<IntGraphType>>("id")
                 .ResolveAsync(async context =>
                 {
@@ -24,24 +24,15 @@ namespace Server.API.Queries
                         ?? throw new ExecutionError("Plan not found") { Code = ResponseCode.BadRequest };
                 });
 
-            Field<ListGraphType<PlanGraphType>>("get_by_usernames")
+            Field<ListGraphType<PlanGraphType>>("byUsernames")
                 .Argument<NonNullGraphType<ListGraphType<StringGraphType>>>("usernames")
                 .ResolveAsync(async context =>
                 {
                     context.Authorize();
 
-                    var usernames = context.GetArgument<List<string>>("usernames");
-                    var plans = new List<Plan>();
+                    var usernames = context.GetArgument<string[]>("usernames");
 
-                    var planRepository = context.RequestServices!.GetRequiredService<IPlanRepository>();
-
-                    foreach (var username in usernames)
-                    {
-                        var userPlans = await planRepository.GetAsync(username);
-                        plans.AddRange(userPlans);
-                    }
-
-                    return plans;
+                    return await context.RequestServices!.GetRequiredService<IPlanRepository>().GetAllAsync(usernames);
                 });
         }
     }

@@ -23,7 +23,7 @@ public sealed class AuthQuery : ObjectGraphType
 
                 return Enum.GetValues(typeof(Permission));
             });
-        Field<ListGraphType<EnumerationGraphType<WorkType>>>("work_types")
+        Field<ListGraphType<EnumerationGraphType<WorkType>>>("workTypes")
             .Resolve(context =>
             {
                 context.Authorize();

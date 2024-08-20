@@ -7,13 +7,6 @@ namespace Server.Data.Repositories
     public class PlanRepository(DbProvider dbProvider) : IPlanRepository
     {
         private readonly SqlConnection _sql = dbProvider.Connection;
-        public Task<IEnumerable<Plan>> GetAllAsync()
-        {
-            string query = @"
-                SELECT Id, Title, Description, TimeStart, TimeEnd, Owner
-                FROM Plans";
-            return _sql.QueryAsync<Plan>(query);
-        }
 
         public Task<Plan?> GetAsync(int id)
         {
@@ -24,12 +17,13 @@ namespace Server.Data.Repositories
             return _sql.QueryFirstOrDefaultAsync<Plan>(query);
         }
 
-        public Task<IEnumerable<Plan>> GetAsync(string username)
+        public Task<IEnumerable<Plan>> GetAllAsync(string[] usernames)
         {
             string query = $@"
                 SELECT Id, Title, Description, TimeStart, TimeEnd, Owner
                 FROM Plans
-                WHERE Owner='{username}'";
+                WHERE Owner='{string.Join("' OR Owner='", usernames)}'";
+
             return _sql.QueryAsync<Plan>(query);
         }
 

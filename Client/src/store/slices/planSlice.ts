@@ -17,7 +17,7 @@ export interface PlanState {
 }
 
 const initialState: PlanState = {
-    plans: <Plan[]>{},
+    plans: [],
     status: 'loading',
     error: null
 };
@@ -28,35 +28,44 @@ const planSlice = createSlice(
         initialState,
         reducers: {
             //@ts-ignore
-            planRequest(state, action: PayloadAction<string[]>) { state.status = 'loading'; },
-            planRequestResolve(state, action: PayloadAction<Plan[]>) 
+            planRequest(state: PlanState, action) { state.status = 'loading'; },
+            planRequestResolve(state: PlanState, action: PayloadAction<Plan[]>)
             {
                 state.plans = action.payload;
                 state.status = 'idle'; 
             },
 
             //@ts-ignore
-            planUpdate(state, action) { state.status = 'loading'; },
-            planUpdateResolve(state)
+            planUpdate(state: PlanState, action) { state.status = 'loading'; },
+            planUpdateResolve(state: PlanState, action: PayloadAction<Plan>)
             {
+                const plan = action.payload;
+
+                const index = state.plans.findIndex(p => p.id === plan.id);
+                if (index !== -1) {
+                    state.plans[index] = plan;
+                }
+
                 state.status = 'idle'; 
             },
 
             //@ts-ignore
-            planDelete(state, action) { state.status = 'loading'; },
-            planDeleteResolve(state)
+            planDelete(state: PlanState, action) { state.status = 'loading'; },
+            planDeleteResolve(state: PlanState, action: PayloadAction<number>)
             {
+                state.plans = state.plans.filter(p => p.id !== action.payload);
                 state.status = 'idle'; 
             },
 
             //@ts-ignore
-            planCreate(state, action) { state.status = 'loading'; },
-            planCreateResolve(state)
+            planCreate(state: PlanState, action) { state.status = 'loading'; },
+            planCreateResolve(state: PlanState, action: PayloadAction<Plan>)
             {
+                state.plans.push(action.payload);
                 state.status = 'idle'; 
             },
 
-            setError(state, action) {
+            setError(state: PlanState, action) {
                 state.status = 'error'
                 state.error = action.payload.error
             }

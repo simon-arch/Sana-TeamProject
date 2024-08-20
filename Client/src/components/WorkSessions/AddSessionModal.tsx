@@ -24,7 +24,9 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
             dispatch(worktimeCreate({
                 username: username,
                 timeStart: startDate!.toISOString(), 
-                timeEnd: endDate!.toISOString()
+                timeEnd: endDate!.toISOString(),
+                source: 'USER',
+                editor: username
             }));
             handleClose();
         } else setError("Wrong date");

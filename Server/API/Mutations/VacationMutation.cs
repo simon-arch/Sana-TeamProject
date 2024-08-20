@@ -39,7 +39,7 @@ namespace Server.API.Mutations
                     return true;
                 });
 
-            Field<VacationGraphType>("set_status")
+            Field<VacationGraphType>("setStatus")
                 .Argument<NonNullGraphType<IntGraphType>>("id")
                 .Argument<NonNullGraphType<EnumerationGraphType<Status>>>("status")
                 .ResolveAsync(async context =>

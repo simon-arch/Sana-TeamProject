@@ -2,18 +2,46 @@ import {
     setError,
     worktimeCreate, worktimeCreateResolve,
     worktimeDelete, worktimeDeleteResolve,
-    worktimeRequest, worktimeRequestResolve,
+    worktimeListRequest, worktimeListRequestResolve,
     worktimeUpdate, worktimeUpdateResolve
 } from '../slices/timeStampSlice';
 import {createEpic} from "./helpers/createEpic.ts";
 
 export const worktimeRequestEpic = createEpic(
-    worktimeRequest.type,
-    (action) => {
-        const username = action.payload;
+    worktimeListRequest.type,
+    action => {
+        const {username, pageSize, pageNumber} = action.payload;
         return `query {
                 timeStamp {
-                    get_by_username(username: "${username}") {
+                    byUsername(username: "${username}", pageSize: ${pageSize}, pageNumber: ${pageNumber}) {
+                        totalCount
+                        results {
+                            id
+                            username
+                            timeStart
+                            timeEnd
+                            source
+                            editor
+                        }
+                    }
+            } 
+    }`},
+    data => worktimeListRequestResolve(data.data.timeStamp["byUsername"]),
+    error => setError(error.message)
+);
+
+export const worktimeUpdateEpic = createEpic(
+    worktimeUpdate.type,
+    action => {
+        const { id, timeStart, timeEnd, editor } = action.payload;
+        return `mutation {
+                timeStamp {
+                    update(
+                        id: ${id}
+                        ${timeStart ? `timeStart: "${timeStart}"` : ""}
+                        timeEnd: "${timeEnd}"
+                        ${editor ? `editor: "${editor}"` : ""}
+                    ) {
                         id
                         username
                         timeStart
@@ -23,48 +51,48 @@ export const worktimeRequestEpic = createEpic(
                     }
             } 
     }`},
-    data => worktimeRequestResolve(data.data.timeStamp.get_by_username),
-    error => setError(error.message)
-);
-
-export const worktimeUpdateEpic = createEpic(
-    worktimeUpdate.type,
-    (action) => {
-        const { id, username, timeStart, timeEnd } = action.payload;
-        return `mutation {
-                timeStamp {
-                    set_time(id: ${id}, timeStart: "${timeStart}", timeEnd: "${timeEnd}", editor: "${username}")
-            } 
-    }`},
-    _ => worktimeUpdateResolve(),
+    data => worktimeUpdateResolve(data.data.timeStamp.update),
     error => setError(error.message)
 );
 
 export const worktimeDeleteEpic = createEpic(
     worktimeDelete.type,
-    (action) => {
+    action => {
         const id = action.payload;
         return `mutation {
                 timeStamp {
-                    remove(id: ${id})
+                    remove(id: ${id}) { id }
             } 
     }`},
-    _ => worktimeDeleteResolve(),
+    data => worktimeDeleteResolve(data.data.timeStamp.remove.id),
     error => setError(error.message)
 );
 
 export const worktimeCreateEpic = createEpic(
     worktimeCreate.type,
-    (action) => {
-        const { username, timeStart, timeEnd } = action.payload;
+    action => {
+        const { username, timeStart, timeEnd, source, editor } = action.payload;
         return `mutation {
                 timeStamp {
-                    add(timeStamp: {username: "${username}", timeStart: "${timeStart}", timeEnd: "${timeEnd}", source: USER, editor: "${username}"}) {
+                    add(
+                        timeStamp: {
+                            username: "${username}"
+                            timeStart: "${timeStart}"
+                            ${timeEnd ? `timeEnd: "${timeEnd}"` : ""}
+                            source: ${source}
+                            ${editor ? `editor: "${editor}"` : ""}
+                        }
+                    ) {
                         id
+                        username
+                        timeStart
+                        timeEnd
+                        source
+                        editor
                     }
             } 
     }`},
-    _ => worktimeCreateResolve(),
+    data => worktimeCreateResolve(data.data.timeStamp.add),
     error => setError(error.message)
 );
 

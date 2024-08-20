@@ -30,7 +30,7 @@ namespace Server.API.Mutations
                     return await planRepository.GetAsync(id);
                 });
 
-            Field<BooleanGraphType>("remove")
+            Field<PlanGraphType>("remove")
                 .Argument<NonNullGraphType<IntGraphType>>("id")
                 .ResolveAsync(async context =>
                 {
@@ -40,15 +40,15 @@ namespace Server.API.Mutations
 
                     var planRepository = context.RequestServices!.GetRequiredService<IPlanRepository>();
 
-                    _ = await planRepository.GetAsync(id)
+                    var plan = await planRepository.GetAsync(id)
                         ?? throw new ExecutionError("Plan not found") { Code = ResponseCode.BadRequest };
 
                     await planRepository.DeleteAsync(id);
 
-                    return true;
+                    return plan;
                 });
 
-            Field<BooleanGraphType>("set_time")
+            Field<PlanGraphType>("update")
                 .Argument<NonNullGraphType<IntGraphType>>("id")
                 .Argument<NonNullGraphType<StringGraphType>>("title")
                 .Argument<StringGraphType>("description")
@@ -68,14 +68,23 @@ namespace Server.API.Mutations
                     var plan = await planRepository.GetAsync(id)
                         ?? throw new ExecutionError("Plan not found") { Code = ResponseCode.BadRequest };
 
-                    if (timeStart != null) plan.TimeStart = (DateTime)timeStart;
-                    if (timeEnd != null) plan.TimeEnd = (DateTime)timeEnd;
-                    if (title != null) plan.Title = title;
+                    if (timeStart != null)
+                    {
+                        plan.TimeStart = DateTime.SpecifyKind((DateTime)timeStart, DateTimeKind.Unspecified);
+                    }
+                    if (timeEnd != null)
+                    {
+                        plan.TimeEnd = DateTime.SpecifyKind((DateTime)timeEnd, DateTimeKind.Unspecified);
+                    }
+                    if (title != null)
+                    {
+                        plan.Title = title;
+                    }
                     plan.Description = description;
 
                     await planRepository.UpdateAsync(plan);
 
-                    return true;
+                    return plan;
                 });
         }
     }

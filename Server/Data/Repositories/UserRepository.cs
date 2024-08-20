@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Server.Models;
 
 namespace Server.Data.Repositories
@@ -30,16 +31,11 @@ namespace Server.Data.Repositories
 
         public async Task<ResultSet<User>> GetAllAsync(GetAllOptions options)
         {           
-            var pagination = options.PageNumber != null && options.PageSize != null 
-                ? $@"ORDER BY (SELECT NULL)
-                     OFFSET {(options.PageNumber - 1) * options.PageSize} ROWS FETCH NEXT {options.PageSize} ROWS ONLY"
-                : string.Empty;
-
             string sql = @$"
                 SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkingTime 
                 FROM Users
                 {options.Condition}
-                {pagination}";
+                {options.Pagination}";
 
             return new ResultSet<User>
             {
@@ -74,8 +70,7 @@ namespace Server.Data.Repositories
 
     public class GetAllOptions
     {
-        public int? PageNumber { get; set; }
-        public int? PageSize { get; set; }
+        public string Pagination { get; set; } = string.Empty;
         public string Condition { get; set; } = string.Empty;
     }
 
@@ -84,27 +79,23 @@ namespace Server.Data.Repositories
         private readonly GetAllOptions _options = new();
         private readonly List<string> _conditions = [];
 
-        public GetAllOptionsBuilder SetPageNumber(int pageNumber)
+        public GetAllOptionsBuilder SetPagination(int pageNumber, int pageSize)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageNumber);
-
-            _options.PageNumber = pageNumber;
-            return this;
-        }
-
-        public GetAllOptionsBuilder SetPageSize(int pageSize)
-        {
             ArgumentOutOfRangeException.ThrowIfNegative(pageSize);
 
-            _options.PageSize = pageSize;
+            _options.Pagination = $@"
+                ORDER BY (SELECT NULL)
+                OFFSET {(pageNumber - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
+            
             return this;
         }
 
-        public GetAllOptionsBuilder SetQuery(string? query)
+        public GetAllOptionsBuilder SetQuery(string query)
         {
             if (!string.IsNullOrEmpty(query))
             {
-                _conditions.Add($"CONCAT(FirstName, ' ', LastName) LIKE '{query}%'");
+                _conditions.Add($"CONCAT(FirstName, ' ', LastName) LIKE '%{query}%'");
             }
             return this;
         }
@@ -119,11 +110,6 @@ namespace Server.Data.Repositories
         }
         public GetAllOptions Build()
         {
-            if (_options.PageNumber != null ^ _options.PageSize != null)
-            {
-                throw new InvalidOperationException("Both PageNumber and PageSize must be set together.");
-            }
-
             if (_conditions.Count > 0)
                 _options.Condition = "WHERE " + string.Join(" AND ", _conditions);
 

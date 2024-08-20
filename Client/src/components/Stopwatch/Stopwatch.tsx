@@ -5,7 +5,8 @@ import {FaSquare} from "react-icons/fa";
 import {FaArrowRightLong} from "react-icons/fa6";
 import {BsFillTriangleFill} from "react-icons/bs";
 import {sendRequest} from "../../store/epics/helpers/request.ts";
-import {useAppSelector} from "../../hooks/redux.ts";
+import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
+import {worktimeCreate, worktimeUpdate} from "../../store/slices/timeStampSlice.ts";
 
 interface TimeStamp {
     id: number,
@@ -13,17 +14,16 @@ interface TimeStamp {
     timeEnd: string | null
 }
 
-interface Props {
-    setStatus(prevState: 'loading' | 'idle' | 'error'): void,
-}
-
 const formatTime = (date : Date): string =>
     date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: "2-digit"});
 
 const getCurrentTime = (): string => formatTime(new Date());
 
-const Stopwatch = (props: Props) => {
-    const username = useAppSelector(state => state.accountInfo.user.username);
+const Stopwatch = () => {
+    const dispatch = useAppDispatch();
+
+    const username = useAppSelector<string>(state => state.accountInfo.user.username);
+    const current = useAppSelector<TimeStamp | null>(state => state.timeStamps.currentTimeStamp)
 
     const [canSend, setCanSend] = useState(false);
 
@@ -37,12 +37,12 @@ const Stopwatch = (props: Props) => {
         let response;
         try {
             response = await sendRequest(
-                `query { timeStamp { get_latest(username: "${username}") { id timeStart timeEnd } } }`).catch(e => console.log(e));
-        } catch (e: any) {
+                `query { timeStamp { latest(username: "${username}") { id timeStart timeEnd } } }`)
+        } catch (e: Error) {
             console.log(e.message);
             return;
         }
-        const stamp = response.data.timeStamp.get_latest as TimeStamp;
+        const stamp = response.data.timeStamp["latest"] as TimeStamp;
 
         if (!stamp) return;
 
@@ -66,42 +66,41 @@ const Stopwatch = (props: Props) => {
         getLatest().then();
     }, []);
 
-    const startNewStamp = async () => {
-        props.setStatus('loading');
-        const start = new Date();
+    const startNewStamp = () => {
+        dispatch(worktimeCreate({
+            username: username,
+            timeStart: new Date().toISOString(),
+            source: 'TIMER'
+        }));
+    }
 
-        let responce;
-        try {
-            responce = await sendRequest(
-                `mutation { timeStamp { add(timeStamp: { username: "${username}", timeStart: "${start.toISOString()}", source: TIMER }) { id } } }`);
-        } catch (e: any) {
-            console.log(e.message);
-            setCurrentStamp({id: 0, timeStart: formatTime(start), timeEnd: formatTime(start)});
-            return;
-        }
-        const id = responce.data.timeStamp.add.id;
-        setCurrentStamp({id, timeStart: formatTime(start), timeEnd: formatTime(start)});
+    const finishCurrent = () => {
+        dispatch(worktimeUpdate({
+            id: currentStamp.id,
+            timeEnd: new Date().toISOString()
+        }));
     }
-    const finishCurrent = async () => {
-        props.setStatus('loading');
-        try {
-            await sendRequest(`mutation { timeStamp { set_time(id: ${currentStamp.id}, timeEnd: "${new Date().toISOString()}") } }`);
-        } catch (e: any) {
-            console.log(e.message);
-            return;
+
+    useEffect(() => {
+        if (current != null) {
+            setCurrentStamp({
+                id: current.id,
+                timeStart: formatTime(new Date(current.timeStart+"+00:00")),
+                timeEnd: getCurrentTime()
+            });
         }
-    }
+    }, [current]);
 
     useEffect(() => {
         if (active) {
             if (currentStamp.timeStart === '') {
-                startNewStamp().then(() => props.setStatus('idle'));
+                startNewStamp();
             }
             const timer = setInterval(() => setCurrentStamp({...currentStamp, timeEnd: getCurrentTime()}), 1000);
             return () => clearInterval(timer);
         }
         else if (canSend) {
-            finishCurrent().then(() => props.setStatus('idle'));
+            finishCurrent();
             setPrevStamp(currentStamp);
             setCurrentStamp({id: 0, timeEnd: null, timeStart: ""});
             setCanSend(false);

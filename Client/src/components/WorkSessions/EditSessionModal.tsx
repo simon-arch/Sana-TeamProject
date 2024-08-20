@@ -41,7 +41,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                 id: props.timeStamp.id, 
                 timeStart: startDate!.toISOString(), 
                 timeEnd: endDate!.toISOString(), 
-                username: username
+                editor: username
             }));
             handleClose();
         } else setError("Wrong date");

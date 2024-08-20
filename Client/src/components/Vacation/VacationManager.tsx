@@ -13,12 +13,12 @@ const VacationManager = () => {
     }, []);
 
     const getAllVacations = () => {
-        sendRequest(`query { vacation { get_all { id, title, description, startDate, endDate, status, sender } } } `)
-        .then(vacations => setVacations(vacations.data.vacation.get_all.reverse()));
+        sendRequest(`query { vacation { vacations { id, title, description, startDate, endDate, status, sender } } } `)
+        .then(vacations => setVacations(vacations.data.vacation["vacations"].reverse()));
     }
 
-    const setVacationStatus = (id: Number, status: 'APPROVED' | 'REJECTED') => {
-        sendRequest(`mutation { vacation { set_status(id: ${id}, status: ${status}) { id } } } `)
+    const setVacationStatus = (id: number, status: 'APPROVED' | 'REJECTED') => {
+        sendRequest(`mutation { vacation { setStatus(id: ${id}, status: ${status}) { id } } } `)
         .then(() => getAllVacations());
     }
 
