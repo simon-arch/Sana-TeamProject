@@ -5,18 +5,22 @@ export interface TimeStamp {
     username: string,
     timeStart: Date,
     timeEnd: Date,
-    source: 'SYSTEM' | 'USER',
+    source: 'SYSTEM' | 'USER' | 'TIMER',
     editor: string | null
 }
 
 export interface TimeStampState {
+    currentTimeStamp: TimeStamp | null;
     timeStamps: TimeStamp[];
+    totalCount: number;
     status: 'idle' | 'loading' | 'error';
     error: string | null;
 }
 
 const initialState: TimeStampState = {
-    timeStamps: <TimeStamp[]>{},
+    currentTimeStamp: null,
+    timeStamps: [],
+    totalCount: 0,
     status: 'loading',
     error: null
 };
@@ -26,36 +30,68 @@ const timeStampSlice = createSlice(
         name: 'timeStamps',
         initialState,
         reducers: {
+            worktimeListClear(state: TimeStampState) { state.timeStamps = [] },
             //@ts-ignore
-            worktimeRequest(state, action: PayloadAction<string>) { state.status = 'loading'; },
-            worktimeRequestResolve(state, action: PayloadAction<TimeStamp[]>) 
+            worktimeListRequest(state: TimeStampState, action) { state.status = 'loading'; },
+            worktimeListRequestResolve(state: TimeStampState, action)
             {
-                state.timeStamps = action.payload;
+                state.totalCount = action.payload.totalCount;
+                let timeStamps = action.payload.results as TimeStamp[];
+
+                state.timeStamps.forEach(tsp => {
+                    timeStamps = timeStamps.filter(tsn => tsn.id !== tsp.id);
+                })
+
+                state.timeStamps = [...state.timeStamps, ...timeStamps];
                 state.status = 'idle'; 
             },
 
             //@ts-ignore
-            worktimeUpdate(state, action) { state.status = 'loading'; },
-            worktimeUpdateResolve(state)
+            worktimeUpdate(state: TimeStampState, action) { state.status = 'loading'; },
+            worktimeUpdateResolve(state: TimeStampState, action: PayloadAction<TimeStamp>)
             {
+                const stamp = action.payload;
+
+                const index = state.timeStamps.findIndex(ts => ts.id === stamp.id);
+                if (index !== -1)
+                {
+                    state.timeStamps[index] = stamp;
+                }
                 state.status = 'idle'; 
             },
 
             //@ts-ignore
-            worktimeDelete(state, action) { state.status = 'loading'; },
-            worktimeDeleteResolve(state)
+            worktimeDelete(state: TimeStampState, action) { state.status = 'loading'; },
+            worktimeDeleteResolve(state: TimeStampState, action: PayloadAction<number>)
             {
-                state.status = 'idle'; 
+                state.timeStamps = state.timeStamps.filter(ts => ts.id !== action.payload);
+                state.status = 'idle';
             },
 
             //@ts-ignore
-            worktimeCreate(state, action) { state.status = 'loading'; },
-            worktimeCreateResolve(state)
+            worktimeCreate(state: TimeStampState, action) { state.status = 'loading'; },
+            worktimeCreateResolve(state: TimeStampState, action: PayloadAction<TimeStamp>)
             {
-                state.status = 'idle'; 
+                const stamp = action.payload;
+
+                if (stamp.source === 'TIMER') {
+                    state.currentTimeStamp = stamp;
+                }
+
+                const index = state.timeStamps.findIndex(ts => ts.id === stamp.id);
+                if (index !== -1)
+                {
+                    state.timeStamps[index] = stamp;
+                }
+                else
+                {
+                    state.timeStamps.unshift(stamp);
+                }
+
+                state.status = 'idle';
             },
 
-            setError(state, action) {
+            setError(state: TimeStampState, action) {
                 state.status = 'error'
                 state.error = action.payload.error
             }
@@ -64,7 +100,8 @@ const timeStampSlice = createSlice(
 );
 
 export const {
-    worktimeRequest, worktimeRequestResolve,
+    worktimeListClear,
+    worktimeListRequest, worktimeListRequestResolve,
     worktimeUpdate, worktimeUpdateResolve,
     worktimeDelete, worktimeDeleteResolve,
     worktimeCreate, worktimeCreateResolve,

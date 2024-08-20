@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Options;
 using Server.Models;
 
 namespace Server.Data.Repositories
@@ -7,6 +8,10 @@ namespace Server.Data.Repositories
     public class TimeStampRepository(DbProvider dbProvider) : ITimeStampRepository
     {
         private readonly SqlConnection _sql = dbProvider.Connection;
+
+        private Task<int> _CountAsync(string condition) =>
+            _sql.QuerySingleAsync<int>($"SELECT COUNT(*) FROM TimeStamps {condition}");
+
         public Task<IEnumerable<TimeStamp>> GetAllAsync()
         {
             string query = @"
@@ -31,6 +36,22 @@ namespace Server.Data.Repositories
                 FROM TimeStamps
                 WHERE Username='{username}'";
             return _sql.QueryAsync<TimeStamp>(query);
+        }
+
+        public async Task<ResultSet<TimeStamp>> GetAsync(string username, int pageSize, int pageNumber)
+        {
+            string query = $@"
+                SELECT Id, Username, TimeStart, TimeEnd, Source, Editor
+                FROM TimeStamps
+                WHERE Username = '{username}'
+                ORDER BY TimeStart DESC
+                OFFSET {(pageNumber - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
+
+            return new ResultSet<TimeStamp>
+            {
+                TotalCount = await _CountAsync($"WHERE Username = '{username}'"),
+                Results = await _sql.QueryAsync<TimeStamp>(query)
+            };
         }
 
         public Task<int> InsertAsync(TimeStamp timeStamp)
