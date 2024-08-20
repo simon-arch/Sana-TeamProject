@@ -4,7 +4,7 @@ import { Capitalize } from "../../helpers/format"
 import styles from "./vacation.module.css";
 
 export interface Vacation {
-    id: Number,
+    id: number,
     title: string,
     description: string | null,
     status: 'PENDING' | 'APPROVED' | 'REJECTED',

@@ -29,9 +29,6 @@ public sealed class UserQuery : ObjectGraphType
             .ResolveAsync(async context =>
             {
                 context.WithPermission(Permission.VIEW_USERS);
-                
-                bool canViewFired = context.HasPermission(Permission.DELETE_USER) ||
-                                       context.HasPermission(Permission.FIRE_USER);
 
                 var pageNumber = context.GetArgument<int>("page_number");
                 var pageSize = context.GetArgument<int>("page_size");
@@ -41,7 +38,6 @@ public sealed class UserQuery : ObjectGraphType
                     .SetPageNumber(pageNumber)
                     .SetPageSize(pageSize)
                     .SetQuery(query)
-                    .IncludeFired(canViewFired)
                 );
             });
     }

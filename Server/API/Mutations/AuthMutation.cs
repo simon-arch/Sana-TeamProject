@@ -29,6 +29,11 @@ public sealed class AuthMutation : ObjectGraphType
                 {
                     throw new ExecutionError("Wrong credentials") { Code = ResponseCode.Unauthorized };
                 }
+                
+                if (user.State == State.Fired)
+                {
+                    throw new ExecutionError("User is fired") { Code = ResponseCode.Fired };
+                }
 
                 var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
 
@@ -58,6 +63,19 @@ public sealed class AuthMutation : ObjectGraphType
 
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
                 await context.RequestServices!.GetRequiredService<IUserRepository>().InsertAsync(user);
+                
+                var usersToUpdate = user.VacationsApprovedByUsers;
+
+                foreach (var username in usersToUpdate)
+                {
+                    var approvingUser = await userRepository.GetAsync(username);
+                    if (approvingUser == null) continue;
+
+                    if (approvingUser.ApproveVacationsForUsers.Contains(user.Username)) continue;
+                    approvingUser.ApproveVacationsForUsers = approvingUser.ApproveVacationsForUsers.Concat(new[] { user.Username }).ToList();
+                    await userRepository.UpdateAsync(approvingUser);
+                }
+                
                 return user;
             });
 
