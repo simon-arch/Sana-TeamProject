@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Status } from "../../helpers/types";
 
 export interface UserState {
     roles: string[];
-    status: 'idle' | 'loading' | 'error';
+    status: Status;
     error: string | null
 }
 

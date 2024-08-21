@@ -45,7 +45,10 @@ const RoleField = (props : RoleFieldProps) => {
         <InputGroup className="mb-1">
             {props.user.username === account.username || !account.permissions.includes(config.permissions.MANAGE_USER_ROLES) 
                 ?
-                <Form.Control name="role" type="text" value={props.user.role} readOnly/>
+                <>
+                    <InputGroup.Text className="col-2">Role</InputGroup.Text>
+                    <Form.Control name="role" type="text" value={props.user.role} readOnly/>
+                </>
                 :
                 <>
                     <DropdownButton

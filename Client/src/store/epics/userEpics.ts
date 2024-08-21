@@ -1,65 +1,18 @@
+import {createEpic} from "./helpers/createEpic";
 import {
-    setError,
-    getAccessToken, setTokenPayload,
-    getAccountInfo, setAccountInfo,
-    logout
-} from '../slices/accountSlice';
-import {createEpic} from "./helpers/createEpic.ts";
-import {
+    setError, User,
+    getUsers, setUsers,
     deleteUser, deleteUserSuccess,
-    getUsers,
     registerRequest, registerSuccess,
     updateRequest, updateSuccess,
-    setUsers,
-    setUserState, setUserStateSuccess, User
-} from "../slices/userSlice.ts";
-import {getPermissions, setPermissions} from "../slices/permissionSlice.ts";
-import {getRoles, setRoles} from "../slices/roleSlice.ts";
-import {getWorkTypes, setWorkTypes} from "../slices/workTypeSlice.ts";
+    setUserState, setUserStateSuccess
+} from "../slices/userSlice";
 import {PayloadAction} from "@reduxjs/toolkit";
-
-export const loginEpic = createEpic(
-    getAccessToken.type,
-    action => `
-    mutation {
-        auth {
-            login(username: "${action.payload.username}", password: "${action.payload.password}") 
-        } 
-    }`,
-    data => setTokenPayload(data.data.auth["login"]),
-    error => setError(error.message)
-);
-
-export const userInfoEpic = createEpic(
-    getAccountInfo.type,
-    action => `
-    query { 
-        user { 
-            user(username: "${action.payload}") {
-                username
-                firstName
-                lastName
-                role
-                permissions
-                state
-                workType
-                workingTime
-            } 
-        } 
-    }`,
-    data => setAccountInfo(data.data.user.user),
-    error => {
-        if (error.message === "Failed to fetch") {
-            return logout();
-        }
-        return setError(error.message);
-    }
-);
 
 export const registerUserEpic = createEpic(
     registerRequest.type,
     action => {
-        const {username, password, firstName, lastName, role, permissions, state, workType, workingTime} = action.payload;
+        const {username, password, firstName, lastName, role, permissions, state, workType, workTime} = action.payload;
         return `mutation {
             auth {
                 register(
@@ -72,7 +25,7 @@ export const registerUserEpic = createEpic(
                         permissions: ${JSON.stringify(permissions).replace(/"/g, '')},
                         state: ${state},
                         workType: ${workType},
-                        workingTime: ${workingTime}
+                        workTime: ${workTime}
                     }
                     ) { 
                         username 
@@ -82,7 +35,7 @@ export const registerUserEpic = createEpic(
                         permissions
                         state
                         workType
-                        workingTime
+                        workTime
                     }
             }
         }`;
@@ -119,6 +72,8 @@ export const updateUserEpic = createEpic(
                         lastName: "${user.lastName}"
                         role: ${user.role}
                         permissions: [${(user.permissions)}]
+                        workType: ${user.workType}
+                        workTime: ${user.workTime}
                         }
                     ) {
                         username 
@@ -161,7 +116,7 @@ export const getAllUsersEpic = createEpic(
                 permissions
                 state
                 workType
-                workingTime`;
+                workTime`;
         }
         return `
             query { 
@@ -183,58 +138,10 @@ export const getAllUsersEpic = createEpic(
     error => setError(error.message)
 );
 
-export const permissionsEpic = createEpic(
-    getPermissions.type,
-    () => `
-    query { 
-        auth { 
-            permissions 
-        } 
-    }`,
-    data => setPermissions(data.data.auth.permissions),
-    error => setError(error.message)
-);
-
-export const rolesEpic = createEpic(
-    getRoles.type,
-    () => `
-    query { 
-        auth { 
-            roles 
-        } 
-    }`,
-    data => setRoles(data.data.auth.roles),
-    error => setError(error.message)
-);
-
-export const workTypesEpic = createEpic(
-    getWorkTypes.type,
-    () => `
-    query { 
-        auth { 
-            workTypes 
-        } 
-    }`,
-    data => setWorkTypes(data.data.auth.workTypes),
-    error => setError(error.message)
-);
-
 export const userEpics = [
-    loginEpic,
-    userInfoEpic,
     registerUserEpic,
     deleteUserEpic,
     setUserStateEpic,
     getAllUsersEpic,
-    permissionsEpic,
-    updateUserEpic,
-    rolesEpic,
-    workTypesEpic
+    updateUserEpic
 ];
-
-
-
-
-
-
-

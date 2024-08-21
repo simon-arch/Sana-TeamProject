@@ -41,6 +41,14 @@ const About = () => {
                         </td>
                     </tr>
                     <tr>
+                        <td>Work Type:</td>
+                        <td>{Capitalize(account.workType)}</td>
+                    </tr>
+                    <tr>
+                        <td>Work Time:</td>
+                        <td>{account.workTime || "Not specified"}</td>
+                    </tr>
+                    <tr>
                         <td>Status:</td>
                         <td>{Capitalize(account.state)}</td>
                     </tr>

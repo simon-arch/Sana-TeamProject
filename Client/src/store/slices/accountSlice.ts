@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
 import { User } from './userSlice';
+import { Status } from '../../helpers/types';
 
 export interface AccountState {
     user: User;
-    status: 'idle' | 'loading' | 'error';
+    status: Status;
     error: string | null;
     isLoggedIn: boolean | null;
 }
@@ -45,7 +46,7 @@ const accountSlice = createSlice({
             state.user.permissions = action.payload.permissions;
             state.user.state = action.payload.state;
             state.user.workType = action.payload.workType;
-            state.user.workingTime = action.payload.workingTime;
+            state.user.workTime = action.payload.workingTime;
             state.status = 'idle';
         },
         setError: (state, action: PayloadAction<string>) => {

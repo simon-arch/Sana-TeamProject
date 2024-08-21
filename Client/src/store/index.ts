@@ -11,6 +11,10 @@ import timeStampSlice from './slices/timeStampSlice.ts';
 import {timeStampEpics} from './epics/timeStampEpics.ts';
 import planSlice from './slices/planSlice.ts';
 import { planEpics } from './epics/planEpics.ts';
+import { accountEpics } from './epics/accountEpics.ts';
+import { permissionEpics } from './epics/permissionEpics.ts';
+import { roleEpics } from './epics/roleEpics.ts';
+import { workTypeEpics } from './epics/workTypeEpics.ts';
 
 
 const rootReducer = combineReducers({
@@ -30,9 +34,17 @@ export const setupStore = () => {
         reducer: rootReducer,
         middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(epicMiddleware)
     });
-
-    epicMiddleware.run(combineEpics(...userEpics, ...timeStampEpics, ...planEpics));
-
+    
+    epicMiddleware.run(
+        combineEpics(
+            ...accountEpics, 
+            ...permissionEpics, 
+            ...planEpics, 
+            ...roleEpics, 
+            ...timeStampEpics, 
+            ...userEpics, 
+            ...workTypeEpics)
+        );
     return store;
 };
 

@@ -8,12 +8,14 @@ import PermissionSelect from "./ModalComponents/PermissionSelect.tsx";
 import FirstNameField from './ModalComponents/FirstNameField.tsx';
 import LastNameField from './ModalComponents/LastNameField.tsx';
 import config from '../../../config.json';
+import {Status} from '../../helpers/types.ts';
+import WorkInfoField from './ModalComponents/WorkInfoField.tsx';
 
 interface ModalProps {
     show: boolean;
     setShow(prevState : boolean) : void
     user: User,
-    setLocalStatus(prevState: 'idle' | 'loading' | 'error'): void
+    setLocalStatus(prevState: Status): void
 }
 
 const convertPayload = (rec: Record<string, boolean>): string[] => {
@@ -44,11 +46,15 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
     const [lastName, setLastName] = useState('');
     const [role, setRole] = useState('');
     const [permissions, setPermissions] = useState<Record<string, boolean>>({});
+    const [workType, setWorkType] = useState('');
+    const [workTime, setWorkTime] = useState<number | null>(null);
 
     const [firstNameEdited, setFirstNameEdited] = useState(false);
     const [lastNameEdited, setLastNameEdited] = useState(false);
     const [roleEdited, setRoleEdited] = useState(false);
     const [permissionsEdited, setPermissionsEdited] = useState(false);
+    const [workTypeEdited, setworkTypeEdited] = useState(false);
+    const [workTimeEdited, setWorkTimeEdited] = useState(false);
 
     const handleUpdate = () => {
         dispatch(updateRequest(
@@ -59,7 +65,9 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                 lastName: lastName,
                 role: role,
                 permissions: convertPayload(permissions),
-                state: 'AVALIABLE'
+                state: 'AVALIABLE',
+                workType: workType,
+                workTime: workTime
             }
         ));
         props.setShow(false);
@@ -84,6 +92,9 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
 
                         <FirstNameField setFirstName={setFirstName} firstName={firstName} user={props.user} setEdited={setFirstNameEdited} isEdited={firstNameEdited}/>
                         <LastNameField setLastName={setLastName} lastName={lastName} user={props.user} setEdited={setLastNameEdited} isEdited={lastNameEdited}/>
+                        <WorkInfoField setWorkTime={setWorkTime} setWorkTimeEdited={setWorkTimeEdited} workTime={workTime} isWorkTimeEdited={workTimeEdited}
+                                       setWorkType={setWorkType} setWorkTypeEdited={setworkTypeEdited} workType={workType} isWorkTypeEdited={workTypeEdited}
+                                       user={props.user}/>
                         <RoleField setRole={setRole} role={role} user={props.user} setEdited={setRoleEdited} isEdited={roleEdited}/>
                         <PermissionSelect setPermissions={setPermissions} permissions={permissions} user={props.user} setEdited={setPermissionsEdited} isEdited={permissionsEdited}/>
 
@@ -92,10 +103,9 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                             || account.permissions.includes(config.permissions.MANAGE_USER_PERMISSIONS)))
                             &&
                             <div className="mt-4 d-flex justify-content-between">
-                                <Button variant="success"
-                                        disabled={!(firstNameEdited || lastNameEdited || roleEdited || permissionsEdited)}
-                                        onClick={handleUpdate}><BsCheck2 className="me-1"/>Confirm</Button>
-
+                            <Button variant="success"
+                                    disabled={!(firstNameEdited || lastNameEdited || roleEdited || permissionsEdited || workTimeEdited || workTypeEdited)}
+                                    onClick={handleUpdate}><BsCheck2 className="me-1"/>Confirm</Button>
                             {confirm
                                 ? <Button onClick={() => handleRequest()} variant="danger"><BsXLg className="me-1"/>Are you sure?</Button>
                                 : props.user.state.includes(config.userStatuses.FIRED)
@@ -103,22 +113,6 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                                         && <Button onClick={() => handleConfirm()} variant="danger"><BsXLg className="me-1"/>Delete</Button>
                                     : account.permissions.includes(config.permissions.FIRE_USER)
                                         && <Button onClick={() => handleConfirm()} variant="danger"><BsXLg className="me-1"/>Fire</Button>
-                                
-                                //                               FALSE    ┌─────────┐    TRUE              
-                                //                           ┌────────────┤ CONFIRM ├────────────┐         
-                                //                           │            └─────────┘            │         
-                                //                           │                                   │         
-                                //                     ┌─────▼─────┐                       ┌─────▼──────┐  
-                                //             TRUE ┌──┤ IS FIRED? ├──┐ FALSE              │SHOW CONFIRM│  
-                                //                  │  └───────────┘  │                    └────────────┘  
-                                //                  │                 │                                    
-                                //            ┌─────▼─────┐FALSE┌─────▼─────┐                              
-                                //    TRUE ┌──┤CAN DELETE?├──┬──┤ CAN FIRE? ├──┐ TRUE                      
-                                //         │  └───────────┘  │  └───────────┘  │                           
-                                //   ┌─────▼─────┐         ┌─▼─┐         ┌─────▼─────┐                     
-                                //   │SHOW DELETE│         │</>│         │ SHOW FIRE │                     
-                                //   └───────────┘         └───┘         └───────────┘   
-
                             } </div>
                         }
                     </>

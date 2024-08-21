@@ -8,6 +8,7 @@
         REGISTER_USER = 3,
         DELETE_USER = 4,
         REVIEW_VACATIONS = 5,
-        FIRE_USER = 6
+        FIRE_USER = 6,
+        MANAGE_USER_WORKINFO = 7
     }
 }

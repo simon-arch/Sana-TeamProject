@@ -1,10 +1,11 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import { Status } from "../../helpers/types";
 
 export interface TimeStamp {
     id: number,
     username: string,
     timeStart: Date,
-    timeEnd: Date,
+    timeEnd: Date | null,
     source: 'SYSTEM' | 'USER' | 'TIMER',
     editor: string | null
 }
@@ -13,7 +14,7 @@ export interface TimeStampState {
     currentTimeStamp: TimeStamp | null;
     timeStamps: TimeStamp[];
     totalCount: number;
-    status: 'idle' | 'loading' | 'error';
+    status: Status;
     error: string | null;
 }
 

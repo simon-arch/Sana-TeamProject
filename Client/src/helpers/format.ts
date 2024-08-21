@@ -10,3 +10,10 @@ export function Localize(value: Date) {
     }
     return null;
 }
+
+export function Clamp(value: number | null, min: number, max: number) {
+    if (value) {
+        return Math.max(min, Math.min(value, max));
+    }
+    return null;
+}

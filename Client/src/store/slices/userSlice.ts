@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {sendRequest} from "../epics/helpers/request";
+import { Status } from "../../helpers/types";
 
 export interface User {
     username: string;
@@ -10,13 +11,13 @@ export interface User {
     permissions: string[];
     state: string;
     workType: string;
-    workingTime: number;
+    workTime: number | null;
 }
 
 export interface UserState {
     users: User[];
     totalCount: number;
-    status: 'idle' | 'loading' | 'error';
+    status: Status;
     error: string | null;
 }
 

@@ -11,7 +11,6 @@ import {getContrast, stringToHex} from '../../helpers/calculate';
 import {Dropdown, DropdownButton} from 'react-bootstrap';
 import {User, getUsers} from '../../store/slices/userSlice';
 import {Status} from "../../helpers/types.ts";
-import {sendRequest} from "../../store/epics/helpers/request.ts";
 
 const Planner = () => {
     const [showEdit, setShowEdit] = useState(false);

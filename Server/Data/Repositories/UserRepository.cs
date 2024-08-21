@@ -20,7 +20,7 @@ namespace Server.Data.Repositories
         private Task<User?> _GetAsync(string condition)
         {
             string query = $@"
-                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkingTime
+                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkTime
                 FROM Users
                 WHERE {condition}";
 
@@ -32,7 +32,7 @@ namespace Server.Data.Repositories
         public async Task<ResultSet<User>> GetAllAsync(GetAllOptions options)
         {           
             string sql = @$"
-                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkingTime 
+                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkTime 
                 FROM Users
                 {options.Condition}
                 {options.Pagination}";
@@ -47,8 +47,8 @@ namespace Server.Data.Repositories
         public Task InsertAsync(User user)
         {
             string query = @"
-                INSERT INTO Users (Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkingTime)
-                VALUES (@Username, @PasswordHash, @TokenId, @FirstName, @LastName, @Role, @Permissions, @State, @WorkType, @WorkingTime)";
+                INSERT INTO Users (Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkTime)
+                VALUES (@Username, @PasswordHash, @TokenId, @FirstName, @LastName, @Role, @Permissions, @State, @WorkType, @WorkTime)";
 
             return _sql.ExecuteAsync(query, user);
         }
@@ -58,7 +58,7 @@ namespace Server.Data.Repositories
             string query = $@"
                 UPDATE Users
                 SET PasswordHash = @PasswordHash, TokenId = @TokenId, FirstName = @FirstName,
-                LastName = @LastName, Role = @Role, Permissions = @Permissions, State = @State, WorkType = @WorkType, WorkingTime = @WorkingTime
+                LastName = @LastName, Role = @Role, Permissions = @Permissions, State = @State, WorkType = @WorkType, WorkTime = @WorkTime
                 WHERE Username = @Username";
 
             return _sql.ExecuteAsync(query, user);

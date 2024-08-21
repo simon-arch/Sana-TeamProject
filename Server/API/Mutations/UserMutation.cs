@@ -59,7 +59,7 @@ public sealed class UserMutation : ObjectGraphType
                     Permissions = requestUser.Permissions,
                     State = oldUser.State,
                     WorkType = requestUser.WorkType,
-                    WorkingTime = requestUser.WorkingTime
+                    WorkTime = requestUser.WorkTime
                     
                 };
 

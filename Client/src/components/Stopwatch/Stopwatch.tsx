@@ -23,7 +23,7 @@ const Stopwatch = () => {
     const dispatch = useAppDispatch();
 
     const username = useAppSelector<string>(state => state.accountInfo.user.username);
-    const current = useAppSelector<TimeStamp | null>(state => state.timeStamps.currentTimeStamp)
+    const current = useAppSelector<TimeStamp | null>(state => state.timeStamps.currentTimeStamp);
 
     const [canSend, setCanSend] = useState(false);
 

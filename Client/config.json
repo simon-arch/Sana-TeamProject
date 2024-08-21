@@ -13,7 +13,8 @@
         "REGISTER_USER": "REGISTER_USER",
         "DELETE_USER": "DELETE_USER",
         "REVIEW_VACATIONS": "REVIEW_VACATIONS",
-        "FIRE_USER": "FIRE_USER"
+        "FIRE_USER": "FIRE_USER",
+        "MANAGE_USER_WORKINFO": "MANAGE_USER_WORKINFO"
     },
 
     "userStatuses": {

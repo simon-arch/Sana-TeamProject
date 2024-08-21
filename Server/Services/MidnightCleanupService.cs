@@ -55,12 +55,12 @@ namespace Server.Services
                 switch (user.WorkType)
                 {
                     case WorkType.FullTime:
-                        if (user.WorkingTime == null)
+                        if (user.WorkTime == null)
                         {
-                            user.WorkingTime = 8;
+                            user.WorkTime = 8;
                             await userRepository.UpdateAsync(user);
                         }
-                        timeStamp.TimeEnd = timeStamp.TimeStart.AddHours((double)user.WorkingTime);
+                        timeStamp.TimeEnd = timeStamp.TimeStart.AddHours((double)user.WorkTime);
                         break;
 
                     case WorkType.PartTime:
