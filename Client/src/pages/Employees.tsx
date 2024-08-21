@@ -11,8 +11,8 @@ import config from '../../config.json';
 import RegisterUserModal from "../components/UserModal/RegisterUserModal.tsx";
 import PageBar from "../components/PageBar/PageBar.tsx";
 import {debounceTime, distinctUntilChanged, map, Subject} from "rxjs";
-
 import styles from "./styles/employees.module.css";
+import { Status } from '../helpers/types.ts';
 
 const Employees = () => {
     const dispatch = useAppDispatch();
@@ -20,8 +20,8 @@ const Employees = () => {
     const userNumber = useAppSelector<number>(state => state.users.totalCount);
     const account = useAppSelector<User>(state => state.accountInfo.user);
     
-    const status = useAppSelector<'idle' | 'loading' | 'error'>(state => state.users.status);
-    const [localStatus, setLocalStatus] = useState<'idle' | 'loading' | 'error'>('loading');
+    const status = useAppSelector<Status>(state => state.users.status);
+    const [localStatus, setLocalStatus] = useState<Status>('loading');
     
     useEffect(() => {
         setUsers(usersRaw);

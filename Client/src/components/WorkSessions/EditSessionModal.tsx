@@ -36,15 +36,18 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
     }, [props.show, props.timeStamp]);
 
     const handleSubmit = () => {
-        if (startDate! < endDate! && startDate && endDate) {
-            dispatch(worktimeUpdate({
-                id: props.timeStamp.id, 
-                timeStart: startDate!.toISOString(), 
-                timeEnd: endDate!.toISOString(), 
-                editor: username
-            }));
-            handleClose();
-        } else setError("Wrong date");
+        if (!startDate) { setError("Start date is missing"); return; }
+        if (!endDate) { setError("End date is missing"); return; }
+        if (startDate >= endDate) { setError("The end date cannot precede the start date"); return; }
+        if (startDate >= new Date(Date.now())) { setError("The start date cannot precede current date"); return; }
+        if (endDate >= new Date(Date.now())) { setError("The end date cannot precede current date"); return; }
+        dispatch(worktimeUpdate({
+            id: props.timeStamp.id, 
+            timeStart: startDate!.toISOString(), 
+            timeEnd: endDate!.toISOString(), 
+            editor: username
+        }));
+        handleClose();
     };
 
     const handleClose = () => {
@@ -64,12 +67,12 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                 <Modal.Body>
                     <InputGroup>
                         <InputGroup.Text className="col-6">Current Owner</InputGroup.Text>
-                        <Form.Control className="text-center" 
+                        <Form.Control className="text-center" name="owner"
                             readOnly type="text" value={props.timeStamp.username}/>
                     </InputGroup>
                     <InputGroup className="mt-2">
                         <InputGroup.Text className="col-6">Current Editor</InputGroup.Text>
-                        <Form.Control className="text-center" readOnly type="text" value={
+                        <Form.Control className="text-center" name="editor" readOnly type="text" value={
                             props.timeStamp.source == "USER" 
                             ? props.timeStamp.editor! : props.timeStamp.source
                         }/>
@@ -77,6 +80,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                     <Row className="d-flex justify-content-between my-2">
                         <Col md={5}>
                             <DatePicker
+                            name="startdate"
                             selected={startDate}
                             todayButton="Today"
                             onChange={(date) => setStartDate(date!)}
@@ -86,6 +90,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                         </Col>_
                         <Col md={5}>
                             <DatePicker
+                            name="enddate"
                             selected={endDate}
                             todayButton="Today"
                             onChange={(date) => setEndDate(date!)}

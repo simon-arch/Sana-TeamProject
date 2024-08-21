@@ -79,6 +79,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                         <InputGroup.Text className="col-6">Owner</InputGroup.Text>
                         <Form.Control className="text-center" 
                             type="text"
+                            name="owner"
                             defaultValue={props.plan.owner}
                             readOnly={true}/>
                     </InputGroup>
@@ -86,6 +87,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                         <InputGroup.Text className="col-6">Title</InputGroup.Text>
                         <Form.Control className="text-center" 
                             onChange={e => setTitle(e.target.value)}
+                            name="title"
                             type="text"
                             placeholder="Plan title..."
                             value={title}
@@ -96,6 +98,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                         <Form.Control className="text-center" 
                             style={{resize: 'none'}}
                             onChange={e => setDescription(e.target.value)}
+                            name="description"
                             as="textarea"
                             placeholder="Plan description..."
                             value={description || ""}
@@ -105,6 +108,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                         <Col md={5}>
                             <DatePicker
                             selected={startDate}
+                            name="startdate"
                             todayButton="Today"
                             onChange={(date) => setStartDate(date!)}
                             className="form-control rounded text-center"
@@ -114,6 +118,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                         </Col>_
                         <Col md={5}>
                             <DatePicker
+                            name="enddate"
                             selected={endDate}
                             todayButton="Today"
                             onChange={(date) => setEndDate(date!)}

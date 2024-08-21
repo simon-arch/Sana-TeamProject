@@ -167,7 +167,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                     </DropdownButton>
                     <Form.Control
                         type="text"
-                        name="workType"
+                        name="worktype"
                         value={workType}
                         autoComplete="off"
                         readOnly/>
@@ -177,6 +177,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                     <InputGroup.Text className="col-2">Work Hours</InputGroup.Text>
                     <Form.Control
                         disabled={!allowWorkTime}
+                        name="worktime"
                         type="number"
                         step="0.5"
                         min="1"

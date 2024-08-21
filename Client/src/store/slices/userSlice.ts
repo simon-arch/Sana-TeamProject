@@ -88,6 +88,10 @@ const userSlice = createSlice(
             setError(state, action) {
                 state.status = 'error'
                 state.error = action.payload.error
+            },
+            dismissError(state) {
+                state.status = 'idle'
+                state.error = null;
             }
         }
     }
@@ -99,7 +103,7 @@ export const {
     setUserPermissions,
     registerRequest, registerSuccess,
     deleteUser, deleteUserSuccess,
-    setError,
+    setError, dismissError,
     updateRequest, updateSuccess,
     setUserState, setUserStateSuccess
 } = userSlice.actions;

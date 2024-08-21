@@ -8,9 +8,10 @@ import AddTimeModal from './AddPlanModal';
 import {Plan, planRequest} from '../../store/slices/planSlice';
 import {Localize} from '../../helpers/format';
 import {getContrast, stringToHex} from '../../helpers/calculate';
-import {Dropdown, DropdownButton} from 'react-bootstrap';
+import {Button, Dropdown, DropdownButton} from 'react-bootstrap';
 import {User, getUsers} from '../../store/slices/userSlice';
 import {Status} from "../../helpers/types.ts";
+import { BsArrowCounterclockwise, BsCheck2All } from 'react-icons/bs';
 
 const Planner = () => {
     const [showEdit, setShowEdit] = useState(false);
@@ -88,10 +89,13 @@ const Planner = () => {
                 show={showDrop}>
                 <div className="px-2">
                     <input
+                    name="search"
                     type="text"
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}/>
+                <Button className="ms-1" variant="outline-dark" onClick={() => setSelectedUsers(users.map(user => user.username))}><BsCheck2All/></Button>
+                <Button className="ms-1" variant="outline-dark" onClick={() => setSelectedUsers([username])}><BsArrowCounterclockwise/></Button>
                 </div>
                 <div style={{ maxHeight: '200px', overflowY: 'auto'}}>
                     {
@@ -107,6 +111,7 @@ const Planner = () => {
                         }}><input
                                 type="checkbox"
                                 checked={selectedUsers.includes(user.username)}
+                                name={`${user}${index}`}
                                 readOnly
                                 className="me-2"/>
                             {user.username} {user.username === username && "(you)"}
