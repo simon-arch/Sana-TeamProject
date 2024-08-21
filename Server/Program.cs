@@ -6,6 +6,7 @@ using Server.Authorization;
 using Server.Data;
 using Server.Data.Helpers;
 using Server.Data.Repositories;
+using Server.Data.TypeHandlers;
 using Server.Services;
 
 internal class Program
@@ -25,6 +26,8 @@ internal class Program
 
         SqlMapper.AddTypeHandler(typeof(Guid), new GuidTypeHandler());
         SqlMapper.RemoveTypeMap(typeof(Guid));
+        
+        SqlMapper.AddTypeHandler(typeof(List<string>), new JsonTypeHandler());
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IVacationRepository, VacationRepository>();

@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Options;
 using Server.Models;
 
 namespace Server.Data.Repositories
@@ -37,7 +36,8 @@ namespace Server.Data.Repositories
                 : string.Empty;
 
             string sql = @$"
-                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkingTime 
+                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkingTime,
+                ApproveVacationsForUsers, VacationsApprovedByUsers
                 FROM Users
                 {options.Condition}
                 {pagination}";

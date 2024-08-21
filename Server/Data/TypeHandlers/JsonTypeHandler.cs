@@ -1,19 +1,18 @@
-﻿using Dapper;
-using System.Data;
+﻿using System.Data;
 using System.Text.Json;
+using Dapper;
 
-namespace Server.Data.Helpers
+namespace Server.Data.TypeHandlers;
+
+public class JsonTypeHandler : SqlMapper.ITypeHandler
 {
-    public class JsonTypeHandler : SqlMapper.ITypeHandler
+    public object? Parse(Type destinationType, object value)
     {
-        public object? Parse(Type destinationType, object value)
-        {
-            return JsonSerializer.Deserialize((string)value, destinationType);
-        }
+        return JsonSerializer.Deserialize(value.ToString()!, destinationType);
+    }
 
-        public void SetValue(IDbDataParameter parameter, object value)
-        {
-            parameter.Value = JsonSerializer.Serialize(value);
-        }
+    public void SetValue(IDbDataParameter parameter, object value)
+    {
+        parameter.Value = JsonSerializer.Serialize(value);
     }
 }

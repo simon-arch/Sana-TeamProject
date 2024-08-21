@@ -6,6 +6,7 @@ using Server.Authorization;
 using Server.Data.Repositories;
 using Server.Models;
 using System.Security.Claims;
+using Server.API.Extensions;
 
 namespace Server.API.Mutations;
 
@@ -78,9 +79,10 @@ public sealed class UserMutation : ObjectGraphType
                 context.WithPermission(Permission.DELETE_USER);
 
                 var username = context.GetArgument<string>("username");
+                var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
                 var user = await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username)
                     ?? throw new ExecutionError("User not found") { Code = ResponseCode.BadRequest };
-
+                
                 await context.RequestServices!.GetRequiredService<IUserRepository>().DeleteAsync(user.Username);
                 return user;
             });
@@ -90,9 +92,9 @@ public sealed class UserMutation : ObjectGraphType
             .ResolveAsync(async context =>
             {
                 context.Authorize();
+                var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
 
                 var requestUser = context.GetArgument<User>("user");
-
                 var oldUser = await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(requestUser.Username)
                     ?? throw new ExecutionError("User not found") { Code = ResponseCode.BadRequest };
 
@@ -107,11 +109,14 @@ public sealed class UserMutation : ObjectGraphType
                     Permissions = requestUser.Permissions,
                     State = oldUser.State,
                     WorkType = requestUser.WorkType,
-                    WorkingTime = requestUser.WorkingTime
-                    
+                    WorkingTime = requestUser.WorkingTime,
+                    // ApproveVacationsForUsers = requestUser.ApproveVacationsForUsers,
+                    // VacationsApprovedByUsers = requestUser.VacationsApprovedByUsers
                 };
-
-                await context.RequestServices!.GetRequiredService<IUserRepository>().UpdateAsync(newUser);
+                
+                await userRepository.UpdateAsync(newUser);
+                // await UserMutationExtensions.UpdateUsersVacationsAsync(newUser, userRepository);
+                
                 return newUser;
             });
 
