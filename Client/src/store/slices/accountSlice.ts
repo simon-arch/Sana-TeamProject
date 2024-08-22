@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
-import { User } from './userSlice';
+import User from "../../models/User.ts";
+import {ErrorType, Status} from "../../helpers/types.ts";
 
 export interface AccountState {
     user: User;
-    status: 'idle' | 'loading' | 'error';
-    error: string | null;
+    status: Status;
+    error: ErrorType;
     isLoggedIn: boolean | null;
 }
 
@@ -26,8 +27,8 @@ const accountSlice = createSlice({
     initialState,
     reducers: {
         //@ts-ignore
-        getAccessToken(state, action) {},
-        setTokenPayload: (state, action: PayloadAction<string>) => {
+        getAccessToken(state: AccountState, action) {},
+        setTokenPayload: (state: AccountState, action: PayloadAction<string>) => {
             localStorage.setItem('authToken', action.payload);
             const data: JWTData = jwtDecode(action.payload) as JWTData;
             state.user.username = data.sub;
@@ -35,10 +36,10 @@ const accountSlice = createSlice({
             state.isLoggedIn = true;
         },
         //@ts-ignore
-        getAccountInfo(state, action) {
+        getAccountInfo(state: AccountState, action) {
             state.status = 'loading';
         },
-        setAccountInfo(state, action) {
+        setAccountInfo(state: AccountState, action) {
             state.user.firstName = action.payload.firstName;
             state.user.lastName = action.payload.lastName;
             state.user.role = action.payload.role;
@@ -48,11 +49,11 @@ const accountSlice = createSlice({
             state.user.workingTime = action.payload.workingTime;
             state.status = 'idle';
         },
-        setError: (state, action: PayloadAction<string>) => {
+        setError: (state: AccountState, action: PayloadAction<string>) => {
             state.error = action.payload;
             state.isLoggedIn = false;
         },
-        logout: (state) => {
+        logout: (state: AccountState) => {
             localStorage.clear();
             state.user = <User>{};
             state.error = null;

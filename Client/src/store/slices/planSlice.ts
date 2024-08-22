@@ -1,19 +1,11 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import { Status } from "../../helpers/types";
-
-export interface Plan {
-    id: number,
-    title: string,
-    description: string | null,
-    timeStart: Date,
-    timeEnd: Date,
-    owner: string
-}
+import Plan from "../../models/Plan.ts";
+import {ErrorType, Status} from "../../helpers/types.ts";
 
 export interface PlanState {
     plans: Plan[];
     status: Status;
-    error: string | null;
+    error: ErrorType;
 }
 
 const initialState: PlanState = {

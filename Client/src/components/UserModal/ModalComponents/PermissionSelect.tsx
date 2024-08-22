@@ -1,16 +1,16 @@
 import {useEffect, useState} from 'react';
-import {User} from "../../../store/slices/userSlice.ts";
 import {useAppSelector} from "../../../hooks/redux.ts";
 import config from "../../../../config.json";
 import {Button, Dropdown, DropdownButton, Form, InputGroup} from "react-bootstrap";
 import {BsArrowCounterclockwise} from "react-icons/bs";
+import User, {Permission} from "../../../models/User.ts";
 
 export interface Settings {
     [name: string]: string[];
 }
 
 export interface Presets {
-    [preset: string]: string[];
+    [preset: string]: Permission[];
 }
 
 export interface Config {
@@ -28,8 +28,8 @@ interface Props {
 const data: Config = config as Config;
 
 const PermissionSelect = (props: Props) => {
-    const account = useAppSelector(state => state.accountInfo.user);
-    const permissions = useAppSelector<string[]>(state => state.permissions.permissions);
+    const account = useAppSelector<User>(state => state.accountInfo.user);
+    const permissions = useAppSelector<Permission[]>(state => state.permissions.permissions);
 
     const [sourceCheckboxes, setSourceCheckboxes] = useState<Record<string, boolean>>({});
     const [preset, setPreset] = useState<string>('');
@@ -77,7 +77,7 @@ const PermissionSelect = (props: Props) => {
     return (
         <div>
             <div>
-                    {(props.user.username !== account.username && account.permissions.includes(config.permissions.MANAGE_USER_PERMISSIONS)) && (
+                    {(props.user.username !== account.username && account.permissions.includes(Permission.ManageUserPermissions)) && (
                         <InputGroup className="mb-1">
                             <DropdownButton
                                 variant="secondary text-start bg-light text-dark col-2"
@@ -108,7 +108,7 @@ const PermissionSelect = (props: Props) => {
                                     name={perm}
                                     type="checkbox"
                                     checked= {props.permissions[perm] || false}
-                                    disabled={props.user.username == account.username || !account.permissions.includes(config.permissions.MANAGE_USER_ROLES) }
+                                    disabled={props.user.username == account.username || !account.permissions.includes(Permission.ManageUserRoles) }
                                     onChange={() => handleCheckboxChange(perm)}/>
                                 <label htmlFor={perm}>{perm}</label>
                             </td>

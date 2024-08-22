@@ -1,14 +1,36 @@
 import {
     setError,
-    worktimeCreate, worktimeCreateResolve,
-    worktimeDelete, worktimeDeleteResolve,
-    worktimeListRequest, worktimeListRequestResolve,
-    worktimeUpdate, worktimeUpdateResolve
+    workTimeCreate, workTimeCreateResolve,
+    workTimeDelete, workTimeDeleteResolve,
+    workTimeLatestRequest, workTimeLatestRequestResolve,
+    workTimeListRequest, workTimeListRequestResolve,
+    workTimeUpdate, workTimeUpdateResolve
 } from '../slices/timeStampSlice';
 import {createEpic} from "./helpers/createEpic.ts";
 
-export const worktimeRequestEpic = createEpic(
-    worktimeListRequest.type,
+export const workTimeLatestRequestEpic = createEpic(
+    workTimeLatestRequest.type,
+    action => {
+        const username = action.payload.username;
+        return `query {
+                    timeStamp {
+                        latest(username: "${username}") {
+                            id
+                            username
+                            timeStart
+                            timeEnd
+                            source
+                            editor
+                        }
+                    }
+                }`
+    },
+    data => workTimeLatestRequestResolve(data.data.timeStamp.latest),
+    error => setError(error.message)
+);
+
+export const workTimeListRequestEpic = createEpic(
+    workTimeListRequest.type,
     action => {
         const {username, pageSize, pageNumber} = action.payload;
         return `query {
@@ -26,12 +48,12 @@ export const worktimeRequestEpic = createEpic(
                     }
             } 
     }`},
-    data => worktimeListRequestResolve(data.data.timeStamp["byUsername"]),
+    data => workTimeListRequestResolve(data.data.timeStamp.byUsername),
     error => setError(error.message)
 );
 
-export const worktimeUpdateEpic = createEpic(
-    worktimeUpdate.type,
+export const workTimeUpdateEpic = createEpic(
+    workTimeUpdate.type,
     action => {
         const { id, timeStart, timeEnd, editor } = action.payload;
         return `mutation {
@@ -51,12 +73,12 @@ export const worktimeUpdateEpic = createEpic(
                     }
             } 
     }`},
-    data => worktimeUpdateResolve(data.data.timeStamp.update),
+    data => workTimeUpdateResolve(data.data.timeStamp.update),
     error => setError(error.message)
 );
 
-export const worktimeDeleteEpic = createEpic(
-    worktimeDelete.type,
+export const workTimeDeleteEpic = createEpic(
+    workTimeDelete.type,
     action => {
         const id = action.payload;
         return `mutation {
@@ -64,12 +86,12 @@ export const worktimeDeleteEpic = createEpic(
                     remove(id: ${id}) { id }
             } 
     }`},
-    data => worktimeDeleteResolve(data.data.timeStamp.remove.id),
+    data => workTimeDeleteResolve(data.data.timeStamp.remove.id),
     error => setError(error.message)
 );
 
-export const worktimeCreateEpic = createEpic(
-    worktimeCreate.type,
+export const workTimeCreateEpic = createEpic(
+    workTimeCreate.type,
     action => {
         const { username, timeStart, timeEnd, source, editor } = action.payload;
         return `mutation {
@@ -92,15 +114,16 @@ export const worktimeCreateEpic = createEpic(
                     }
             } 
     }`},
-    data => worktimeCreateResolve(data.data.timeStamp.add),
+    data => workTimeCreateResolve(data.data.timeStamp.add),
     error => setError(error.message)
 );
 
 export const timeStampEpics = [
-    worktimeRequestEpic,
-    worktimeUpdateEpic,
-    worktimeDeleteEpic,
-    worktimeCreateEpic
+    workTimeLatestRequestEpic,
+    workTimeListRequestEpic,
+    workTimeUpdateEpic,
+    workTimeDeleteEpic,
+    workTimeCreateEpic
 ];
 
 

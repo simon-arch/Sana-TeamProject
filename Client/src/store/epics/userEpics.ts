@@ -11,12 +11,13 @@ import {
     registerRequest, registerSuccess,
     updateRequest, updateSuccess,
     setUsers,
-    setUserState, setUserStateSuccess, User
+    setUserState, setUserStateSuccess,
 } from "../slices/userSlice.ts";
 import {getPermissions, setPermissions} from "../slices/permissionSlice.ts";
 import {getRoles, setRoles} from "../slices/roleSlice.ts";
 import {getWorkTypes, setWorkTypes} from "../slices/workTypeSlice.ts";
 import {PayloadAction} from "@reduxjs/toolkit";
+import User from "../../models/User.ts";
 
 export const loginEpic = createEpic(
     getAccessToken.type,
@@ -26,7 +27,7 @@ export const loginEpic = createEpic(
             login(username: "${action.payload.username}", password: "${action.payload.password}") 
         } 
     }`,
-    data => setTokenPayload(data.data.auth["login"]),
+    data => setTokenPayload(data.data.auth.login),
     error => setError(error.message)
 );
 
@@ -138,11 +139,14 @@ export const setUserStateEpic = createEpic(
         const state = action.payload.state;
         return `mutation {
                     user {
-                        setState(username: "${username}", state: ${state}) { username }
+                        setState(username: "${username}", state: ${state}) {
+                            username
+                            state 
+                        }
                     }
             }`;
     },
-    data => setUserStateSuccess(data.data.user.setState.username),
+    data => setUserStateSuccess(data.data.user.setState),
     error => setError(error.message)
 )
 

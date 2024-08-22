@@ -18,6 +18,5 @@ export const sendRequest = async (query: string) => {
   if (json.errors) {
     throw new Error(json.errors[0].extensions.code);
   }
-  
   return json;
 };

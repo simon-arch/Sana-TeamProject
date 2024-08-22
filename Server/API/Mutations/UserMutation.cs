@@ -60,7 +60,6 @@ public sealed class UserMutation : ObjectGraphType
                     State = oldUser.State,
                     WorkType = requestUser.WorkType,
                     WorkingTime = requestUser.WorkingTime
-                    
                 };
 
                 await context.RequestServices!.GetRequiredService<IUserRepository>().UpdateAsync(newUser);

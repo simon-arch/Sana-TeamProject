@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {Button, Col, Container, Form, InputGroup, Modal, OverlayTrigger, Row, Tooltip} from "react-bootstrap";
-import { TimeStamp, worktimeDelete, worktimeUpdate } from '../../store/slices/timeStampSlice';
+import { workTimeDelete, workTimeUpdate } from '../../store/slices/timeStampSlice';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { BsArrowCounterclockwise, BsCheck2, BsXLg } from 'react-icons/bs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import TimeStamp from "../../models/TimeStamp.ts";
 
 interface EditProps {
     show : boolean,
@@ -22,7 +23,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
 
     const handleConfirm = () => {
         if (confirm) {
-            dispatch(worktimeDelete(props.timeStamp.id));
+            dispatch(workTimeDelete(props.timeStamp.id));
             handleClose();
         } else setConfirm(true);
     }
@@ -37,7 +38,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
 
     const handleSubmit = () => {
         if (startDate! < endDate! && startDate && endDate) {
-            dispatch(worktimeUpdate({
+            dispatch(workTimeUpdate({
                 id: props.timeStamp.id, 
                 timeStart: startDate!.toISOString(), 
                 timeEnd: endDate!.toISOString(), 

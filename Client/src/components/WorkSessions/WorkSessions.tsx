@@ -1,7 +1,6 @@
-import {worktimeListClear, worktimeListRequest} from '../../store/slices/timeStampSlice';
+import {workTimeListClear, workTimeListRequest} from '../../store/slices/timeStampSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import React, {useEffect, useRef, useState} from 'react';
-import { TimeStamp } from '../../store/slices/timeStampSlice';
 import EditTimeModal from './EditSessionModal';
 import AddTimeModal from './AddSessionModal';
 import { Button, Table } from 'react-bootstrap';
@@ -9,6 +8,7 @@ import { Localize } from '../../helpers/format';
 import { getTimeDifference } from '../../helpers/calculate';
 import useInView from "../../hooks/useInView.ts";
 import {Status} from "../../helpers/types.ts";
+import TimeStamp from "../../models/TimeStamp.ts";
 
 const WorkSessions = () => {
 
@@ -34,9 +34,9 @@ const WorkSessions = () => {
 
     useEffect(() => {
         if (page === 1) {
-            dispatch(worktimeListClear());
+            dispatch(workTimeListClear());
         }
-        dispatch(worktimeListRequest({username, pageSize, pageNumber: page}));
+        dispatch(workTimeListRequest({username, pageSize, pageNumber: page}));
     }, [page]);
 
     useEffect(() => {

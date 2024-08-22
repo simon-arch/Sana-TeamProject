@@ -1,7 +1,7 @@
 import VacationManager from "../components/Vacation/VacationManager";
 import { useAppSelector } from "../hooks/redux";
-import config from "../../config.json";
 import VacationForm from "../components/Vacation/VacationForm";
+import {Permission} from "../models/User.ts";
 
 const Vacations = () => {
     const permissions = useAppSelector(state => state.accountInfo.user.permissions);
@@ -12,7 +12,7 @@ const Vacations = () => {
                 <h1>Vacations</h1>
                 <p className="text-secondary">Vacation appeals manager</p>
             </div>
-            { permissions && permissions.includes(config.permissions.REVIEW_VACATIONS) ? <VacationManager/> : <VacationForm/> }
+            { permissions && permissions.includes(Permission.ReviewVacations) ? <VacationManager/> : <VacationForm/> }
         </div>
     );
   };

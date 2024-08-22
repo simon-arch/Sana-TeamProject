@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {Button, Col, Container, Form, InputGroup, Modal, OverlayTrigger, Row, Tooltip} from "react-bootstrap";
-import {worktimeCreate} from '../../store/slices/timeStampSlice';
+import {workTimeCreate} from '../../store/slices/timeStampSlice';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import {BsArrowCounterclockwise, BsCheck2} from 'react-icons/bs';
@@ -21,7 +21,7 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
 
     const handleSubmit = () => {
         if (startDate! < endDate! && startDate && endDate) {
-            dispatch(worktimeCreate({
+            dispatch(workTimeCreate({
                 username: username,
                 timeStart: startDate!.toISOString(), 
                 timeEnd: endDate!.toISOString(),

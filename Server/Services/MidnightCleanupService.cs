@@ -47,12 +47,7 @@ namespace Server.Services
             var resultSet = await userRepository.GetAllAsync();
             foreach (var user in resultSet.Results)
             {
-                var timeStamp = await timeStampRepository.GetLatestAsync(user.Username);
-                if (timeStamp == null || timeStamp.TimeEnd != null)
-                {
-                    continue;
-                }
-                switch (user.WorkType)
+                switch(user.WorkType)
                 {
                     case WorkType.FullTime:
                         if (user.WorkingTime == null)
@@ -60,14 +55,25 @@ namespace Server.Services
                             user.WorkingTime = 8;
                             await userRepository.UpdateAsync(user);
                         }
-                        timeStamp.TimeEnd = timeStamp.TimeStart.AddHours((double)user.WorkingTime);
-                        break;
 
+                        await timeStampRepository.InsertAsync(new()
+                        {
+                            Username = user.Username,
+                            TimeStart = DateTime.Today.AddHours(8).ToUniversalTime(),
+                            TimeEnd = DateTime.Today.AddHours((double)(8 + user.WorkingTime)).ToUniversalTime(),
+                            Source = Source.SYSTEM,
+                        });
+                        break;
                     case WorkType.PartTime:
-                        timeStamp.TimeEnd = DateTime.Today.AddSeconds(-1);
+                        var latest = await timeStampRepository.GetLatestAsync(user.Username);
+                        if (latest != null && latest.TimeEnd == null)
+                        {
+                            latest.TimeEnd = DateTime.Today.AddSeconds(-1).ToUniversalTime();
+                            latest.Source = Source.SYSTEM;
+                            await timeStampRepository.UpdateAsync(latest);
+                        }
                         break;
                 }
-                await timeStampRepository.UpdateAsync(timeStamp);
             }
         }
     }

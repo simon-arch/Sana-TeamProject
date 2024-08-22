@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {User, deleteUser, setUserState, updateRequest} from "../../store/slices/userSlice.ts";
+import {deleteUser, setUserState, updateRequest} from "../../store/slices/userSlice.ts";
 import {Button, Form, InputGroup, Modal} from "react-bootstrap";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {BsCheck2, BsXLg} from "react-icons/bs";
@@ -7,18 +7,19 @@ import RoleField from "./ModalComponents/RoleField.tsx";
 import PermissionSelect from "./ModalComponents/PermissionSelect.tsx";
 import FirstNameField from './ModalComponents/FirstNameField.tsx';
 import LastNameField from './ModalComponents/LastNameField.tsx';
-import config from '../../../config.json';
+import User, {Permission, Role, UserStatus} from "../../models/User.ts";
+import {Status} from "../../helpers/types.ts";
 
 interface ModalProps {
     show: boolean;
     setShow(prevState : boolean) : void
     user: User,
-    setLocalStatus(prevState: 'idle' | 'loading' | 'error'): void
+    setLocalStatus(prevState: Status): void
 }
 
 const convertPayload = (rec: Record<string, boolean>): string[] => {
     return Object.entries(rec)
-        .filter(([_, val]) => val)
+        .filter(([, val]) => val)
         .map(([key]) => key);
 };
 
@@ -27,9 +28,9 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
     const account = useAppSelector<User>(state => state.accountInfo.user);
 
     const handleRequest = () => {
-        props.user.state.includes(config.userStatuses.FIRED)
+        props.user.state.includes(UserStatus.Fired)
             ? dispatch(deleteUser({username: props.user.username}))
-            : dispatch(setUserState({username: props.user.username, state: config.userStatuses.FIRED}))
+            : dispatch(setUserState({username: props.user.username, state: UserStatus.Fired}))
         
         props.setLocalStatus('loading');
         setConfirm(false);
@@ -42,7 +43,7 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [role, setRole] = useState('');
+    const [role, setRole] = useState<Role>(Role.Developer);
     const [permissions, setPermissions] = useState<Record<string, boolean>>({});
 
     const [firstNameEdited, setFirstNameEdited] = useState(false);
@@ -59,7 +60,7 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                 lastName: lastName,
                 role: role,
                 permissions: convertPayload(permissions),
-                state: 'AVALIABLE'
+                state: UserStatus.Available
             }
         ));
         props.setShow(false);
@@ -88,8 +89,8 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                         <PermissionSelect setPermissions={setPermissions} permissions={permissions} user={props.user} setEdited={setPermissionsEdited} isEdited={permissionsEdited}/>
 
                         {(props.user.username !== account.username
-                            && (account.permissions.includes(config.permissions.MANAGE_USER_ROLES)
-                            || account.permissions.includes(config.permissions.MANAGE_USER_PERMISSIONS)))
+                            && (account.permissions.includes(Permission.ManageUserRoles)
+                            || account.permissions.includes(Permission.ManageUserRoles)))
                             &&
                             <div className="mt-4 d-flex justify-content-between">
                                 <Button variant="success"
@@ -98,27 +99,11 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
 
                             {confirm
                                 ? <Button onClick={() => handleRequest()} variant="danger"><BsXLg className="me-1"/>Are you sure?</Button>
-                                : props.user.state.includes(config.userStatuses.FIRED)
-                                    ? account.permissions.includes(config.permissions.DELETE_USER)
+                                : props.user.state.includes(UserStatus.Fired)
+                                    ? account.permissions.includes(Permission.DeleteUser)
                                         && <Button onClick={() => handleConfirm()} variant="danger"><BsXLg className="me-1"/>Delete</Button>
-                                    : account.permissions.includes(config.permissions.FIRE_USER)
+                                    : account.permissions.includes(Permission.FireUser)
                                         && <Button onClick={() => handleConfirm()} variant="danger"><BsXLg className="me-1"/>Fire</Button>
-                                
-                                //                               FALSE    ┌─────────┐    TRUE              
-                                //                           ┌────────────┤ CONFIRM ├────────────┐         
-                                //                           │            └─────────┘            │         
-                                //                           │                                   │         
-                                //                     ┌─────▼─────┐                       ┌─────▼──────┐  
-                                //             TRUE ┌──┤ IS FIRED? ├──┐ FALSE              │SHOW CONFIRM│  
-                                //                  │  └───────────┘  │                    └────────────┘  
-                                //                  │                 │                                    
-                                //            ┌─────▼─────┐FALSE┌─────▼─────┐                              
-                                //    TRUE ┌──┤CAN DELETE?├──┬──┤ CAN FIRE? ├──┐ TRUE                      
-                                //         │  └───────────┘  │  └───────────┘  │                           
-                                //   ┌─────▼─────┐         ┌─▼─┐         ┌─────▼─────┐                     
-                                //   │SHOW DELETE│         │</>│         │ SHOW FIRE │                     
-                                //   └───────────┘         └───┘         └───────────┘   
-
                             } </div>
                         }
                     </>

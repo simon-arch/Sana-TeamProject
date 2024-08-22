@@ -5,13 +5,14 @@ import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {useEffect, useState} from 'react';
 import EditTimeModal from './EditPlanModal';
 import AddTimeModal from './AddPlanModal';
-import {Plan, planRequest} from '../../store/slices/planSlice';
+import {planRequest} from '../../store/slices/planSlice';
 import {Localize} from '../../helpers/format';
 import {getContrast, stringToHex} from '../../helpers/calculate';
 import {Dropdown, DropdownButton} from 'react-bootstrap';
-import {User, getUsers} from '../../store/slices/userSlice';
+import {getUsers} from '../../store/slices/userSlice';
 import {Status} from "../../helpers/types.ts";
-import {sendRequest} from "../../store/epics/helpers/request.ts";
+import User from "../../models/User.ts";
+import Plan from "../../models/Plan.ts";
 
 const Planner = () => {
     const [showEdit, setShowEdit] = useState(false);
@@ -55,6 +56,7 @@ const Planner = () => {
         setEvents(newEvents);}
     }, [status, plans, showEdit, showAdd]);
 
+    // @ts-ignore
     const handleEventClick = context => {
         setEditedPlan(context.event.extendedProps.relation);
         setShowEdit(true); 

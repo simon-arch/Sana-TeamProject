@@ -2,20 +2,19 @@ import React, {useEffect, useState} from 'react';
 import {Button, Dropdown, DropdownButton, Form, InputGroup, Modal} from "react-bootstrap";
 import {BsCheck2} from "react-icons/bs";
 import {registerRequest, setError} from "../../store/slices/userSlice.ts";
-import {useAppDispatch} from "../../hooks/redux.ts";
-
+import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {getPermissions} from "../../store/slices/permissionSlice.ts";
 import {getRoles} from "../../store/slices/roleSlice.ts";
-import {RootState} from "../../store";
-import {useSelector} from "react-redux";
 import config from "../../../config.json";
 import {Config} from "./ModalComponents/PermissionSelect.tsx";
 import {getWorkTypes} from "../../store/slices/workTypeSlice.ts";
+import {Permission, Role, UserStatus, WorkType} from "../../models/User.ts";
+import {Status} from "../../helpers/types.ts";
 
 interface ModalProps {
     show: boolean,
     setShow(prevState: boolean): void,
-    setLocalStatus(prevState: 'idle' | 'loading' | 'error'): void
+    setLocalStatus(prevState: Status): void
 }
 
 const data: Config = config as Config;
@@ -26,17 +25,17 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('');
-    const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+    const [role, setRole] = useState(Role.Developer);
+    const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
     const [preset, setPreset] = useState<string>('');
 
-    const [workType, setWorkType] = useState('');
+    const [workType, setWorkType] = useState(WorkType.FullTime);
     const [workingTime, setWorkingTime] = useState(1);
-    const [showWorkingTime, setShowWorkingTime] = useState(false);
+    const [showWorkingTime, setShowWorkingTime] = useState(true);
 
-    const roles: string[] = useSelector((state: RootState) => state.roles.roles);
-    const permissions: string[] = useSelector((state: RootState) => state.permissions.permissions);
-    const workTypes: string[] = useSelector((state: RootState) => state.workTypes.workTypes);
+    const roles = useAppSelector<Role[]>(state => state.roles.roles);
+    const permissions = useAppSelector<Permission[]>(state => state.permissions.permissions);
+    const workTypes = useAppSelector<WorkType[]>(state => state.workTypes.workTypes);
 
     useEffect(() => {
         dispatch(getRoles());
@@ -44,7 +43,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
         dispatch(getWorkTypes());
     }, [dispatch]);
 
-    const handlePermissionChange = (perm: string) => {
+    const handlePermissionChange = (perm: Permission) => {
         setSelectedPermissions(prev =>
             prev.includes(perm)
                 ? prev.filter(p => p !== perm)
@@ -60,9 +59,9 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
         }
     };
 
-    const handleWorkTypeChange = (workType: string) => {
+    const handleWorkTypeChange = (workType: WorkType) => {
         setWorkType(workType);
-        setShowWorkingTime(workType === config.workType.FULL_TIME);
+        setShowWorkingTime(workType === WorkType.FullTime);
     };
 
     const handleRegister = (e: React.FormEvent) => {
@@ -75,7 +74,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 password: password,
                 role: role,
                 permissions: selectedPermissions,
-                state: config.userStatuses.AVAILABLE,
+                state: UserStatus.Available,
                 workType: workType,
                 workingTime: workingTime
             }));
@@ -83,10 +82,10 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
             setFirstName('');
             setLastName('');
             setPassword('');
-            setRole('');
+            setRole(Role.Developer);
             setSelectedPermissions([]);
             setPreset('');
-            setWorkType('');
+            setWorkType(WorkType.FullTime);
             setWorkingTime(1);
             props.setShow(false);
             setShowWorkingTime(false);

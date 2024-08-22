@@ -25,7 +25,9 @@ public sealed class AuthMutation : ObjectGraphType
 
                 var user = await userRepository.GetAsync(username);
 
-                if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                if (user == null ||
+                    user.State == State.Fired ||
+                    !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
                 {
                     throw new ExecutionError("Wrong credentials") { Code = ResponseCode.Unauthorized };
                 }

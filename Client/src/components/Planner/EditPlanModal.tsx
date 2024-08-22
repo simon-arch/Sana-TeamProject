@@ -3,10 +3,11 @@ import {Button, Col, Container, Form, InputGroup, Modal, OverlayTrigger, Row, To
 import DatePicker from 'react-datepicker';
 import { BsArrowCounterclockwise, BsCheck2, BsXLg } from 'react-icons/bs';
 import { useAppDispatch } from '../../hooks/redux';
-import { Plan, planDelete, planUpdate } from '../../store/slices/planSlice';
+import { planDelete, planUpdate } from '../../store/slices/planSlice';
 import { Localize } from '../../helpers/format';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ErrorType } from '../../helpers/types';
+import Plan from "../../models/Plan.ts";
 
 interface EditProps {
     show : boolean,

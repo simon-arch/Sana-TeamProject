@@ -1,17 +1,7 @@
 import { Card, Col, Row, Table } from "react-bootstrap"
 import { Capitalize } from "../../helpers/format"
-
 import styles from "./vacation.module.css";
-
-export interface Vacation {
-    id: Number,
-    title: string,
-    description: string | null,
-    status: 'PENDING' | 'APPROVED' | 'REJECTED',
-    sender: string,
-    startDate: Date,
-    endDate: Date,
-}
+import Vacation from "../../models/Vacation.ts";
 
 interface Props {
     vacation: Vacation

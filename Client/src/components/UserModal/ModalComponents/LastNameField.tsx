@@ -1,9 +1,8 @@
 import {useEffect, useState} from 'react';
 import {Button, Form, InputGroup} from "react-bootstrap";
 import {useAppSelector} from "../../../hooks/redux.ts";
-import {User} from "../../../store/slices/userSlice.ts";
 import {BsArrowCounterclockwise} from "react-icons/bs";
-import config from '../../../../config.json';
+import User, {Permission} from "../../../models/User.ts";
 
 interface LastNameFieldProps {
     user: User,
@@ -42,7 +41,7 @@ const LastNameField = (props : LastNameFieldProps) => {
     return (
         <InputGroup className="mb-1">
             <InputGroup.Text className="col-2">Last name</InputGroup.Text>
-            {props.user.username === account.username || !account.permissions.includes(config.permissions.MANAGE_USER_ROLES) 
+            {props.user.username === account.username || !account.permissions.includes(Permission.ManageUserRoles)
                 ?
                 <Form.Control name="lastname" type="text" value={props.user.lastName} readOnly/>
                 :

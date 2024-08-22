@@ -1,24 +1,23 @@
 import {useEffect, useState} from 'react';
 import {Button, Dropdown, DropdownButton, Form, InputGroup} from "react-bootstrap";
 import {useAppSelector} from "../../../hooks/redux.ts";
-import {User} from "../../../store/slices/userSlice.ts";
 import {BsArrowCounterclockwise} from "react-icons/bs";
+import User, {Permission, Role} from "../../../models/User.ts";
 import {Capitalize} from "../../../helpers/format.ts";
-import config from '../../../../config.json';
 
 interface RoleFieldProps {
     user: User,
     isEdited: boolean,
     setEdited(prevState: boolean): void,
-    setRole(prevState: string) : void,
+    setRole(prevState: Role) : void,
     role: string
 }
 
 const RoleField = (props : RoleFieldProps) => {
     const account = useAppSelector<User>(state => state.accountInfo.user);
-    const availableRoles = useAppSelector<string[]>(state => state.roles.roles);
+    const availableRoles = useAppSelector<Role[]>(state => state.roles.roles);
 
-    const [sourceRole, setSourceRole] = useState('');
+    const [sourceRole, setSourceRole] = useState<Role>(Role.Developer);
 
     useEffect(() => {
         if (props.user) {
@@ -28,7 +27,7 @@ const RoleField = (props : RoleFieldProps) => {
         }
     }, [props.user]);
 
-    const handleChange = (role: string) => {
+    const handleChange = (role: Role) => {
         const newRole = role;
         if (sourceRole !== newRole) {
             props.setEdited(true);
@@ -43,7 +42,7 @@ const RoleField = (props : RoleFieldProps) => {
 
     return (
         <InputGroup className="mb-1">
-            {props.user.username === account.username || !account.permissions.includes(config.permissions.MANAGE_USER_ROLES) 
+            {props.user.username === account.username || !account.permissions.includes(Permission.ManageUserRoles)
                 ?
                 <Form.Control name="role" type="text" value={props.user.role} readOnly/>
                 :
@@ -52,7 +51,7 @@ const RoleField = (props : RoleFieldProps) => {
                         variant="secondary col-2 text-start bg-light text-dark"
                         title="Role">
                         {availableRoles.map((role, index) => (
-                            <Dropdown.Item key={index} onClick={() => handleChange(role)}>{Capitalize(role)}</Dropdown.Item>
+                            <Dropdown.Item key={index} onClick={() => handleChange(role)}>{Capitalize(role as string)}</Dropdown.Item>
                         ))}
                     </DropdownButton>
                     <Form.Control name="role" type="text" value={props.role} readOnly/>

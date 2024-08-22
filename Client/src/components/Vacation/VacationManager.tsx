@@ -1,12 +1,13 @@
 import {useEffect, useState} from "react";
-import {sendRequest} from "../../store/epics/helpers/request";
-import VacationCard, { Vacation } from "./VacationCard";
+import {sendRequest} from "../../store/epics/helpers/sendRequest.ts";
+import VacationCard from "./VacationCard";
 import { Button, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import Vacation, {VacationStatus} from "../../models/Vacation.ts";
 
 const VacationManager = () => {
     const [vacations, setVacations] = useState<Vacation[]>([]);
     const [filter, setFilter] = useState([2]);
-    const statuses = ['APPROVED', 'PENDING', 'REJECTED'];
+    const statuses = [VacationStatus.Approved, VacationStatus.Pending, VacationStatus.Rejected];
 
     useEffect(() => {
         getAllVacations();

@@ -1,7 +1,7 @@
 import {ofType} from "redux-observable";
 import {catchError, switchMap} from "rxjs/operators";
 import {from, of} from "rxjs";
-import {sendRequest} from "./request.ts";
+import {sendRequest} from "./sendRequest.ts";
 
 export const createEpic = (
     actionType: string,

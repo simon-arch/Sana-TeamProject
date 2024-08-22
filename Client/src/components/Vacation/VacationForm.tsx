@@ -1,13 +1,14 @@
 import {useEffect, useState} from "react";
 import {Alert, Button, Col, Form, InputGroup, OverlayTrigger, Row, Tooltip} from "react-bootstrap";
-import {sendRequest} from "../../store/epics/helpers/request";
-import {User} from "../../store/slices/userSlice";
+import {sendRequest} from "../../store/epics/helpers/sendRequest.ts";
 import {useAppSelector} from "../../hooks/redux";
 import {Capitalize} from "../../helpers/format";
 import {BsJustify, BsType} from "react-icons/bs";
 import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
-import VacationCard, { Vacation } from "./VacationCard";
+import VacationCard from "./VacationCard";
+import User from "../../models/User.ts";
+import Vacation from "../../models/Vacation.ts";
 
 const VacationForm = () => {
     const account = useAppSelector<User>(state => state.accountInfo.user);

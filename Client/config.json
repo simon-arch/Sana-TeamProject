@@ -5,24 +5,5 @@
         "Preset2": ["MANAGE_USER_ROLES"],
         "Preset3": ["MANAGE_USER_ROLES", "MANAGE_USER_PERMISSIONS"],
         "Preset4": [""]
-    },
-    "permissions": {
-        "VIEW_USERS": "VIEW_USERS",
-        "MANAGE_USER_ROLES": "MANAGE_USER_ROLES",
-        "MANAGE_USER_PERMISSIONS": "MANAGE_USER_PERMISSIONS",
-        "REGISTER_USER": "REGISTER_USER",
-        "DELETE_USER": "DELETE_USER",
-        "REVIEW_VACATIONS": "REVIEW_VACATIONS",
-        "FIRE_USER": "FIRE_USER"
-    },
-
-    "userStatuses": {
-        "AVAILABLE": "AVAILABLE",
-        "VACATION": "VACATION",
-        "FIRED": "FIRED"
-    },
-    "workType": {
-        "FULL_TIME": "FULL_TIME",
-        "PART_TIME": "PART_TIME"
     }
 }
