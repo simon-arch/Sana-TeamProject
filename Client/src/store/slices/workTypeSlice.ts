@@ -1,14 +1,14 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {ErrorType, Status} from "../../helpers/types.ts";
 import {WorkType} from "../../models/User.ts";
 
-export interface UserState {
+export interface WorkTypeState {
     workTypes: WorkType[];
     status: Status;
     error: ErrorType;
 }
 
-const initialState: UserState = {
+const initialState: WorkTypeState = {
     workTypes: [],
     status: 'loading',
     error: null
@@ -19,14 +19,14 @@ const workTypeSlice = createSlice(
         name: 'work_types',
         initialState,
         reducers: {
-            getWorkTypes(state){
+            getWorkTypes(state: WorkTypeState){
                 state.status = 'loading';
             },
-            setWorkTypes(state, action) {
+            setWorkTypes(state: WorkTypeState, action: PayloadAction<WorkType[]>) {
                 state.status = 'idle';
-                state.workTypes = action.payload.map((workType: string) => workType );
+                state.workTypes = action.payload;
             },
-            setError(state, action) {
+            setError(state: WorkTypeState, action) {
                 state.status = 'error';
                 state.error = action.payload.error
             }

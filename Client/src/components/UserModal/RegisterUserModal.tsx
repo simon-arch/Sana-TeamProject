@@ -5,11 +5,12 @@ import {registerRequest, setError} from "../../store/slices/userSlice.ts";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {getPermissions} from "../../store/slices/permissionSlice.ts";
 import {getRoles} from "../../store/slices/roleSlice.ts";
-import config from "../../../config.json";
-import {Config} from "./ModalComponents/PermissionSelect.tsx";
 import {getWorkTypes} from "../../store/slices/workTypeSlice.ts";
 import {Permission, Role, UserStatus, WorkType} from "../../models/User.ts";
 import {Status} from "../../helpers/types.ts";
+import {Capitalize, Clamp} from "../../helpers/format.ts";
+import config from "../../../config.json";
+import {Config} from "./ModalComponents/PermissionSelect.tsx";
 
 interface ModalProps {
     show: boolean,
@@ -30,8 +31,8 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
     const [preset, setPreset] = useState<string>('');
 
     const [workType, setWorkType] = useState(WorkType.FullTime);
-    const [workingTime, setWorkingTime] = useState(1);
-    const [showWorkingTime, setShowWorkingTime] = useState(true);
+    const [workTime, setWorkTime] = useState<number | null>(null);
+    const [allowWorkTime, setAllowWorkTime] = useState(false);
 
     const roles = useAppSelector<Role[]>(state => state.roles.roles);
     const permissions = useAppSelector<Permission[]>(state => state.permissions.permissions);
@@ -60,23 +61,30 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
     };
 
     const handleWorkTypeChange = (workType: WorkType) => {
+        if (workType == WorkType.PartTime) setWorkTime(null);
+        else setWorkTime(8);
         setWorkType(workType);
-        setShowWorkingTime(workType === WorkType.FullTime);
+        setAllowWorkTime(workType === WorkType.FullTime);
     };
+
+    const workTimeChange = (workTime: number) => {
+        if (!allowWorkTime) return;
+        setWorkTime(Clamp(workTime, 1, 24));
+    }
 
     const handleRegister = (e: React.FormEvent) => {
         e.preventDefault();
         if (username && firstName && lastName && password && role) {
             dispatch(registerRequest({
-                username: username,
                 firstName: firstName,
                 lastName: lastName,
                 password: password,
-                role: role,
                 permissions: selectedPermissions,
+                role: role,
                 state: UserStatus.Available,
-                workType: workType,
-                workingTime: workingTime
+                username: username,
+                workTime: workTime,
+                workType: workType
             }));
             setUsername('');
             setFirstName('');
@@ -86,9 +94,9 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
             setSelectedPermissions([]);
             setPreset('');
             setWorkType(WorkType.FullTime);
-            setWorkingTime(1);
+            setWorkTime(null);
             props.setShow(false);
-            setShowWorkingTime(false);
+            setAllowWorkTime(false);
             props.setLocalStatus('loading');
         } else {
             dispatch(setError('All fields are required.'));
@@ -152,35 +160,36 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 <InputGroup className="mb-1">
                     <DropdownButton
                         variant="secondary col-2 text-start bg-light text-dark"
-                        title="WorkType">
-                        {workTypes.map((workType, index) => (<Dropdown.Item key={index} onClick={() => handleWorkTypeChange(workType)}>{workType}</Dropdown.Item>))}
+                        title="Work Type">
+                        {workTypes.map((workType, index) => (<Dropdown.Item key={index} onClick={() => handleWorkTypeChange(workType)}>{Capitalize(workType)}</Dropdown.Item>))}
                     </DropdownButton>
                     <Form.Control
                         type="text"
-                        name="workType"
+                        name="worktype"
                         value={workType}
                         autoComplete="off"
                         readOnly/>
                 </InputGroup>
 
-                {showWorkingTime &&
-                <InputGroup className="formHours">
-                    <InputGroup.Text className="col-2">Working time</InputGroup.Text>
+                <InputGroup className="formHours mb-1">
+                    <InputGroup.Text className="col-2">Work Hours</InputGroup.Text>
                     <Form.Control
+                        disabled={!allowWorkTime}
+                        name="worktime"
                         type="number"
                         step="0.5"
                         min="1"
-                        max="12"
-                        value={workingTime}
-                        onChange={event => setWorkingTime(Number(event.target.value))}
+                        max="24"
+                        value={workTime || ''}
+                        onChange={event => workTimeChange(Number(event.target.value))}
                     />
                 </InputGroup>
-                }
+                
                 <InputGroup className="mb-1">
                     <DropdownButton
                     variant="secondary col-2 text-start bg-light text-dark"
                     title="Role">
-                        {roles.map((role, index) => (<Dropdown.Item key={index} onClick={() => setRole(role)}>{role}</Dropdown.Item>))}
+                        {roles.map((role, index) => (<Dropdown.Item key={index} onClick={() => setRole(role)}>{Capitalize(role)}</Dropdown.Item>))}
                     </DropdownButton>
                     <Form.Control
                             type="text"

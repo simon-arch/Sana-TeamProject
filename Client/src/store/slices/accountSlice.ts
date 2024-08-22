@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import User from "../../models/User.ts";
 import {ErrorType, Status} from "../../helpers/types.ts";
 
+
 export interface AccountState {
     user: User;
     status: Status;
@@ -39,14 +40,8 @@ const accountSlice = createSlice({
         getAccountInfo(state: AccountState, action) {
             state.status = 'loading';
         },
-        setAccountInfo(state: AccountState, action) {
-            state.user.firstName = action.payload.firstName;
-            state.user.lastName = action.payload.lastName;
-            state.user.role = action.payload.role;
-            state.user.permissions = action.payload.permissions;
-            state.user.state = action.payload.state;
-            state.user.workType = action.payload.workType;
-            state.user.workingTime = action.payload.workingTime;
+        setAccountInfo(state: AccountState, action: PayloadAction<User>) {
+            state.user = action.payload;
             state.status = 'idle';
         },
         setError: (state: AccountState, action: PayloadAction<string>) => {
@@ -63,10 +58,8 @@ const accountSlice = createSlice({
 });
 
 export const {
-    getAccessToken,
-    setTokenPayload,
-    getAccountInfo,
-    setAccountInfo,
+    getAccessToken, setTokenPayload,
+    getAccountInfo, setAccountInfo,
     setError,
     logout
 } = accountSlice.actions;

@@ -15,6 +15,6 @@ public sealed class UserInputGraphType : InputObjectGraphType<User>
         Field(u => u.Permissions);
         Field(u => u.State);
         Field(u => u.WorkType);
-        Field(u => u.WorkingTime, nullable: true);
+        Field(u => u.WorkTime, nullable: true);
     }
 }

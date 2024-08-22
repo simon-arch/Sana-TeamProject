@@ -50,9 +50,9 @@ namespace Server.Services
                 switch(user.WorkType)
                 {
                     case WorkType.FullTime:
-                        if (user.WorkingTime == null)
+                        if (user.WorkTime == null)
                         {
-                            user.WorkingTime = 8;
+                            user.WorkTime = 8;
                             await userRepository.UpdateAsync(user);
                         }
 
@@ -60,7 +60,7 @@ namespace Server.Services
                         {
                             Username = user.Username,
                             TimeStart = DateTime.Today.AddHours(8).ToUniversalTime(),
-                            TimeEnd = DateTime.Today.AddHours((double)(8 + user.WorkingTime)).ToUniversalTime(),
+                            TimeEnd = DateTime.Today.AddHours((double)(8 + user.WorkTime)).ToUniversalTime(),
                             Source = Source.SYSTEM,
                         });
                         break;

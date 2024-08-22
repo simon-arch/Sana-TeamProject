@@ -7,7 +7,7 @@ export default interface User {
     permissions: Permission[];
     state: UserStatus;
     workType: WorkType;
-    workingTime: number;
+    workTime: number | null;
 }
 
 export enum Permission {
@@ -17,7 +17,8 @@ export enum Permission {
     RegisterUser = "REGISTER_USER",
     DeleteUser = "DELETE_USER",
     ReviewVacations = "REVIEW_VACATIONS",
-    FireUser = "FIRE_USER"
+    FireUser = "FIRE_USER",
+    ManageUserWorkInfo = "MANAGE_USER_WORK_INFO"
 }
 
 export enum UserStatus {

@@ -4,8 +4,8 @@ import {
     planDelete, planDeleteResolve, 
     planRequest, planRequestResolve, 
     planUpdate, planUpdateResolve 
-} from "../slices/planSlice.ts";
-import {createEpic} from "./helpers/createEpic.ts";
+} from "../slices/planSlice";
+import { createEpic } from "./helpers/createEpic";
 
 export const planRequestEpic = createEpic(
     planRequest.type,
@@ -21,7 +21,7 @@ export const planRequestEpic = createEpic(
                         timeEnd
                         owner
                     }
-            } 
+            }
     }`},
     data => planRequestResolve(data.data.plan["byUsernames"]),
     error => setError(error.message)

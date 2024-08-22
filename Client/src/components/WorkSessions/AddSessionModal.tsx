@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import {BsArrowCounterclockwise, BsCheck2} from 'react-icons/bs';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
+import {Source} from "../../models/TimeStamp.ts";
 
 interface EditProps {
     show : boolean,
@@ -14,26 +15,31 @@ interface EditProps {
 const AddTimeModal = (props: EditProps) : React.JSX.Element => {
     const dispatch = useAppDispatch();
 
-    const username = useAppSelector(state => state.accountInfo.user.username);
+    const username = useAppSelector<string>(state => state.accountInfo.user.username);
     const [startDate, setStartDate] = useState<Date>(new Date(Date.now()));
     const [endDate, setEndDate] = useState<Date>(new Date(Date.now()));
     const [error, setError] = useState('');
 
     const handleSubmit = () => {
-        if (startDate! < endDate! && startDate && endDate) {
-            dispatch(workTimeCreate({
-                username: username,
-                timeStart: startDate!.toISOString(), 
-                timeEnd: endDate!.toISOString(),
-                source: 'USER',
-                editor: username
-            }));
-            handleClose();
-        } else setError("Wrong date");
+        if (!startDate) { setError("Start date is missing"); return; }
+        if (!endDate) { setError("End date is missing"); return; }
+        if (startDate >= endDate) { setError("The end date cannot precede the start date"); return; }
+        if (startDate >= new Date(Date.now())) { setError("The start date cannot precede current date"); return; }
+        if (endDate >= new Date(Date.now())) { setError("The end date cannot precede current date"); return; }
+        dispatch(workTimeCreate({
+            username: username,
+            timeStart: startDate!.toISOString(), 
+            timeEnd: endDate!.toISOString(),
+            source: Source.User,
+            editor: username
+        }));
+        handleClose();
     };
 
     const handleClose = () => {
         props.setShow(false); 
+        setStartDate(new Date(Date.now()));
+        setEndDate(new Date(Date.now()));
         setError('');
     }
 
@@ -48,16 +54,19 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
                 <InputGroup>
                     <InputGroup.Text className="col-6">Current Owner</InputGroup.Text>
                     <Form.Control className="text-center" 
+                        name="owner"
                         readOnly type="text" value={username}/>
                 </InputGroup>
                 <InputGroup className="mt-2">
                     <InputGroup.Text className="col-6">Current Editor</InputGroup.Text>
                     <Form.Control className="text-center" 
+                        name="editor"
                         readOnly type="text" value={username}/>
                 </InputGroup>
                 <Row className="d-flex justify-content-between my-2">
                     <Col md={5}>
                         <DatePicker
+                        name="startdate"
                         selected={startDate}
                         onChange={(date) => setStartDate(date!)}
                         className="form-control rounded text-center"
@@ -67,6 +76,7 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
                     </Col>_
                     <Col md={5}>
                         <DatePicker
+                        name="enddate"
                         selected={endDate}
                         onChange={(date) => setEndDate(date!)}
                         className="form-control rounded text-center"

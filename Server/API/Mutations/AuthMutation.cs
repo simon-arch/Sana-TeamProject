@@ -44,7 +44,7 @@ public sealed class AuthMutation : ObjectGraphType
             .Argument<NonNullGraphType<UserInputGraphType>>("user")
             .ResolveAsync(async context =>
             {
-                context.WithPermission(Permission.REGISTER_USER);
+                context.WithPermission(Permission.RegisterUser);
 
                 var user = context.GetArgument<User>("user");
                 var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();

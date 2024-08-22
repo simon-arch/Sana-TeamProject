@@ -6,7 +6,7 @@ import {
     workTimeListRequest, workTimeListRequestResolve,
     workTimeUpdate, workTimeUpdateResolve
 } from '../slices/timeStampSlice';
-import {createEpic} from "./helpers/createEpic.ts";
+import {createEpic} from "./helpers/createEpic";
 
 export const workTimeLatestRequestEpic = createEpic(
     workTimeLatestRequest.type,
@@ -125,10 +125,4 @@ export const timeStampEpics = [
     workTimeDeleteEpic,
     workTimeCreateEpic
 ];
-
-
-
-
-
-
 

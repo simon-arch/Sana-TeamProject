@@ -28,10 +28,10 @@ public sealed class UserQuery : ObjectGraphType
             .Argument<StringGraphType>("query")
             .ResolveAsync(async context =>
             {
-                context.WithPermission(Permission.VIEW_USERS);
+                context.WithPermission(Permission.ViewUsers);
                 
-                bool canViewFired = context.HasPermission(Permission.DELETE_USER) ||
-                                       context.HasPermission(Permission.FIRE_USER);
+                bool canViewFired = context.HasPermission(Permission.DeleteUser) ||
+                                       context.HasPermission(Permission.FireUser);
 
                 var pageNumber = context.GetArgument<int?>("pageNumber");
                 var pageSize = context.GetArgument<int?>("pageSize");

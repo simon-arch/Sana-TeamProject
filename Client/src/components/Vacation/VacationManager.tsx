@@ -1,13 +1,13 @@
 import {useEffect, useState} from "react";
 import {sendRequest} from "../../store/epics/helpers/sendRequest.ts";
 import VacationCard from "./VacationCard";
-import { Button, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import {Button, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import Vacation, {VacationStatus} from "../../models/Vacation.ts";
 
 const VacationManager = () => {
     const [vacations, setVacations] = useState<Vacation[]>([]);
     const [filter, setFilter] = useState([2]);
-    const statuses = [VacationStatus.Approved, VacationStatus.Pending, VacationStatus.Rejected];
+    const statuses = Object.values(VacationStatus) as VacationStatus[];
 
     useEffect(() => {
         getAllVacations();
@@ -15,10 +15,10 @@ const VacationManager = () => {
 
     const getAllVacations = () => {
         sendRequest(`query { vacation { vacations { id, title, description, startDate, endDate, status, sender } } } `)
-        .then(vacations => setVacations(vacations.data.vacation["vacations"].reverse()));
+        .then(vacations => setVacations(vacations.data.vacation.vacations.reverse()));
     }
 
-    const setVacationStatus = (id: number, status: 'APPROVED' | 'REJECTED') => {
+    const setVacationStatus = (id: number, status: VacationStatus) => {
         sendRequest(`mutation { vacation { setStatus(id: ${id}, status: ${status}) { id } } } `)
         .then(() => getAllVacations());
     }
@@ -44,10 +44,10 @@ const VacationManager = () => {
                             <VacationCard key={index} vacation={appeal}>
                                 Sent by <span style={{fontStyle: "italic"}}>{appeal.sender}</span>
                                 {
-                                    appeal.status == 'PENDING' && (
+                                    appeal.status === VacationStatus.Pending && (
                                         <div className="mt-3">
-                                            <Button variant="success" onClick={() => setVacationStatus(appeal.id, 'APPROVED')}>Approve</Button>
-                                            <Button className="ms-2" variant="danger" onClick={() => setVacationStatus(appeal.id, 'REJECTED')}>Reject</Button>
+                                            <Button variant="success" onClick={() => setVacationStatus(appeal.id, VacationStatus.Approved)}>Approve</Button>
+                                            <Button className="ms-2" variant="danger" onClick={() => setVacationStatus(appeal.id, VacationStatus.Rejected)}>Reject</Button>
                                         </div>
                                     )
                                 }

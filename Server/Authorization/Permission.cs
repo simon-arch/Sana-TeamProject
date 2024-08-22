@@ -2,12 +2,13 @@
 {
     public enum Permission
     {
-        VIEW_USERS = 0,
-        MANAGE_USER_ROLES = 1,
-        MANAGE_USER_PERMISSIONS = 2,
-        REGISTER_USER = 3,
-        DELETE_USER = 4,
-        REVIEW_VACATIONS = 5,
-        FIRE_USER = 6
+        ViewUsers = 0,
+        ManageUserRoles = 1,
+        ManageUserPermissions = 2,
+        RegisterUser = 3,
+        DeleteUser = 4,
+        ReviewVacations = 5,
+        FireUser = 6,
+        ManageUserWorkInfo = 7
     }
 }

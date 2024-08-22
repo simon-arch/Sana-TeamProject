@@ -13,7 +13,7 @@ public class User
     public required Permission[] Permissions { get; set; }
     public required State State { get; set; } = State.Available;
     public required WorkType WorkType { get; set; } = WorkType.FullTime;
-    public decimal? WorkingTime { get; set; }
+    public decimal? WorkTime { get; set; }
 }
 
 public enum State

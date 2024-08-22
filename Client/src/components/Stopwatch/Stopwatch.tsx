@@ -6,7 +6,8 @@ import {FaArrowRightLong} from "react-icons/fa6";
 import {BsFillTriangleFill} from "react-icons/bs";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {workTimeCreate, workTimeLatestRequest, workTimeUpdate} from "../../store/slices/timeStampSlice.ts";
-import TimeStamp from "../../models/TimeStamp.ts";
+import TimeStamp, {Source} from "../../models/TimeStamp.ts";
+import {Localize} from "../../helpers/format.ts";
 
 const formatTime = (date: Date): string =>
     date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: "2-digit"});
@@ -32,9 +33,9 @@ const Stopwatch = () => {
                 setActive(true);
             }
             workTime = {...latestWorkTime} as TimeStamp;
-            workTime.timeStart = new Date(`${workTime.timeStart}+00:00`);
+            workTime.timeStart = Localize(workTime.timeStart)!;
             workTime.timeEnd = workTime.timeEnd
-                ? new Date(`${workTime.timeEnd}+00:00`)
+                ? Localize(workTime.timeEnd)
                 : new Date();
         }
         setCurrentWorkTime(workTime);
@@ -45,7 +46,7 @@ const Stopwatch = () => {
             dispatch(workTimeCreate({
                 username: username,
                 timeStart: new Date().toISOString(),
-                source: 'TIMER'
+                source: Source.Timer
             }));
         }
         else if (canSend && currentWorkTime) {

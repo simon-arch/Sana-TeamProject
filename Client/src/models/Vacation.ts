@@ -9,7 +9,7 @@ export default interface Vacation {
 }
 
 export enum VacationStatus {
-    Pending = 'PENDING',
     Approved = 'APPROVED',
+    Pending = 'PENDING',
     Rejected = 'REJECTED'
 }

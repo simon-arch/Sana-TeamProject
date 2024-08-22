@@ -17,7 +17,7 @@ public sealed class UserMutation : ObjectGraphType
             .Argument<NonNullGraphType<StringGraphType>>("username")
             .ResolveAsync(async context =>
             {
-                context.WithPermission(Permission.DELETE_USER);
+                context.WithPermission(Permission.DeleteUser);
 
                 var username = context.GetArgument<string>("username");
                 var user = await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username)
@@ -59,7 +59,7 @@ public sealed class UserMutation : ObjectGraphType
                     Permissions = requestUser.Permissions,
                     State = oldUser.State,
                     WorkType = requestUser.WorkType,
-                    WorkingTime = requestUser.WorkingTime
+                    WorkTime = requestUser.WorkTime
                 };
 
                 await context.RequestServices!.GetRequiredService<IUserRepository>().UpdateAsync(newUser);

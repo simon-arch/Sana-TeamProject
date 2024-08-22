@@ -59,6 +59,7 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
                     <Form.Control className="text-center" 
                         onChange={e => setTitle(e.target.value)}
                         type="text"
+                        name="title"
                         placeholder="Plan title..."
                         value={title}/>
                 </InputGroup>
@@ -67,6 +68,7 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
                     <Form.Control className="text-center" 
                         style={{resize: 'none'}}
                         onChange={e => setDescription(e.target.value)}
+                        name="description"
                         as="textarea"
                         placeholder="Plan description..."
                         value={description || ""}/>
@@ -75,6 +77,7 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
                     <Col md={5}>
                         <DatePicker
                         selected={startDate}
+                        name="startdate"
                         onChange={(date) => setStartDate(date!)}
                         className="form-control rounded text-center"
                         dateFormat="MM/dd/yyyy h:mm aa"
@@ -83,6 +86,7 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
                     </Col>_
                     <Col md={5}>
                         <DatePicker
+                        name="enddate"
                         selected={endDate}
                         onChange={(date) => setEndDate(date!)}
                         className="form-control rounded text-center"
