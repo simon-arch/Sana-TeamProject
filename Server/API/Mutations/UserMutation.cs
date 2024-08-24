@@ -6,6 +6,7 @@ using Server.Authorization;
 using Server.Data.Repositories;
 using Server.Models;
 using System.Security.Claims;
+using Server.API.Mutations.Extensions;
 
 namespace Server.API.Mutations;
 
@@ -20,10 +21,12 @@ public sealed class UserMutation : ObjectGraphType
                 context.WithPermission(Permission.DeleteUser);
 
                 var username = context.GetArgument<string>("username");
-                var user = await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username)
+                var repository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                var user = await repository.GetAsync(username)
                     ?? throw new ExecutionError("User not found") { Code = ResponseCode.BadRequest };
 
-                await context.RequestServices!.GetRequiredService<IUserRepository>().DeleteAsync(user.Username);
+                await repository.DeleteAsync(user.Username);
+                await UserMutationExtensions.RemoveApproveVacationsForUsersAsync(user.Username, repository);
                 return user;
             });
 
@@ -75,13 +78,41 @@ public sealed class UserMutation : ObjectGraphType
 
                 var username = context.GetArgument<string>("username");
                 var state = context.GetArgument<State>("state");
-
-                var user = await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username)
+                
+                var repository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                
+                var user = await repository.GetAsync(username)
                     ?? throw new ExecutionError("User not found") { Code = ResponseCode.BadRequest };
-
+                
                 user.State = state;
                 await context.RequestServices!.GetRequiredService<IUserRepository>().UpdateAsync(user);
 
+                return user;
+            });
+        
+        Field<UserGraphType>("setApprovedVacationsByUsers")
+            .Argument<StringGraphType>("username")
+            .Argument<ListGraphType<StringGraphType>>("approvedVacationsByUsers")
+            .ResolveAsync(async context =>
+            {
+                context.Authorize();
+
+                var username = context.GetArgument<string>("username");
+                var approvedVacationsByUsers = context.GetArgument<List<string>>("approvedVacationsByUsers");
+                
+                var repository = context.RequestServices!.GetRequiredService<IUserRepository>();
+
+                var user = await repository.GetAsync(username)
+                           ?? throw new ExecutionError("User not found") { Code = ResponseCode.BadRequest };
+
+                user.ApprovedVacationsByUsers = approvedVacationsByUsers;
+                await repository.UpdateAsync(user);
+                
+                await UserMutationExtensions.UpdateApproveVacationsForUsersAsync(
+                    user.Username, 
+                    user.ApprovedVacationsByUsers, 
+                    repository);
+                
                 return user;
             });
     }

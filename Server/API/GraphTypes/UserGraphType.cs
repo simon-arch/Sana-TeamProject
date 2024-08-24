@@ -15,5 +15,7 @@ public sealed class UserGraphType : ObjectGraphType<User>
         Field(u => u.State);
         Field(u => u.WorkType);
         Field(u => u.WorkTime, nullable: true);
+        Field(u => u.ApprovedVacationsByUsers, nullable: true);
+        Field(u => u.ApproveVacationsForUsers, nullable: true);
     }
 }

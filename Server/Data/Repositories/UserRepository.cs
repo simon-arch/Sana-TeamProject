@@ -1,7 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Server.Models;
 
 namespace Server.Data.Repositories
@@ -20,7 +18,8 @@ namespace Server.Data.Repositories
         private Task<User?> _GetAsync(string condition)
         {
             string query = $@"
-                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkTime
+                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkTime, 
+                    ApprovedVacationsByUsers, ApproveVacationsForUsers
                 FROM Users
                 WHERE {condition}";
 
@@ -32,7 +31,8 @@ namespace Server.Data.Repositories
         public async Task<ResultSet<User>> GetAllAsync(GetAllOptions options)
         {           
             string sql = @$"
-                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkTime 
+                SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkTime, 
+                    ApprovedVacationsByUsers, ApproveVacationsForUsers 
                 FROM Users
                 {options.Condition}
                 {options.Pagination}";
@@ -47,8 +47,17 @@ namespace Server.Data.Repositories
         public Task InsertAsync(User user)
         {
             string query = @"
-                INSERT INTO Users (Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkTime)
-                VALUES (@Username, @PasswordHash, @TokenId, @FirstName, @LastName, @Role, @Permissions, @State, @WorkType, @WorkTime)";
+                INSERT INTO Users 
+                (
+                    Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, 
+                    WorkType, WorkTime, ApprovedVacationsByUsers, ApproveVacationsForUsers
+                )
+                VALUES 
+                (
+                    @Username, @PasswordHash, @TokenId, @FirstName, @LastName, @Role, @Permissions, @State, 
+                    @WorkType, @WorkTime, @ApprovedVacationsByUsers, @ApproveVacationsForUsers
+                )
+            ";
 
             return _sql.ExecuteAsync(query, user);
         }
@@ -57,8 +66,9 @@ namespace Server.Data.Repositories
         {
             string query = $@"
                 UPDATE Users
-                SET PasswordHash = @PasswordHash, TokenId = @TokenId, FirstName = @FirstName,
-                LastName = @LastName, Role = @Role, Permissions = @Permissions, State = @State, WorkType = @WorkType, WorkTime = @WorkTime
+                SET PasswordHash = @PasswordHash, TokenId = @TokenId, FirstName = @FirstName,LastName = @LastName, 
+                    Role = @Role, Permissions = @Permissions, State = @State, WorkType = @WorkType, WorkTime = @WorkTime, 
+                    ApprovedVacationsByUsers = @ApprovedVacationsByUsers, ApproveVacationsForUsers = @ApproveVacationsForUsers
                 WHERE Username = @Username";
 
             return _sql.ExecuteAsync(query, user);
