@@ -1,4 +1,5 @@
-﻿using Server.Models;
+﻿using Server.Authorization;
+using Server.Models;
 
 namespace Server.Data.Repositories
 {
@@ -8,6 +9,7 @@ namespace Server.Data.Repositories
         Task<User?> GetAsync(Guid tokenId);
         Task<ResultSet<User>> GetAllAsync();
         Task<ResultSet<User>> GetAllAsync(GetAllOptions options);
+        Task<IEnumerable<User>> GetUsersWithPermissionsAsync(Permission[] permissions);
         Task InsertAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(string username);

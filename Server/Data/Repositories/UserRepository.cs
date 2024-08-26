@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Server.Authorization;
 using Server.Models;
 
 namespace Server.Data.Repositories
@@ -29,7 +30,7 @@ namespace Server.Data.Repositories
         public Task<ResultSet<User>> GetAllAsync() => GetAllAsync(new GetAllOptions());
 
         public async Task<ResultSet<User>> GetAllAsync(GetAllOptions options)
-        {           
+        {
             string sql = @$"
                 SELECT Username, PasswordHash, TokenId, FirstName, LastName, Role, Permissions, State, WorkType, WorkTime, 
                     ApprovedVacationsByUsers, ApproveVacationsForUsers 
@@ -44,6 +45,26 @@ namespace Server.Data.Repositories
             };
         }
 
+        // TODO: Refactor this method to use a stored procedure
+        public async Task<IEnumerable<User>> GetUsersWithPermissionsAsync(Permission[] permissions)
+        {
+            var permissionParams = string.Join(",", permissions.Select(p => (int)p));
+
+            var query = $@"
+            DECLARE @Permissions TABLE (Permission INT);
+            INSERT INTO @Permissions (Permission) VALUES ({permissionParams});
+
+            SELECT Username, FirstName, LastName, Role, State
+            FROM Users
+            WHERE EXISTS (
+                SELECT 1
+                FROM OPENJSON(Permissions) WITH (Permission INT '$') AS p
+                WHERE p.Permission IN (SELECT Permission FROM @Permissions)
+            )";
+
+            return await _sql.QueryAsync<User>(query);
+        }
+        
         public Task InsertAsync(User user)
         {
             string query = @"
@@ -97,7 +118,7 @@ namespace Server.Data.Repositories
             _options.Pagination = $@"
                 ORDER BY (SELECT NULL)
                 OFFSET {(pageNumber - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
-            
+
             return this;
         }
 
@@ -107,6 +128,7 @@ namespace Server.Data.Repositories
             {
                 _conditions.Add($"CONCAT(FirstName, ' ', LastName) LIKE '%{query}%'");
             }
+
             return this;
         }
 
@@ -116,8 +138,10 @@ namespace Server.Data.Repositories
             {
                 _conditions.Add($"State != {(int)State.Fired}");
             }
+
             return this;
         }
+
         public GetAllOptions Build()
         {
             if (_conditions.Count > 0)

@@ -14,44 +14,56 @@ const About = () => {
             
             <Table hover className="border">
                 <tbody>
-                    <tr>
-                        <td>Username:</td>
-                        <td>{account.username}</td>
-                    </tr>
-                    <tr>
-                        <td>First Name:</td>
-                        <td>{account.firstName}</td>
-                    </tr>
-                    <tr>
-                        <td>Last Name:</td>
-                        <td>{account.lastName}</td>
-                    </tr>
-                    <tr>
-                        <td>Role:</td>
-                        <td>{Capitalize(account.role)}</td>
-                    </tr>
-                    <tr>
-                        <td>Permissions:</td>
-                        <td>
-                            <ul className="m-0 p-0">
-                                {account.permissions && account.permissions.map((permission, index) => (
-                                    <li key={index} className="list-group-item">{permission}</li>
-                                ))}
-                            </ul>    
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Work Type:</td>
-                        <td>{Capitalize(account.workType)}</td>
-                    </tr>
-                    <tr>
-                        <td>Work Time:</td>
-                        <td>{account.workTime || "Not specified"}</td>
-                    </tr>
-                    <tr>
-                        <td>Status:</td>
-                        <td>{Capitalize(account.state)}</td>
-                    </tr>
+                <tr>
+                    <td>Username:</td>
+                    <td>{account.username}</td>
+                </tr>
+                <tr>
+                    <td>First Name:</td>
+                    <td>{account.firstName}</td>
+                </tr>
+                <tr>
+                    <td>Last Name:</td>
+                    <td>{account.lastName}</td>
+                </tr>
+                <tr>
+                    <td>Role:</td>
+                    <td>{Capitalize(account.role)}</td>
+                </tr>
+                <tr>
+                    <td>Permissions:</td>
+                    <td>
+                        <ul className="m-0 p-0">
+                            {account.permissions && account.permissions.map((permission, index) => (
+                                <li key={index} className="list-group-item">{permission}</li>
+                            ))}
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Work Type:</td>
+                    <td>{Capitalize(account.workType)}</td>
+                </tr>
+                <tr>
+                    <td>Work Time:</td>
+                    <td>{account.workTime || "Not specified"}</td>
+                </tr>
+                <tr>
+                    <td>Status:</td>
+                    <td>{Capitalize(account.state)}</td>
+                </tr>
+                <tr>
+                    <td>Approved vacations by:</td>
+                    <td>
+                        {Capitalize(account.approvedVacationsByUsers.join(", ")) || ""}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Approve vacations for:</td>
+                    <td>
+                        {Capitalize(account.approveVacationsForUsers.join(", ")) || ""}
+                    </td>
+                </tr>
                 </tbody>
             </Table>
         </div>

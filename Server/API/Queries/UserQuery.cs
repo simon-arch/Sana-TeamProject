@@ -2,7 +2,6 @@
 using GraphQL.Types;
 using Server.API.GraphTypes;
 using Server.Authorization;
-using Server.Data.Extensions;
 using Server.Data.Repositories;
 using Server.Models;
 
@@ -51,5 +50,26 @@ public sealed class UserQuery : ObjectGraphType
 
                 return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync(builder.Build());
             });
+        
+        Field<ListGraphType<UsersWithPermissionsGraphType>>("usersWithPermission")
+            .Argument<ListGraphType<EnumerationGraphType<Permission>>>("permissions")
+            .ResolveAsync(async context =>
+            {
+                context.WithPermission(Permission.ViewUsers);
+
+                var permissions = context.GetArgument<List<Permission>>("permissions");
+
+                var users = await context.RequestServices!
+                    .GetRequiredService<IUserRepository>()
+                    .GetUsersWithPermissionsAsync(permissions.ToArray());
+
+                return users;
+            });
+
+
+
+
+
+
     }
 }

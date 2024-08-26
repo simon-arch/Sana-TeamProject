@@ -1,32 +1,40 @@
 import {createEpic} from "./helpers/createEpic.ts";
 import {
-    registerRequest, registerSuccess,
-    deleteUser, deleteUserSuccess,
-    getUsers, setUsers,
+    registerRequest,
+    registerSuccess,
+    deleteUser,
+    deleteUserSuccess,
+    getUsers,
+    setUsers,
     setError,
-    setUserState, setUserStateSuccess,
-    updateRequest, updateSuccess
+    setUserState,
+    setUserStateSuccess,
+    updateRequest,
+    updateSuccess,
+    getUsersWithApproveVacationsPermission,
+    setUsersWithApproveVacationsPermission
 } from "../slices/userSlice.ts";
 import {PayloadAction} from "@reduxjs/toolkit";
-import User from "../../models/User.ts";
+import User, {Permission} from "../../models/User.ts";
 
 export const registerUserEpic = createEpic(
     registerRequest.type,
     action => {
-        const {username, password, firstName, lastName, role, permissions, state, workType, workTime} = action.payload;
+        const user = action.payload;
         return `mutation {
             auth {
                 register(
                     user: { 
-                        username: "${username}", 
-                        password: "${password}", 
-                        firstName: "${firstName}", 
-                        lastName: "${lastName}", 
-                        role: ${role}, 
-                        permissions: ${JSON.stringify(permissions).replace(/"/g, '')},
-                        state: ${state},
-                        workType: ${workType},
-                        workTime: ${workTime}
+                        username: "${user.username}", 
+                        password: "${user.password}", 
+                        firstName: "${user.firstName}", 
+                        lastName: "${user.lastName}", 
+                        role: ${user.role}, 
+                        permissions: ${JSON.stringify(user.permissions).replace(/"/g, '')},
+                        state: ${user.state},
+                        workType: ${user.workType},
+                        workTime: ${user.workTime},
+                        approvedVacationsByUsers: ${JSON.stringify(user.approvedVacationsByUsers)}
                     }
                     ) { 
                         username 
@@ -37,6 +45,7 @@ export const registerUserEpic = createEpic(
                         state
                         workType
                         workTime
+                        approvedVacationsByUsers
                     }
             }
         }`;
@@ -68,22 +77,23 @@ export const updateUserEpic = createEpic(
             user {
                 update(
                     user: {
-                        username: "${user.username}"
-                        firstName: "${user.firstName}"
-                        lastName: "${user.lastName}"
-                        role: ${user.role}
-                        permissions: [${(user.permissions)}]
-                        workType: ${user.workType}
-                        workTime: ${user.workTime}
+                        username: "${user.username}",
+                        firstName: "${user.firstName}",
+                        lastName: "${user.lastName}",
+                        role: ${user.role},
+                        permissions: [${(user.permissions)}],
+                        workType: ${user.workType},
+                        workTime: ${user.workTime},
+                        approvedVacationsByUsers: ${user.approvedVacationsByUsers}
                         }
                     ) {
-                        username 
+                        username
                     } 
                 } 
         }`;
     },
 
-    () => updateSuccess(),
+    data => updateSuccess(data.data.user.update),
     error => setError(error.message)
 );
 
@@ -103,14 +113,14 @@ export const setUserStateEpic = createEpic(
     },
     data => setUserStateSuccess(data.data.user.setState),
     error => setError(error.message)
-)
+);
 
 export const getAllUsersEpic = createEpic(
     getUsers.type,
     action => {
         const {pageNumber, pageSize, query} = action.payload;
         const hasParams = pageNumber || pageSize || query;
-        let { fields } = action.payload;
+        let {fields} = action.payload;
         if (!fields) {
             fields = `
                 username
@@ -120,7 +130,8 @@ export const getAllUsersEpic = createEpic(
                 permissions
                 state
                 workType
-                workTime`;
+                workTime
+                approvedVacationsByUsers`;
         }
         return `
             query { 
@@ -142,10 +153,31 @@ export const getAllUsersEpic = createEpic(
     error => setError(error.message)
 );
 
+export const getUsersWithApproveVacationsPermissionEpic = createEpic(
+    getUsersWithApproveVacationsPermission.type,
+    () => {
+        const approveVacationsPermission = Permission.ApproveVacations;
+        return `query {
+            user {
+                usersWithPermission(permissions: [${approveVacationsPermission}]) {
+                    username
+                    firstName
+                    lastName
+                    role
+                    state
+                }
+            }
+        }`;
+    },
+    data => setUsersWithApproveVacationsPermission(data.data.user.usersWithPermission),
+    error => setError(error.message)
+);
+
 export const userEpics = [
     registerUserEpic,
     deleteUserEpic,
     setUserStateEpic,
     getAllUsersEpic,
-    updateUserEpic
+    updateUserEpic,
+    getUsersWithApproveVacationsPermissionEpic,
 ];

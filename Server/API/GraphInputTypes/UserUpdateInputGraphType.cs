@@ -14,5 +14,6 @@ public sealed class UserUpdateInputGraphType : InputObjectGraphType<User>
         Field(u => u.Permissions);
         Field(u => u.WorkType);
         Field(u => u.WorkTime, nullable: true);
+        Field(u => u.ApprovedVacationsByUsers, nullable: true);
     }
 }

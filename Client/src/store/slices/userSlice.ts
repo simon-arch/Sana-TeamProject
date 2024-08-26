@@ -1,10 +1,11 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import User, {UserStatus} from "../../models/User.ts";
+import User, {UserLite, UserStatus} from "../../models/User.ts";
 import {ErrorType, Status} from "../../helpers/types.ts";
 import ResultSet from "../../models/ResultSet.ts";
 
 export interface UserState {
     users: User[];
+    usersWithApprovalPermission: UserLite[];
     totalCount: number;
     status: Status;
     error: ErrorType;
@@ -12,6 +13,7 @@ export interface UserState {
 
 const initialState: UserState = {
     users: [],
+    usersWithApprovalPermission: [],
     totalCount: 0,
     status: 'idle',
     error: null
@@ -23,20 +25,38 @@ const userSlice = createSlice(
         initialState,
         reducers: {
             //@ts-ignore
-            getUsers(state: UserState, action){ state.status = 'loading'; },
+            getUsers(state: UserState) {
+                state.status = 'loading';
+            },
 
             setUsers(state: UserState, action: PayloadAction<ResultSet<User>>) {
                 state.totalCount = action.payload.totalCount;
                 state.users = action.payload.results;
                 state.status = 'idle';
             },
+            getUsersWithApproveVacationsPermission(state: UserState) {
+                state.status = 'loading';
+            },
+            setUsersWithApproveVacationsPermission(state: UserState, action: PayloadAction<UserLite[]>) {
+                state.totalCount = action.payload.length;
+                state.usersWithApprovalPermission = action.payload;
+                state.status = 'idle';
+            },
             //@ts-ignore
-            registerRequest(state: UserState, action: PayloadAction<User>) { state.status = 'loading';},
-            registerSuccess(state: UserState) { state.status = "idle";},
+            registerRequest(state: UserState, action: PayloadAction<User>) {
+                state.status = 'loading';
+            },
+            registerSuccess(state: UserState) {
+                state.status = "idle";
+            },
 
             //@ts-ignore
-            updateRequest(state: UserState, action) { state.status = 'loading'; },
-            updateSuccess(state: UserState) { state.status = "idle"; },
+            updateRequest(state: UserState, action) {
+                state.status = 'loading';
+            },
+            updateSuccess(state: UserState) {
+                state.status = "idle";
+            },
 
             //@ts-ignore
             deleteUser(state: UserState, action: PayloadAction<{ username: string }>) {
@@ -59,6 +79,7 @@ const userSlice = createSlice(
                 });
                 state.status = 'idle';
             },
+
             setError(state: UserState, action) {
                 state.status = 'error'
                 state.error = action.payload.error
@@ -73,6 +94,7 @@ const userSlice = createSlice(
 
 export const {
     getUsers, setUsers,
+    getUsersWithApproveVacationsPermission, setUsersWithApproveVacationsPermission,
     registerRequest, registerSuccess,
     deleteUser, deleteUserSuccess,
     setError, dismissError,
