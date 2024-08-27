@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../hooks/redux.ts";
-import {getAccessToken, setError} from "../store/slices/accountSlice.ts";
+import {tokenRequest, setError} from "../store/slices/accountSlice.ts";
 import {Button, Form, InputGroup, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {BsFillKeyFill, BsFillPersonFill} from "react-icons/bs";
 
@@ -15,7 +15,7 @@ const Login = () : React.JSX.Element => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (username && password) {
-            dispatch(getAccessToken(({username: username, password: password})));
+            dispatch(tokenRequest(({username: username, password: password})));
         } else {
             dispatch(setError('All fields are required.'));
         }

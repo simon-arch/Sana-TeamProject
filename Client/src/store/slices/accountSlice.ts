@@ -1,13 +1,13 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { jwtDecode } from 'jwt-decode';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {jwtDecode} from 'jwt-decode';
 import User from "../../models/User.ts";
-import {ErrorType, Status} from "../../helpers/types.ts";
+import SliceState from "../../models/SliceState.ts";
+import {sendRequest} from "../epics/helpers/sendRequest.ts";
 
 
-export interface AccountState {
+export interface AccountState extends SliceState {
     user: User;
-    status: Status;
-    error: ErrorType;
+    isTokenExpired: boolean | null;
     isLoggedIn: boolean | null;
 }
 
@@ -15,52 +15,53 @@ export const initialState: AccountState = {
     user: <User>{},
     status: 'loading',
     error: null,
+    isTokenExpired: null,
     isLoggedIn: null,
 };
-
-interface JWTData {
-    sub: string;
-    permissions: string[];
-}
 
 const accountSlice = createSlice({
     name: 'accountInfo',
     initialState,
     reducers: {
         //@ts-ignore
-        getAccessToken(state: AccountState, action) {},
-        setTokenPayload: (state: AccountState, action: PayloadAction<string>) => {
+        tokenRequest(state: AccountState, action: PayloadAction<{username: string, password: string}>) {},
+        tokenRequestResolve: (state: AccountState, action: PayloadAction<string>) => {
             localStorage.setItem('authToken', action.payload);
-            const data: JWTData = jwtDecode(action.payload) as JWTData;
-            state.user.username = data.sub;
+            state.user.username = jwtDecode(action.payload).sub!;
             state.error = null;
+            state.isTokenExpired = false;
             state.isLoggedIn = true;
         },
         //@ts-ignore
-        getAccountInfo(state: AccountState, action) {
+        accountInfoRequest(state: AccountState, action: PayloadAction<string>) {
             state.status = 'loading';
         },
-        setAccountInfo(state: AccountState, action: PayloadAction<User>) {
+        accountInfoRequestResolve(state: AccountState, action: PayloadAction<User>) {
             state.user = action.payload;
             state.status = 'idle';
         },
         setError: (state: AccountState, action: PayloadAction<string>) => {
+            state.status = 'error';
             state.error = action.payload;
-            state.isLoggedIn = false;
+        },
+        setTokenExpire(state: AccountState, action: PayloadAction<boolean>) {
+            state.isTokenExpired = action.payload;
         },
         logout: (state: AccountState) => {
+            sendRequest(`mutation { auth { logout } }`).then();
             localStorage.clear();
             state.user = <User>{};
             state.error = null;
+            state.isTokenExpired = null;
             state.isLoggedIn = false;
         },
     },
 });
 
 export const {
-    getAccessToken, setTokenPayload,
-    getAccountInfo, setAccountInfo,
-    setError,
+    tokenRequest, tokenRequestResolve,
+    accountInfoRequest, accountInfoRequestResolve,
+    setError, setTokenExpire,
     logout
 } = accountSlice.actions;
 

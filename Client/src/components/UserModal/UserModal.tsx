@@ -8,14 +8,14 @@ import PermissionSelect from "./ModalComponents/PermissionSelect.tsx";
 import FirstNameField from './ModalComponents/FirstNameField.tsx';
 import LastNameField from './ModalComponents/LastNameField.tsx';
 import User, {Permission, Role, UserStatus, WorkType} from "../../models/User.ts";
-import {Status} from "../../helpers/types.ts";
 import WorkInfoField from "./ModalComponents/WorkInfoField.tsx";
+import {SliceStatus} from "../../models/SliceState.ts";
 
 interface ModalProps {
     show: boolean;
     setShow(prevState : boolean) : void
     user: User,
-    setLocalStatus(prevState: Status): void
+    setLocalStatus(prevState: SliceStatus): void
 }
 
 const convertPayload = (rec: Record<string, boolean>): string[] => {

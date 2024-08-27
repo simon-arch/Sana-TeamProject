@@ -10,10 +10,10 @@ import {Localize} from '../../helpers/format';
 import {getContrast, stringToHex} from '../../helpers/calculate';
 import {Button, Dropdown, DropdownButton} from 'react-bootstrap';
 import {getUsers} from '../../store/slices/userSlice';
-import {Status} from "../../helpers/types.ts";
 import User from "../../models/User.ts";
 import Plan from "../../models/Plan.ts";
 import {BsArrowCounterclockwise, BsCheck2All} from "react-icons/bs";
+import {SliceStatus} from "../../models/SliceState.ts";
 
 const Planner = () => {
     const [showEdit, setShowEdit] = useState(false);
@@ -21,7 +21,7 @@ const Planner = () => {
     const [showDrop, setShowDrop] = useState(false);
 
     const username = useAppSelector<string>(state => state.accountInfo.user.username);
-    const status = useAppSelector<Status>(state => state.plans.status);
+    const status = useAppSelector<SliceStatus>(state => state.plans.status);
     const plans = useAppSelector<Plan[]>(state => state.plans.plans);
 
     const [events, setEvents] = useState([{}]);

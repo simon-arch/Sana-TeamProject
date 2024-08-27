@@ -1,17 +1,17 @@
 import { 
-    getRoles, setError, setRoles 
+    rolesRequest, setError, rolesRequestResolve
 } from "../slices/roleSlice";
 import { createEpic } from "./helpers/createEpic";
 
 export const rolesEpic = createEpic(
-    getRoles.type,
+    rolesRequest.type,
     () => `
     query { 
         auth { 
             roles 
         } 
     }`,
-    data => setRoles(data.data.auth.roles),
+    data => rolesRequestResolve(data.data.auth.roles),
     error => setError(error.message)
 );
 

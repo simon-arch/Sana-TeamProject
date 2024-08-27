@@ -1,11 +1,9 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import Plan from "../../models/Plan.ts";
-import {ErrorType, Status} from "../../helpers/types.ts";
+import SliceState from "../../models/SliceState.ts";
 
-export interface PlanState {
+export interface PlanState extends SliceState {
     plans: Plan[];
-    status: Status;
-    error: ErrorType;
 }
 
 const initialState: PlanState = {

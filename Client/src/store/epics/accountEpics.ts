@@ -1,24 +1,25 @@
 import {
     setError, logout,
-    getAccessToken, setTokenPayload,
-    getAccountInfo, setAccountInfo, 
+    tokenRequest, tokenRequestResolve,
+    accountInfoRequest, accountInfoRequestResolve,
 } from "../slices/accountSlice";
 import {createEpic} from "./helpers/createEpic";
+import {ResponseCode} from "../../models/ResponseError.ts";
 
 export const loginEpic = createEpic(
-    getAccessToken.type,
+    tokenRequest.type,
     action => `
     mutation {
         auth {
             login(username: "${action.payload.username}", password: "${action.payload.password}") 
         } 
     }`,
-    data => setTokenPayload(data.data.auth.login),
+    data => tokenRequestResolve(data.data.auth.login),
     error => setError(error.message)
 );
 
 export const userInfoEpic = createEpic(
-    getAccountInfo.type,
+    accountInfoRequest.type,
     action => `
     query {
         user {
@@ -34,9 +35,9 @@ export const userInfoEpic = createEpic(
             } 
         } 
     }`,
-    data => setAccountInfo(data.data.user.user),
+    data => accountInfoRequestResolve(data.data.user.user),
     error => {
-        if (error.message === "Failed to fetch") {
+        if (error.code === ResponseCode.ServiceUnavailable || error.code === ResponseCode.ServerError) {
             return logout();
         }
         return setError(error.message);

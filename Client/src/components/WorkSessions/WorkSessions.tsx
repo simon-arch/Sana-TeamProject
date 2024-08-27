@@ -7,17 +7,17 @@ import { Button, Table } from 'react-bootstrap';
 import { Localize } from '../../helpers/format';
 import { getTimeDifference } from '../../helpers/calculate';
 import useInView from "../../hooks/useInView.ts";
-import {Status} from "../../helpers/types.ts";
 import TimeStamp from "../../models/TimeStamp.ts";
+import {SliceStatus} from "../../models/SliceState.ts";
 
 const WorkSessions = () => {
 
     const [showEdit, setShowEdit] = useState(false);
     const [showAdd, setShowAdd] = useState(false);
 
-    const username = useAppSelector(state => state.accountInfo.user.username);
+    const username = useAppSelector<string>(state => state.accountInfo.user.username);
     const timeStamps = useAppSelector<TimeStamp[]>(state => state.timeStamps.timeStamps);
-    const status = useAppSelector<Status>(state => state.timeStamps.status);
+    const status = useAppSelector<SliceStatus>(state => state.timeStamps.status);
     const totalCount = useAppSelector<number>(state => state.timeStamps.totalCount);
 
     const [editStamp, setEditStamp] = useState<TimeStamp>();

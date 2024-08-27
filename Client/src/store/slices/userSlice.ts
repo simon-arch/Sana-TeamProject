@@ -1,13 +1,11 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import User, {UserStatus} from "../../models/User.ts";
-import {ErrorType, Status} from "../../helpers/types.ts";
 import ResultSet from "../../models/ResultSet.ts";
+import SliceState from "../../models/SliceState.ts";
 
-export interface UserState {
+export interface UserState extends SliceState {
     users: User[];
     totalCount: number;
-    status: Status;
-    error: ErrorType;
 }
 
 const initialState: UserState = {

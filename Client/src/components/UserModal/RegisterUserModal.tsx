@@ -3,19 +3,19 @@ import {Button, Dropdown, DropdownButton, Form, InputGroup, Modal} from "react-b
 import {BsCheck2} from "react-icons/bs";
 import {registerRequest, setError} from "../../store/slices/userSlice.ts";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
-import {getPermissions} from "../../store/slices/permissionSlice.ts";
-import {getRoles} from "../../store/slices/roleSlice.ts";
+import {permissionsRequest} from "../../store/slices/permissionSlice.ts";
+import {rolesRequest} from "../../store/slices/roleSlice.ts";
 import {getWorkTypes} from "../../store/slices/workTypeSlice.ts";
 import {Permission, Role, UserStatus, WorkType} from "../../models/User.ts";
-import {Status} from "../../helpers/types.ts";
 import {Capitalize, Clamp} from "../../helpers/format.ts";
 import config from "../../../config.json";
 import {Config} from "./ModalComponents/PermissionSelect.tsx";
+import {SliceStatus} from "../../models/SliceState.ts";
 
 interface ModalProps {
     show: boolean,
     setShow(prevState: boolean): void,
-    setLocalStatus(prevState: Status): void
+    setLocalStatus(prevState: SliceStatus): void
 }
 
 const data: Config = config as Config;
@@ -39,8 +39,8 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
     const workTypes = useAppSelector<WorkType[]>(state => state.workTypes.workTypes);
 
     useEffect(() => {
-        dispatch(getRoles());
-        dispatch(getPermissions());
+        dispatch(rolesRequest());
+        dispatch(permissionsRequest());
         dispatch(getWorkTypes());
     }, [dispatch]);
 

@@ -1,11 +1,9 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {ErrorType, Status} from "../../helpers/types.ts";
 import {Role} from "../../models/User.ts";
+import SliceState from "../../models/SliceState.ts";
 
-export interface RoleState {
+export interface RoleState extends SliceState {
     roles: Role[];
-    status: Status;
-    error: ErrorType;
 }
 
 const initialState: RoleState = {
@@ -19,10 +17,10 @@ const roleSlice = createSlice(
         name: 'roles',
         initialState,
         reducers: {
-            getRoles(state: RoleState){
+            rolesRequest(state: RoleState){
                 state.status = 'loading';
             },
-            setRoles(state: RoleState, action: PayloadAction<Role[]>) {
+            rolesRequestResolve(state: RoleState, action: PayloadAction<Role[]>) {
                 state.status = 'idle';
                 state.roles = action.payload;
             },
@@ -35,8 +33,8 @@ const roleSlice = createSlice(
 );
 
 export const {
-    getRoles,
-    setRoles,
+    rolesRequest,
+    rolesRequestResolve,
     setError
 } = roleSlice.actions;
 

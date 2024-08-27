@@ -1,11 +1,9 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {ErrorType, Status} from "../../helpers/types.ts";
 import {WorkType} from "../../models/User.ts";
+import SliceState from "../../models/SliceState.ts";
 
-export interface WorkTypeState {
+export interface WorkTypeState extends SliceState {
     workTypes: WorkType[];
-    status: Status;
-    error: ErrorType;
 }
 
 const initialState: WorkTypeState = {

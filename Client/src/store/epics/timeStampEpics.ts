@@ -3,15 +3,16 @@ import {
     workTimeCreate, workTimeCreateResolve,
     workTimeDelete, workTimeDeleteResolve,
     workTimeLatestRequest, workTimeLatestRequestResolve,
-    workTimeListRequest, workTimeListRequestResolve,
+    workTimeListRequest, workTimeListRequestPayload, workTimeListRequestResolve,
     workTimeUpdate, workTimeUpdateResolve
 } from '../slices/timeStampSlice';
 import {createEpic} from "./helpers/createEpic";
+import {PayloadAction} from "@reduxjs/toolkit";
 
 export const workTimeLatestRequestEpic = createEpic(
     workTimeLatestRequest.type,
     action => {
-        const username = action.payload.username;
+        const username = action.payload;
         return `query {
                     timeStamp {
                         latest(username: "${username}") {
@@ -31,7 +32,7 @@ export const workTimeLatestRequestEpic = createEpic(
 
 export const workTimeListRequestEpic = createEpic(
     workTimeListRequest.type,
-    action => {
+    (action : PayloadAction<workTimeListRequestPayload>) => {
         const {username, pageSize, pageNumber} = action.payload;
         return `query {
                 timeStamp {

@@ -1,61 +1,79 @@
 import {useEffect} from "react";
 import {jwtDecode} from "jwt-decode";
 import config from "../../config.json";
-import {logout} from "../store/slices/accountSlice.ts";
-import {useAppDispatch} from "./redux.ts";
+import {useAppDispatch, useAppSelector} from "./redux.ts";
+import {logout, setTokenExpire, tokenRequestResolve} from "../store/slices/accountSlice.ts";
 
-async function refreshToken() : Promise<string | null> {
-    const response = await fetch(config.apiEndpoint, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            query: `mutation { auth { refresh } }`
-        })
-    });
+const refreshTokenRequest = async ()=> {
+    let response = null;
+
+    try {
+        response = await fetch(config.apiEndpoint, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                query: `mutation { auth { refresh } }`
+            })
+        });
+    }
+    catch {
+        return null;
+    }
     const json = await response.json();
+
     if (json.error) return null;
-    else return json.data.auth.refresh;
+
+    return json.data.auth.refresh as string;
 }
 
+const getExpirationTime = () => {
+    const token = localStorage.getItem('authToken');
 
-const UseTokenRefresh = () => {
+    if (!token) return 0;
+
+    const decodedToken = jwtDecode(token);
+    return decodedToken.exp! * 1000;
+}
+
+const UseTokenRefresh = (refreshGapMinutes: number) => {
     const dispatch = useAppDispatch();
 
-    useEffect(() => {
-        function getExpirationTime() : (number | null) {
-            const token = localStorage.getItem('authToken');
-            if (!token) return null;
+    const isLoggedIn = useAppSelector(state => state.accountInfo.isLoggedIn);
+    const isExpired = useAppSelector(state => state.accountInfo.isTokenExpired);
 
-            const decodedToken = jwtDecode(token);
-            return decodedToken.exp! * 1000;
-        }
+    const refreshGapMilliseconds = refreshGapMinutes * 60 * 1000;
 
-        async function checkAndRefresh() {
-            const currentTime = Date.now();
-            const expirationTime = getExpirationTime();
-
-            if (!expirationTime || expirationTime - currentTime <= 0) {
+    const refreshToken = () => {
+        refreshTokenRequest().then(token => {
+            if (!token) {
                 dispatch(logout());
-                localStorage.removeItem("authToken");
-                return;
             }
+            else {
+                localStorage.setItem('authToken', token);
+                dispatch(tokenRequestResolve(token));
+            }
+        });
+    }
 
-            if (expirationTime - currentTime < 5 * 60 * 1000) {
-                refreshToken().then(token => {
-                    if (token) {
-                        localStorage.setItem("authToken", token);
-                    }
-                });
+    useEffect(() => {
+        if (isExpired === null && isLoggedIn === null) {
+            refreshToken();
+        }
+        else if (isLoggedIn) {
+            if (isExpired) {
+                refreshToken();
+            }
+            else {
+                const timerId = setTimeout(() => {
+                    dispatch(setTokenExpire(true));
+                }, getExpirationTime() - Date.now() - refreshGapMilliseconds);
+                return () => clearTimeout(timerId);
             }
         }
-
-        const interval = setInterval(checkAndRefresh, 60 * 1000);
-
-        return () => clearInterval(interval);
-    });
+    }, [dispatch, isExpired]);
 };
 
 export default UseTokenRefresh;

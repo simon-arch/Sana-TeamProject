@@ -1,11 +1,9 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {ErrorType, Status} from "../../helpers/types.ts";
 import {Permission} from "../../models/User.ts";
+import SliceState from "../../models/SliceState.ts";
 
-export interface PermissionState {
+export interface PermissionState extends SliceState {
     permissions: Permission[];
-    status: Status;
-    error: ErrorType;
 }
 
 const initialState: PermissionState = {
@@ -19,10 +17,10 @@ const permissionSlice = createSlice(
         name: 'permissions',
         initialState,
         reducers: {
-            getPermissions(state: PermissionState){
+            permissionsRequest(state: PermissionState){
                 state.status = 'loading';
             },
-            setPermissions(state: PermissionState, action: PayloadAction<Permission[]>) {
+            permissionsRequestResolve(state: PermissionState, action: PayloadAction<Permission[]>) {
                 state.status = 'idle';
                 state.permissions = action.payload;
             },
@@ -35,8 +33,8 @@ const permissionSlice = createSlice(
 );
 
 export const {
-    getPermissions,
-    setPermissions,
+    permissionsRequest,
+    permissionsRequestResolve,
     setError
 } = permissionSlice.actions;
 

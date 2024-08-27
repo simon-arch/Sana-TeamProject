@@ -1,35 +1,24 @@
 import useTokenRefresh from "./hooks/useTokenRefresh.ts";
 import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import Login from "./pages/Login.tsx";
-import {useAppDispatch, useAppSelector} from "./hooks/redux.ts";
+import {useAppSelector} from "./hooks/redux.ts";
 import Employees from "./pages/Employees.tsx";
 import Sidebar from "./components/Sidebar/Sidebar.tsx";
-import {useEffect} from "react";
-import {setTokenPayload} from "./store/slices/accountSlice.ts";
 import Dashboard from "./pages/Dashboard.tsx";
 import Vacations from "./pages/Vacations.tsx";
 import About from "./pages/About.tsx";
 import Organizer from "./pages/Organizer.tsx";
+import {Role} from "./models/User.ts";
 
 function App() {
-    const dispatch = useAppDispatch();
-
     const isLoggedIn = useAppSelector(state => state.accountInfo.isLoggedIn);
     const role = useAppSelector(state => state.accountInfo.user.role);
 
-    useEffect(() => {
-        if (!isLoggedIn) {
-            const token = localStorage.getItem('authToken');
-            if (token != null)
-                dispatch(setTokenPayload(token));
-        }
-    }, [dispatch, isLoggedIn]);
-
-    useTokenRefresh();
+    useTokenRefresh(5);
 
     return (
         <BrowserRouter>
-            { isLoggedIn
+            {isLoggedIn
                 ?
                 <div className="container-fluid" style={{height: "100vh"}}>
                     <div className="row h-100">
@@ -46,8 +35,8 @@ function App() {
 
                                 <Route path="*" element={
                                     <Navigate to={
-                                        role == "DEVELOPER" ? "/dashboard" :
-                                        role == "USER_MANAGER" ? "/employees" :
+                                        role === Role.Developer ? "/dashboard" :
+                                        role === Role.UserManager ? "/employees" :
                                         "/"
                                     }/>
                                 }/> 

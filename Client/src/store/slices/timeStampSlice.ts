@@ -1,14 +1,18 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import TimeStamp from "../../models/TimeStamp.ts";
-import {ErrorType, Status} from "../../helpers/types.ts";
 import ResultSet from "../../models/ResultSet.ts";
+import SliceState from "../../models/SliceState.ts";
 
-export interface TimeStampState {
+export interface TimeStampState extends SliceState {
     TimeStamp: TimeStamp | null;
     timeStamps: TimeStamp[];
     totalCount: number;
-    status: Status;
-    error: ErrorType;
+}
+
+export interface workTimeListRequestPayload {
+    username: string,
+    pageSize: number,
+    pageNumber: number
 }
 
 const initialState: TimeStampState = {
@@ -24,16 +28,16 @@ const timeStampSlice = createSlice(
         name: 'timeStamps',
         initialState,
         reducers: {
+            workTimeLatestClear(state: TimeStampState) { state.TimeStamp = null; },
             //@ts-ignore
-            workTimeLatestRequest(state: TimeStampState, action) { state.status = 'loading'; },
-            workTimeLatestRequestResolve(state: TimeStampState, action: PayloadAction<TimeStamp | null>)
-            {
+            workTimeLatestRequest(state: TimeStampState, action: PayloadAction<string>) { state.status = 'loading'; },
+            workTimeLatestRequestResolve(state: TimeStampState, action: PayloadAction<TimeStamp | null>) {
                 state.TimeStamp = action.payload;
                 state.status = 'idle';
             },
             workTimeListClear(state: TimeStampState) { state.timeStamps = [] },
             //@ts-ignore
-            workTimeListRequest(state: TimeStampState, action) { state.status = 'loading'; },
+            workTimeListRequest(state: TimeStampState, action: PayloadAction<workTimeListRequestPayload>) { state.status = 'loading'; },
             workTimeListRequestResolve(state: TimeStampState, action: PayloadAction<ResultSet<TimeStamp>>)
             {
                 state.totalCount = action.payload.totalCount;
@@ -62,7 +66,7 @@ const timeStampSlice = createSlice(
             },
 
             //@ts-ignore
-            workTimeDelete(state: TimeStampState, action) { state.status = 'loading'; },
+            workTimeDelete(state: TimeStampState, action: PayloadAction<number>) { state.status = 'loading'; },
             workTimeDeleteResolve(state: TimeStampState, action: PayloadAction<number>)
             {
                 state.timeStamps = state.timeStamps.filter(ts => ts.id !== action.payload);
@@ -102,7 +106,7 @@ const timeStampSlice = createSlice(
 
 export const {
     workTimeLatestRequest, workTimeLatestRequestResolve,
-    workTimeListClear,
+    workTimeListClear, workTimeLatestClear,
     workTimeListRequest, workTimeListRequestResolve,
     workTimeUpdate, workTimeUpdateResolve,
     workTimeDelete, workTimeDeleteResolve,

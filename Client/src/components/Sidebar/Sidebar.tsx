@@ -2,7 +2,7 @@ import {FC, useEffect} from 'react';
 import {BsCalendar3Range, BsDoorOpenFill, BsEnvelopeFill, BsFillPersonLinesFill, BsPeopleFill, BsQuestionOctagon, BsUiChecksGrid} from "react-icons/bs";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {Link} from "react-router-dom";
-import {getAccountInfo, logout} from "../../store/slices/accountSlice.ts";
+import {accountInfoRequest, logout} from "../../store/slices/accountSlice.ts";
 import {Capitalize} from '../../helpers/format.ts';
 import {Badge} from 'react-bootstrap';
 
@@ -15,7 +15,7 @@ const Sidebar : FC = () => {
     const {status, user} = useAppSelector(state => state.accountInfo);
 
     useEffect(() => {
-        dispatch(getAccountInfo(user.username));
+        dispatch(accountInfoRequest(user.username));
     }, [dispatch, user.username]);
 
     return (

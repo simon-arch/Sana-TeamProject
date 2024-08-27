@@ -6,8 +6,8 @@ import { useAppDispatch } from '../../hooks/redux';
 import { planDelete, planUpdate } from '../../store/slices/planSlice';
 import { Localize } from '../../helpers/format';
 import 'react-datepicker/dist/react-datepicker.css';
-import { ErrorType } from '../../helpers/types';
 import Plan from "../../models/Plan.ts";
+import {SliceError} from "../../models/SliceState.ts";
 
 interface EditProps {
     show : boolean,
@@ -23,7 +23,7 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
     const [description, setDescription] = useState<string | null>('');
     const [startDate, setStartDate] = useState<Date>();
     const [endDate, setEndDate] = useState<Date>();
-    const [error, setError] = useState<ErrorType>(null);
+    const [error, setError] = useState<SliceError>(null);
 
     const handleConfirm = () => {
         if (confirm) {

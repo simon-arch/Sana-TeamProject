@@ -1,18 +1,18 @@
 import { 
     setError, 
-    getPermissions, setPermissions 
+    permissionsRequest, permissionsRequestResolve
 } from "../slices/permissionSlice";
 import { createEpic } from "./helpers/createEpic";
 
 export const permissionsEpic = createEpic(
-    getPermissions.type,
+    permissionsRequest.type,
     () => `
     query { 
         auth { 
             permissions 
         } 
     }`,
-    data => setPermissions(data.data.auth.permissions),
+    data => permissionsRequestResolve(data.data.auth.permissions),
     error => setError(error.message)
 );
 

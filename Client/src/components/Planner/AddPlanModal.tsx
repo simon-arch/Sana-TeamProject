@@ -4,8 +4,8 @@ import DatePicker from 'react-datepicker';
 import {BsArrowCounterclockwise, BsCheck2} from 'react-icons/bs';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import { planCreate } from '../../store/slices/planSlice';
-import { ErrorType } from '../../helpers/types';
 import 'react-datepicker/dist/react-datepicker.css';
+import {SliceError} from "../../models/SliceState.ts";
 
 interface EditProps {
     show : boolean,
@@ -20,7 +20,7 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
     const [description, setDescription] = useState<string | null>('');
     const [startDate, setStartDate] = useState<Date>(new Date(Date.now()));
     const [endDate, setEndDate] = useState<Date>(new Date(Date.now()));
-    const [error, setError] = useState<ErrorType>(null);
+    const [error, setError] = useState<SliceError>(null);
 
     const handleSubmit = () => {
         if (!title) { setError("Title is missing"); return; }

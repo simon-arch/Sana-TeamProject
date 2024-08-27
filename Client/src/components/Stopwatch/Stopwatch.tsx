@@ -5,7 +5,12 @@ import {FaSquare} from "react-icons/fa";
 import {FaArrowRightLong} from "react-icons/fa6";
 import {BsFillTriangleFill} from "react-icons/bs";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
-import {workTimeCreate, workTimeLatestRequest, workTimeUpdate} from "../../store/slices/timeStampSlice.ts";
+import {
+    workTimeCreate,
+    workTimeLatestClear,
+    workTimeLatestRequest,
+    workTimeUpdate
+} from "../../store/slices/timeStampSlice.ts";
 import TimeStamp, {Source} from "../../models/TimeStamp.ts";
 import {Localize} from "../../helpers/format.ts";
 
@@ -23,8 +28,12 @@ const Stopwatch = () => {
     const [currentWorkTime, setCurrentWorkTime] = useState<TimeStamp | null>(null);
 
     useEffect(() => {
-        dispatch(workTimeLatestRequest({username}));
-    }, []);
+        dispatch(workTimeLatestRequest(username));
+
+        return () => {
+            dispatch(workTimeLatestClear());
+        };
+    }, [dispatch, username]);
 
     useEffect(() => {
         let workTime: TimeStamp | null = null;
@@ -48,6 +57,7 @@ const Stopwatch = () => {
                 timeStart: new Date().toISOString(),
                 source: Source.Timer
             }));
+            setCanSend(false);
         }
         else if (canSend && currentWorkTime) {
             dispatch(workTimeUpdate({

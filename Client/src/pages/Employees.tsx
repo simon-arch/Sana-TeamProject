@@ -4,15 +4,15 @@ import {getUsers} from "../store/slices/userSlice.ts";
 import {Badge, Button, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Spinner, Table} from "react-bootstrap";
 import {HiMagnifyingGlass} from "react-icons/hi2";
 import UserModal from "../components/UserModal/UserModal.tsx";
-import {getRoles} from "../store/slices/roleSlice.ts";
-import {getPermissions} from "../store/slices/permissionSlice.ts";
+import {rolesRequest} from "../store/slices/roleSlice.ts";
+import {permissionsRequest} from "../store/slices/permissionSlice.ts";
 import {Capitalize} from "../helpers/format.ts";
 import RegisterUserModal from "../components/UserModal/RegisterUserModal.tsx";
 import PageBar from "../components/PageBar/PageBar.tsx";
 import {debounceTime, distinctUntilChanged, map, Subject} from "rxjs";
 import styles from "./styles/employees.module.css";
 import User, {Permission} from "../models/User.ts";
-import { Status } from '../helpers/types.ts';
+import {SliceStatus} from "../models/SliceState.ts";
 
 
 const Employees = () => {
@@ -21,8 +21,8 @@ const Employees = () => {
     const userNumber = useAppSelector<number>(state => state.users.totalCount);
     const account = useAppSelector<User>(state => state.accountInfo.user);
     
-    const status = useAppSelector<Status>(state => state.users.status);
-    const [localStatus, setLocalStatus] = useState<Status>('loading');
+    const status = useAppSelector<SliceStatus>(state => state.users.status);
+    const [localStatus, setLocalStatus] = useState<SliceStatus>('loading');
     
     useEffect(() => {
         setUsers(usersRaw);
@@ -91,8 +91,8 @@ const Employees = () => {
     }, [dispatch, sort]);
 
     useEffect(() => {
-        dispatch(getRoles());
-        dispatch(getPermissions());
+        dispatch(rolesRequest());
+        dispatch(permissionsRequest());
     }, [dispatch]);
 
     useEffect(() => {
