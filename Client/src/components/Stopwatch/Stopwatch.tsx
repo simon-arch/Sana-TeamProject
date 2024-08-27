@@ -58,6 +58,7 @@ const Stopwatch = () => {
                 source: Source.Timer
             }));
             setCanSend(false);
+            setCanSend(false);
         }
         else if (canSend && currentWorkTime) {
             dispatch(workTimeUpdate({
@@ -92,7 +93,7 @@ const Stopwatch = () => {
     }
 
     return (
-        <Card className="mb-4" border={active ? "danger" : "success"}>
+        <Card className="mb-2" border={active ? "danger" : "success"}>
             <Card.Body className="d-flex justify-content-between align-items-center">
                 <h4>Ongoing session</h4>
                 <div className="d-flex align-items-center gap-3">

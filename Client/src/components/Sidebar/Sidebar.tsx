@@ -35,7 +35,7 @@ const Sidebar : FC = () => {
                     </li>
                     <li className="my-1">
                         <BsQuestionOctagon className="me-1"/>
-                        <Link to="/home" className="text-decoration-none text-black">Placeholder</Link>
+                        <Link to="/overview" className="text-decoration-none text-black">Overview</Link>
                     </li>
                 </div>
                 <hr className="mx-3 my-0"/>

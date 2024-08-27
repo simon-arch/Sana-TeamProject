@@ -1,6 +1,4 @@
-export function getTimeDifference(date1: Date, date2: Date): string {
-    const difference = date2.getTime() - date1.getTime();
-
+export function getTimeByDifference(difference: number): string {
     const seconds = Math.floor(difference / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);

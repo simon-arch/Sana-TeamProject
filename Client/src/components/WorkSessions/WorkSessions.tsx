@@ -5,7 +5,7 @@ import EditTimeModal from './EditSessionModal';
 import AddTimeModal from './AddSessionModal';
 import { Button, Table } from 'react-bootstrap';
 import { Localize } from '../../helpers/format';
-import { getTimeDifference } from '../../helpers/calculate';
+import { getTimeByDifference } from '../../helpers/calculate';
 import useInView from "../../hooks/useInView.ts";
 import TimeStamp from "../../models/TimeStamp.ts";
 import {SliceStatus} from "../../models/SliceState.ts";
@@ -24,7 +24,7 @@ const WorkSessions = () => {
     const [events, setEvents] = useState<TimeStamp[]>([]);
 
     const [page, setPage] = useState(1);
-    const pageSize = 10;
+    const pageSize = 15;
 
     const tableBottomRef = useRef<HTMLDivElement | null>(null);
     const inView = useInView(tableBottomRef, {threshold: 0});
@@ -68,7 +68,7 @@ const WorkSessions = () => {
     return (
         <div>
             <Button className="mb-2" onClick={() => setShowAdd(true)}>Add +</Button>
-            <div style={{overflowY: "scroll", height: "80vh"}}>
+            <div style={{overflowY: "scroll", height: "70vh"}}>
                 <Table hover className="border text-center">
                     <thead>
                         <tr>
@@ -99,7 +99,7 @@ const WorkSessions = () => {
                                     <td>{Localize(event.timeEnd)!.toLocaleTimeString()}</td> :
                                     <td className="fst-italic text-primary">in progress</td> }
                                 { event.timeEnd ? 
-                                    <td>{getTimeDifference(new Date(event.timeStart), new Date(event.timeEnd))}</td> :
+                                    <td>{getTimeByDifference(new Date(event.timeEnd).getTime() - new Date(event.timeStart).getTime())}</td> :
                                     <td className="fst-italic text-primary">in progress</td> }
                                 <td>{event.source}</td>
                                 <td>{event.editor || "none"}</td>

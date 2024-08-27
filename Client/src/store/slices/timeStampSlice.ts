@@ -96,6 +96,16 @@ const timeStampSlice = createSlice(
                 state.status = 'idle';
             },
 
+            workTimeLatestClear(state: TimeStampState) { state.TimeStamp = null; },
+
+            //@ts-ignore
+            workTimeIntervalRequest(state: TimeStampState, action) { state.status = 'loading'; },
+            workTimeIntervalRequestResolve(state: TimeStampState, action)
+            {
+                state.timeStamps = action.payload;
+                state.status = 'idle';
+            },
+
             setError(state: TimeStampState, action) {
                 state.status = 'error'
                 state.error = action.payload.error
@@ -111,6 +121,7 @@ export const {
     workTimeUpdate, workTimeUpdateResolve,
     workTimeDelete, workTimeDeleteResolve,
     workTimeCreate, workTimeCreateResolve,
+    workTimeIntervalRequest, workTimeIntervalRequestResolve,
     setError,
 } = timeStampSlice.actions;
 

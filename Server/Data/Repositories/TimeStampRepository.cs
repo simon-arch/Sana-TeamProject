@@ -19,6 +19,15 @@ namespace Server.Data.Repositories
                 FROM TimeStamps";
             return _sql.QueryAsync<TimeStamp>(query);
         }
+        public Task<IEnumerable<TimeStamp>> GetByInterval(DateTime dateStart, DateTime dateEnd, string username)
+        {
+            string query = $@"
+                SELECT Id, Username, TimeStart, TimeEnd, Source, Editor
+                FROM TimeStamps
+                WHERE (TimeStart >= '{dateStart}' AND TimeEnd <= '{dateEnd}')
+                AND Username = '{username}'";
+            return _sql.QueryAsync<TimeStamp>(query);
+        }
 
         public Task<TimeStamp?> GetAsync(int id)
         {
