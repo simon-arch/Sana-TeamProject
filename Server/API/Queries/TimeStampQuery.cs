@@ -49,6 +49,23 @@ namespace Server.API.Queries
                     var res = await context.RequestServices!.GetRequiredService<ITimeStampRepository>().GetLatestAsync(username);
                     return res;
                 });
+
+            Field<ListGraphType<TimeStampGraphType>>("interval")
+                .Argument<NonNullGraphType<DateTimeGraphType>>("dateStart")
+                .Argument<NonNullGraphType<DateTimeGraphType>>("dateEnd")
+                .Argument<NonNullGraphType<StringGraphType>>("username")
+                .ResolveAsync(async context =>
+                {
+                    context.Authorize();
+
+                    var username = context.GetArgument<string>("username");
+                    var start = context.GetArgument<DateTime>("dateStart");
+                    var end = context.GetArgument<DateTime>("dateEnd");
+
+                    var res = await context.RequestServices!.GetRequiredService<ITimeStampRepository>().GetByInterval(start, end, username);
+
+                    return res;
+                });
         }
     }
 }

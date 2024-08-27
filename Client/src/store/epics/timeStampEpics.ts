@@ -1,5 +1,6 @@
 import {
     setError,
+    workTimeIntervalRequest, workTimeIntervalRequestResolve,
     workTimeCreate, workTimeCreateResolve,
     workTimeDelete, workTimeDeleteResolve,
     workTimeLatestRequest, workTimeLatestRequestResolve,
@@ -118,9 +119,34 @@ export const workTimeCreateEpic = createEpic(
     error => setError(error.message)
 );
 
+export const workTimeByMonthRequestEpic = createEpic(
+    workTimeIntervalRequest.type,
+    action => {
+        const { username, dateStart, dateEnd } = action.payload;
+        return `query {
+                timeStamp {
+                    interval(
+                            username: "${username}",
+                            dateStart: "${dateStart}",
+                            dateEnd: "${dateEnd}"
+                    ) {
+                        id
+                        username
+                        timeStart
+                        timeEnd
+                        source
+                        editor
+                    }
+            } 
+    }`},
+    data => workTimeIntervalRequestResolve(data.data.timeStamp.interval),
+    error => setError(error.message)
+);
+
 export const timeStampEpics = [
     workTimeLatestRequestEpic,
     workTimeListRequestEpic,
+    workTimeByMonthRequestEpic,
     workTimeUpdateEpic,
     workTimeDeleteEpic,
     workTimeCreateEpic

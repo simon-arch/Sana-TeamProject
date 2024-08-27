@@ -5,7 +5,7 @@ import {FaSquare} from "react-icons/fa";
 import {FaArrowRightLong} from "react-icons/fa6";
 import {BsFillTriangleFill} from "react-icons/bs";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
-import {workTimeCreate, workTimeLatestRequest, workTimeUpdate} from "../../store/slices/timeStampSlice.ts";
+import { workTimeCreate, workTimeLatestClear, workTimeLatestRequest, workTimeUpdate} from "../../store/slices/timeStampSlice.ts";
 import TimeStamp, {Source} from "../../models/TimeStamp.ts";
 import {Localize} from "../../helpers/format.ts";
 
@@ -24,7 +24,11 @@ const Stopwatch = () => {
 
     useEffect(() => {
         dispatch(workTimeLatestRequest({username}));
-    }, []);
+
+        return () => {
+            dispatch(workTimeLatestClear());
+        };
+    }, [dispatch]);
 
     useEffect(() => {
         let workTime: TimeStamp | null = null;
@@ -48,6 +52,7 @@ const Stopwatch = () => {
                 timeStart: new Date().toISOString(),
                 source: Source.Timer
             }));
+            setCanSend(false);
         }
         else if (canSend && currentWorkTime) {
             dispatch(workTimeUpdate({
@@ -82,7 +87,7 @@ const Stopwatch = () => {
     }
 
     return (
-        <Card className="mb-4" border={active ? "danger" : "success"}>
+        <Card className="mb-2" border={active ? "danger" : "success"}>
             <Card.Body className="d-flex justify-content-between align-items-center">
                 <h4>Ongoing session</h4>
                 <div className="d-flex align-items-center gap-3">
