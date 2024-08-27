@@ -1,6 +1,5 @@
 export default interface Vacation {
     id: number,
-    title: string,
     description: string | null,
     status: VacationStatus,
     sender: string,

@@ -8,7 +8,6 @@ namespace Server.API.GraphTypes
         public VacationGraphType() 
         {
             Field(a => a.Id);
-            Field(a => a.Title);
             Field(a => a.Description, nullable: true);
             Field(a => a.Status);
             Field(a => a.Sender);

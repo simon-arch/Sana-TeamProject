@@ -25,10 +25,6 @@ const VacationCard = (props: Props) => {
                         <Table hover className="border rounded">
                             <tbody>
                                 <tr>
-                                    <td>Title:</td>
-                                    <td>{props.vacation.title}</td>
-                                </tr>
-                                <tr>
                                     <td>Start Date:</td>
                                     <td>{props.vacation.startDate.toString().split("T")[0]}</td>
                                 </tr>

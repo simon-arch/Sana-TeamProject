@@ -18,7 +18,7 @@ const VacationManager = () => {
     }, []);
 
     const getAllVacations = () => {
-        sendRequest(`query { vacation { vacations { id, title, description, startDate, endDate, status, sender } } } `)
+        sendRequest(`query { vacation { vacations { id, description, startDate, endDate, status, sender } } } `)
             .then(response => {
                 const allVacations = response.data.vacation.vacations.reverse();
                 const filteredVacations = allVacations.filter((vacation: Vacation) => {

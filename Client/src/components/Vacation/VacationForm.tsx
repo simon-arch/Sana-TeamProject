@@ -20,11 +20,10 @@ const VacationForm = () => {
     }, []);
 
     const getVacations = () => {
-        sendRequest(`query { vacation { byUsername(username:"${account.username}") { id, title, description, startDate, endDate, status } } } `)
+        sendRequest(`query { vacation { byUsername(username:"${account.username}") { id, description, startDate, endDate, status } } } `)
         .then(vacations => setVacations(vacations.data.vacation.byUsername.reverse()));
     }
 
-    const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [startDate, setStartDate] = useState<Date>(new Date());
     const [endDate, setEndDate] = useState<Date>(new Date());
@@ -33,14 +32,12 @@ const VacationForm = () => {
 
     const handleSubmit = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        if (!title) { setError("Title is missing"); return; }
         if (!startDate) { setError("Start date is missing"); return; }
         if (!endDate) { setError("End date is missing"); return; }
         if (startDate >= endDate) { setError("The end date cannot precede the start date"); return; }
         sendRequest(`mutation { 
                         vacation { 
                             add(vacation: { 
-                            title: "${title}", 
                             description: """${description}""" , 
                             startDate: "${startDate!.toISOString()}", 
                             endDate: "${endDate!.toISOString()}", 
@@ -48,7 +45,6 @@ const VacationForm = () => {
                         { id } 
                     } }`)
             .then(() => {
-        setTitle('');
         setDescription('');
         setStartDate(new Date());
         setEndDate(new Date());
@@ -61,18 +57,6 @@ const VacationForm = () => {
     return (
         <Row>
             <Col md={4}>
-                <InputGroup>
-                    <InputGroup.Text className="col-4"><BsType className="me-2"/>Title</InputGroup.Text>
-                        <Form.Control
-                            className="rounded-0"
-                            type="text"
-                            name="title"
-                            placeholder="Title of your appeal"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            autoComplete="off"/>
-                </InputGroup>
-
                 <InputGroup className="my-3">
                     <InputGroup.Text className="col-4"><BsType className="me-2"/>Description</InputGroup.Text>
                         <Form.Control
