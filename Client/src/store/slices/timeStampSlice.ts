@@ -6,6 +6,7 @@ import SliceState from "../../models/SliceState.ts";
 export interface TimeStampState extends SliceState {
     TimeStamp: TimeStamp | null;
     timeStamps: TimeStamp[];
+    monthStamps: TimeStamp[];
     totalCount: number;
 }
 
@@ -18,6 +19,7 @@ export interface workTimeListRequestPayload {
 const initialState: TimeStampState = {
     TimeStamp: null,
     timeStamps: [],
+    monthStamps: [],
     totalCount: 0,
     status: 'loading',
     error: null
@@ -96,13 +98,11 @@ const timeStampSlice = createSlice(
                 state.status = 'idle';
             },
 
-            workTimeLatestClear(state: TimeStampState) { state.TimeStamp = null; },
-
             //@ts-ignore
             workTimeIntervalRequest(state: TimeStampState, action) { state.status = 'loading'; },
             workTimeIntervalRequestResolve(state: TimeStampState, action)
             {
-                state.timeStamps = action.payload;
+                state.monthStamps = action.payload;
                 state.status = 'idle';
             },
 

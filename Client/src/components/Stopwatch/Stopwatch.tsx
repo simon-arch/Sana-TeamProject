@@ -58,7 +58,6 @@ const Stopwatch = () => {
                 source: Source.Timer
             }));
             setCanSend(false);
-            setCanSend(false);
         }
         else if (canSend && currentWorkTime) {
             dispatch(workTimeUpdate({

@@ -49,7 +49,9 @@ const UseTokenRefresh = (refreshGapMinutes: number) => {
     const refreshToken = () => {
         refreshTokenRequest().then(token => {
             if (!token) {
-                dispatch(logout());
+                if (isLoggedIn) {
+                    dispatch(logout());
+                }
             }
             else {
                 localStorage.setItem('authToken', token);

@@ -12,7 +12,7 @@ import { Card } from "react-bootstrap";
 const Dashboard = () => {
     const dispatch = useAppDispatch();
 
-    const timeStamps = useAppSelector<TimeStamp[]>(state => state.timeStamps.timeStamps).filter(ts => ts.timeEnd);
+    const timeStamps = useAppSelector<TimeStamp[]>(state => state.timeStamps.monthStamps).filter(ts => ts.timeEnd);
     const {user} = useAppSelector(state => state.accountInfo);
 
     useEffect(() => {
