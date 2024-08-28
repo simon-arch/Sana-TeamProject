@@ -5,14 +5,15 @@ import {useAppSelector} from "./hooks/redux.ts";
 import Employees from "./pages/Employees.tsx";
 import Sidebar from "./components/Sidebar/Sidebar.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
-import Vacations from "./pages/Vacations.tsx";
+import VacationsForm from "./pages/VacationsForm.tsx";
 import About from "./pages/About.tsx";
 import Organizer from "./pages/Organizer.tsx";
-import {Role} from "./models/User.ts";
+import {Permission, Role} from "./models/User.ts";
+import VacationsManager from "./pages/VacationsManager.tsx";
 
 function App() {
     const isLoggedIn = useAppSelector(state => state.accountInfo.isLoggedIn);
-    const role = useAppSelector(state => state.accountInfo.user.role);
+    const user = useAppSelector(state => state.accountInfo.user);
 
     useTokenRefresh(5);
 
@@ -29,15 +30,17 @@ function App() {
                             <Routes>
                                 <Route path="/dashboard" element={<Dashboard/>}/>
                                 <Route path="/employees" element={<Employees/>}/>
-                                <Route path="/vacations" element={<Vacations/>}/>
+                                <Route path="/vacationsForm" element={<VacationsForm/>}/>
+                                {
+                                    user.permissions?.includes(Permission.ApproveVacations) &&
+                                    <Route path="/vacationsManager" element={<VacationsManager/>}/>
+                                }
                                 <Route path="/organizer" element={<Organizer/>}/>
                                 <Route path="/about" element={<About/>}/>
 
                                 <Route path="*" element={
                                     <Navigate to={
-                                        role === Role.Developer ? "/dashboard" :
-                                        role === Role.UserManager ? "/employees" :
-                                        "/"
+                                        user.role === Role.UserManager ? "/employees" : "/dashboard"
                                     }/>
                                 }/> 
                             </Routes>

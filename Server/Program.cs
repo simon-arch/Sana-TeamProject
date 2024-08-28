@@ -26,6 +26,8 @@ internal class Program
 
         SqlMapper.AddTypeHandler(typeof(Guid), new GuidTypeHandler());
         SqlMapper.RemoveTypeMap(typeof(Guid));
+        
+        SqlMapper.AddTypeHandler(typeof(List<string>), new JsonTypeHandler());
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IVacationRepository, VacationRepository>();

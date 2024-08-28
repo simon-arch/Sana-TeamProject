@@ -32,6 +32,8 @@ export const userInfoEpic = createEpic(
                 state
                 workType
                 workTime
+                approvedVacationsByUsers
+                approveVacationsForUsers
             } 
         } 
     }`,

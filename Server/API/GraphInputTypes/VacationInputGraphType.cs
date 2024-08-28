@@ -7,7 +7,6 @@ namespace Server.API.GraphInputTypes
     {
         public VacationInputGraphType()
         {
-            Field(a => a.Title);
             Field(a => a.Description, nullable: true);
             Field(a => a.Sender);
             Field(a => a.StartDate);

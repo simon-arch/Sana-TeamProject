@@ -1,16 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Dropdown, DropdownButton, Form, InputGroup, Modal} from "react-bootstrap";
-import {BsCheck2} from "react-icons/bs";
-import {registerRequest, setError} from "../../store/slices/userSlice.ts";
+import {Button, Dropdown, DropdownButton, Form, InputGroup, Modal, OverlayTrigger, Tooltip} from "react-bootstrap";
+import {BsArrowCounterclockwise, BsCheck2, BsCheck2All} from "react-icons/bs";
+import {dismissError, getUsersWithApproveVacationsPermission, registerRequest, setError} from "../../store/slices/userSlice.ts";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {permissionsRequest} from "../../store/slices/permissionSlice.ts";
 import {rolesRequest} from "../../store/slices/roleSlice.ts";
 import {getWorkTypes} from "../../store/slices/workTypeSlice.ts";
-import {Permission, Role, UserStatus, WorkType} from "../../models/User.ts";
+import User, {Permission, Role, UserLite, UserStatus, WorkType} from "../../models/User.ts";
 import {Capitalize, Clamp} from "../../helpers/format.ts";
 import config from "../../../config.json";
 import {Config} from "./ModalComponents/PermissionSelect.tsx";
-import {SliceStatus} from "../../models/SliceState.ts";
+import {SliceError, SliceStatus} from "../../models/SliceState.ts";
 
 interface ModalProps {
     show: boolean,
@@ -30,18 +30,36 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
     const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
     const [preset, setPreset] = useState<string>('');
 
-    const [workType, setWorkType] = useState(WorkType.FullTime);
+    const [workType, setWorkType] = useState(WorkType.PartTime);
     const [workTime, setWorkTime] = useState<number | null>(null);
     const [allowWorkTime, setAllowWorkTime] = useState(false);
 
+    const users = useAppSelector<UserLite[]>(state => state.users.usersWithApprovalPermission);
     const roles = useAppSelector<Role[]>(state => state.roles.roles);
     const permissions = useAppSelector<Permission[]>(state => state.permissions.permissions);
     const workTypes = useAppSelector<WorkType[]>(state => state.workTypes.workTypes);
+    const account = useAppSelector<User>(state => state.accountInfo.user);
+    const error = useAppSelector<SliceError>(state => state.users.error);
+
+    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showDrop, setShowDrop] = useState(false);
+
+    const filteredUsers = users.filter((user) => user.username !== account.username && user.username.includes(searchQuery));
+
+    const handleSelect = (user: UserLite) => {
+        setSelectedUsers((prevSelectedUsers) =>
+            prevSelectedUsers.includes(user.username)
+                ? prevSelectedUsers.filter((username) => username !== user.username)
+                : [...prevSelectedUsers, user.username]
+        );
+      };
 
     useEffect(() => {
         dispatch(rolesRequest());
         dispatch(permissionsRequest());
         dispatch(getWorkTypes());
+        dispatch(getUsersWithApproveVacationsPermission());
     }, [dispatch]);
 
     const handlePermissionChange = (perm: Permission) => {
@@ -72,6 +90,22 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
         setWorkTime(Clamp(workTime, 1, 24));
     }
 
+    const resetState = () => {
+        setUsername('');
+        setFirstName('');
+        setLastName('');
+        setPassword('');
+        setRole(Role.Developer);
+        setSelectedPermissions([]);
+        setPreset('');
+        setWorkType(WorkType.PartTime);
+        setWorkTime(null);
+        props.setShow(false);
+        setAllowWorkTime(false);
+        setSelectedUsers([]);
+        dispatch(dismissError());
+    }
+
     const handleRegister = (e: React.FormEvent) => {
         e.preventDefault();
         if (username && firstName && lastName && password && role) {
@@ -84,24 +118,21 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 state: UserStatus.Available,
                 username: username,
                 workTime: workTime,
-                workType: workType
+                workType: workType,
+                approvedVacationsByUsers: selectedUsers,
+                approveVacationsForUsers: []
             }));
-            setUsername('');
-            setFirstName('');
-            setLastName('');
-            setPassword('');
-            setRole(Role.Developer);
-            setSelectedPermissions([]);
-            setPreset('');
-            setWorkType(WorkType.FullTime);
-            setWorkTime(null);
-            props.setShow(false);
-            setAllowWorkTime(false);
+            resetState();
             props.setLocalStatus('loading');
         } else {
             dispatch(setError('All fields are required.'));
         }
     };
+
+    useEffect(() => {
+        if (!props.show)
+            resetState();
+    }, [props.show])
 
     return (
         <Modal show={props.show}
@@ -116,52 +147,53 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 <InputGroup className="my-1">
                     <InputGroup.Text className="col-2">First name</InputGroup.Text>
                     <Form.Control
-                            type="text"
-                            name="firstname"
-                            value={firstName}
-                            onChange={e => setFirstName(e.target.value)}
-                            autoComplete="off"
-                            required/>
+                        type="text"
+                        name="firstname"
+                        value={firstName}
+                        onChange={e => setFirstName(e.target.value)}
+                        autoComplete="off"
+                        required/>
                 </InputGroup>
 
                 <InputGroup className="my-1">
                     <InputGroup.Text className="col-2">Last name</InputGroup.Text>
                     <Form.Control
-                            type="text"
-                            name="lastname"
-                            value={lastName}
-                            onChange={e => setLastName(e.target.value)}
-                            autoComplete="off"
-                            required/>
+                        type="text"
+                        name="lastname"
+                        value={lastName}
+                        onChange={e => setLastName(e.target.value)}
+                        autoComplete="off"
+                        required/>
                 </InputGroup>
 
                 <InputGroup className="my-1">
                     <InputGroup.Text className="col-2">Username</InputGroup.Text>
                     <Form.Control
-                            type="text"
-                            name="username"
-                            value={username} onChange={e =>
-                            setUsername(e.target.value)}
-                            autoComplete="off"
-                            required/>
+                        type="text"
+                        name="username"
+                        value={username} onChange={e =>
+                        setUsername(e.target.value)}
+                        autoComplete="off"
+                        required/>
                 </InputGroup>
 
                 <InputGroup className="my-1">
                     <InputGroup.Text className="col-2">Password</InputGroup.Text>
                     <Form.Control
-                            type="password"
-                            name="password"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                            autoComplete="off"
-                            required/>
+                        type="password"
+                        name="password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        autoComplete="off"
+                        required/>
                 </InputGroup>
 
                 <InputGroup className="mb-1">
                     <DropdownButton
                         variant="secondary col-2 text-start bg-light text-dark"
                         title="Work Type">
-                        {workTypes.map((workType, index) => (<Dropdown.Item key={index} onClick={() => handleWorkTypeChange(workType)}>{Capitalize(workType)}</Dropdown.Item>))}
+                        {workTypes.map((workType, index) => (<Dropdown.Item key={index}
+                            onClick={() => handleWorkTypeChange(workType)}>{Capitalize(workType)}</Dropdown.Item>))}
                     </DropdownButton>
                     <Form.Control
                         type="text"
@@ -184,36 +216,88 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                         onChange={event => workTimeChange(Number(event.target.value))}
                     />
                 </InputGroup>
-                
+
                 <InputGroup className="mb-1">
                     <DropdownButton
-                    variant="secondary col-2 text-start bg-light text-dark"
-                    title="Role">
-                        {roles.map((role, index) => (<Dropdown.Item key={index} onClick={() => setRole(role)}>{Capitalize(role)}</Dropdown.Item>))}
+                        variant="secondary col-2 text-start bg-light text-dark"
+                        title="Role">
+                        {roles.map((role, index) => (<Dropdown.Item key={index}
+                            onClick={() => setRole(role)}>{Capitalize(role)}</Dropdown.Item>))}
                     </DropdownButton>
                     <Form.Control
+                        type="text"
+                        name="role"
+                        value={role}
+                        autoComplete="off"
+                        readOnly/>
+                </InputGroup>
+
+                <InputGroup className="mb-1">
+                    <DropdownButton
+                        autoClose="outside"
+                        title="Review Vacations For"
+                        variant="secondary col-2 text-start bg-light text-dark"
+                        onToggle={() => setShowDrop(!showDrop)}
+                        show={showDrop}>
+                        <div className="px-2">
+                            <input
+                            name="search"
                             type="text"
-                            name="role"
-                            value={role}
-                            autoComplete="off"
-                            readOnly/>
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}/>
+                        <Button className="ms-1" variant="outline-dark" onClick={() => setSelectedUsers(users.map(user => user.username))}><BsCheck2All/></Button>
+                        <Button className="ms-1" variant="outline-dark" onClick={() => setSelectedUsers([])}><BsArrowCounterclockwise/></Button>
+                        </div>
+                        <div style={{ maxHeight: '200px', overflowY: 'auto'}}>
+                            {
+                                filteredUsers.length > 0 ?
+                                (filteredUsers.map((user, index) => (
+                                    <Dropdown.Item
+                                    as="button"
+                                    key={index}
+                                    eventKey={index}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleSelect(user);
+                                }}><input
+                                        type="checkbox"
+                                        checked={selectedUsers.includes(user.username)}
+                                        name={`${user}${index}`}
+                                        readOnly
+                                        className="me-2"/>
+                                    {user.username}
+                                </Dropdown.Item>
+                                ))) : <Dropdown.Item disabled>No users found</Dropdown.Item>
+                            }
+                        </div>
+                    </DropdownButton>
+                    <Form.Control
+                        style={{textOverflow: "ellipsis"}}
+                        type="text"
+                        name="preset"
+                        value={ (selectedUsers.length > 0 ? selectedUsers.join(', ') : 'none') }
+                        autoComplete="off"
+                        readOnly/>
                 </InputGroup>
 
                 <InputGroup className="mb-1">
                     <DropdownButton
                         variant="secondary col-2 text-start bg-light text-dark"
                         title="Permissions">
-                            {Object.keys(data.presets).map((preset, index) => (
-                                <Dropdown.Item key={index} onClick={() => handlePresetChange(preset)}>{preset}</Dropdown.Item>
-                            ))}
+                        {Object.keys(data.presets).map((preset, index) => (
+                            <Dropdown.Item key={index}
+                                           onClick={() => handlePresetChange(preset)}>{preset}</Dropdown.Item>
+                        ))}
                     </DropdownButton>
                     <Form.Control
-                            type="text"
-                            name="preset"
-                            value={preset}
-                            autoComplete="off"
-                            readOnly/>
+                        type="text"
+                        name="preset"
+                        value={preset}
+                        autoComplete="off"
+                        readOnly/>
                 </InputGroup>
+
 
                 <table className="table text-start table-bordered">
                     <tbody>
@@ -221,10 +305,10 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                         <tr key={index}>
                             <td>
                                 <input className="mx-2"
-                                        type="checkbox"
-                                        id={perm}
-                                        checked={selectedPermissions.includes(perm)}
-                                        onChange={() => handlePermissionChange(perm)}/>
+                                       type="checkbox"
+                                       id={perm}
+                                       checked={selectedPermissions.includes(perm)}
+                                       onChange={() => handlePermissionChange(perm)}/>
                                 <label htmlFor={perm}>{perm}</label>
                             </td>
                         </tr>
@@ -233,8 +317,17 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 </table>
 
                 <div className="text-end mt-4">
-                    <Button variant="success"
-                            onClick={handleRegister}><BsCheck2 className="me-1"/>Register</Button>
+                    <OverlayTrigger
+                        show={!!error}
+                        delay={{show: 250, hide: 400}}
+                        overlay={
+                            <Tooltip>
+                                <div>{error}</div>
+                            </Tooltip>
+                        }
+                    >
+                            <Button variant="success" onClick={handleRegister}><BsCheck2 className="me-1"/>Register</Button>
+                    </OverlayTrigger>
                 </div>
             </Modal.Body>
         </Modal>

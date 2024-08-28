@@ -1,10 +1,11 @@
 import {FC, useEffect} from 'react';
-import {BsCalendar3Range, BsDoorOpenFill, BsEnvelopeFill, BsFillPersonLinesFill, BsPeopleFill, BsQuestionOctagon, BsUiChecksGrid} from "react-icons/bs";
+import {BsCalendar3Range, BsDoorOpenFill, BsEnvelopeFill, BsFillPersonLinesFill, BsMenuButtonWide, BsPeopleFill, BsUiChecksGrid} from "react-icons/bs";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {Link} from "react-router-dom";
 import {accountInfoRequest, logout} from "../../store/slices/accountSlice.ts";
 import {Capitalize} from '../../helpers/format.ts';
 import {Badge} from 'react-bootstrap';
+import { Permission } from '../../models/User.ts';
 
 const Sidebar : FC = () => {
     const dispatch = useAppDispatch();
@@ -29,19 +30,12 @@ const Sidebar : FC = () => {
             <hr className="m-0"/>
             <ul className="list-unstyled">
                 <div className="p-3">
+                    <li className="mb-2">
+                        <small className="text-uppercase text-secondary" style={{fontSize: "0.7rem"}}>Main Menu</small>
+                    </li>
                     <li className="my-1">
                         <BsUiChecksGrid className="me-1"/>
                         <Link to="/dashboard" className="text-decoration-none text-black">Dashboard</Link>
-                    </li>
-                    <li className="my-1">
-                        <BsQuestionOctagon className="me-1"/>
-                        <Link to="/overview" className="text-decoration-none text-black">Overview</Link>
-                    </li>
-                </div>
-                <hr className="mx-3 my-0"/>
-                <div className="p-3">
-                    <li className="mb-2">
-                        <small className="text-uppercase text-secondary" style={{fontSize: "0.7rem"}}>Main Menu</small>
                     </li>
                     <li className="my-1">
                         <BsCalendar3Range className="me-1"/>
@@ -51,10 +45,23 @@ const Sidebar : FC = () => {
                         <BsPeopleFill className="me-1"/>
                         <Link to="/employees" className="text-decoration-none text-black">Employees</Link>
                     </li>
+                </div>
+                <hr className="mx-3 my-0"/>
+                <div className="p-3">
+                    <li className="mb-2">
+                        <small className="text-uppercase text-secondary" style={{fontSize: "0.7rem"}}>Vacations</small>
+                    </li>
                     <li className="my-1">
                         <BsEnvelopeFill className="me-1"/>
-                        <Link to="/vacations" className="text-decoration-none text-black">Vacations</Link>
+                        <Link to="/vacationsForm" className="text-decoration-none text-black">Form</Link>
                     </li>
+                    {
+                        user.permissions?.includes(Permission.ApproveVacations) &&
+                            <li className="my-1">
+                                <BsMenuButtonWide className="me-1"/>
+                                <Link to="/vacationsManager" className="text-decoration-none text-black">Manager</Link>
+                            </li>
+                    }
                 </div>
                 <hr className="mx-3 my-0"/>
                 <div className="p-3">

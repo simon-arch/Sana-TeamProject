@@ -7,7 +7,7 @@
         ManageUserPermissions = 2,
         RegisterUser = 3,
         DeleteUser = 4,
-        ReviewVacations = 5,
+        ApproveVacations = 5,
         FireUser = 6,
         ManageUserWorkInfo = 7
     }

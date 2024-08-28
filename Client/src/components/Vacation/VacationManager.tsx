@@ -1,34 +1,47 @@
-import {useEffect, useState} from "react";
-import {sendRequest} from "../../store/epics/helpers/sendRequest.ts";
+import { useEffect, useState } from "react";
+import { sendRequest } from "../../store/epics/helpers/sendRequest.ts";
 import VacationCard from "./VacationCard";
-import {Button, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
-import Vacation, {VacationStatus} from "../../models/Vacation.ts";
+import { Button, Col, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import Vacation, { VacationStatus } from "../../models/Vacation.ts";
+import User from "../../models/User.ts";
+import { useAppSelector } from "../../hooks/redux.ts";
 
 const VacationManager = () => {
     const [vacations, setVacations] = useState<Vacation[]>([]);
     const [filter, setFilter] = useState([2]);
     const statuses = Object.values(VacationStatus) as VacationStatus[];
 
+    const account = useAppSelector<User>(state => state.accountInfo.user);
+
     useEffect(() => {
         getAllVacations();
     }, []);
 
     const getAllVacations = () => {
-        sendRequest(`query { vacation { vacations { id, title, description, startDate, endDate, status, sender } } } `)
-        .then(vacations => setVacations(vacations.data.vacation.vacations.reverse()));
+        sendRequest(`query { vacation { vacations { id, description, startDate, endDate, status, sender } } } `)
+            .then(response => {
+                const allVacations = response.data.vacation.vacations.reverse();
+                const filteredVacations = allVacations.filter((vacation: Vacation) => {
+                    const { sender } = vacation;
+                    const isCurrentUser = sender === account.username;
+                    const isApprovedUser = account.approveVacationsForUsers?.includes(sender) || false;
+                    return !isCurrentUser && isApprovedUser;
+                });
+
+                setVacations(filteredVacations);
+            });
     }
 
     const setVacationStatus = (id: number, status: VacationStatus) => {
         sendRequest(`mutation { vacation { setStatus(id: ${id}, status: ${status}) { id } } } `)
-        .then(() => getAllVacations());
+            .then(() => getAllVacations());
     }
 
-    const handleChangeFilter = (val : React.SetStateAction<number[]>) => setFilter(val);
+    const handleChangeFilter = (val: React.SetStateAction<number[]>) => setFilter(val);
 
     return (
-        <div>
-            <div className="col-8">
-            <ToggleButtonGroup type="checkbox" defaultValue={filter} onChange={handleChangeFilter} className="mb-2">
+        <Col md={8}>
+            <ToggleButtonGroup type="checkbox" defaultValue={filter} onChange={handleChangeFilter} className="mb-1">
                 <ToggleButton variant="outline-success" id="tbg-check-1" value={1}>
                     Approved
                 </ToggleButton>
@@ -39,24 +52,25 @@ const VacationManager = () => {
                     Rejected
                 </ToggleButton>
             </ToggleButtonGroup>
-                { vacations.map((appeal, index) => (
-                    filter.includes(statuses.indexOf(appeal.status) + 1) && (
-                            <VacationCard key={index} vacation={appeal}>
-                                Sent by <span style={{fontStyle: "italic"}}>{appeal.sender}</span>
-                                {
-                                    appeal.status === VacationStatus.Pending && (
-                                        <div className="mt-3">
-                                            <Button variant="success" onClick={() => setVacationStatus(appeal.id, VacationStatus.Approved)}>Approve</Button>
-                                            <Button className="ms-2" variant="danger" onClick={() => setVacationStatus(appeal.id, VacationStatus.Rejected)}>Reject</Button>
-                                        </div>
-                                    )
-                                }
-                            </VacationCard>
-                    ))) 
-                }
+            <div style={{overflowY: "scroll", maxHeight: "75vh"}}>
+            {vacations.map((vacation, index) => {
+                const isApprovedUser = account.approveVacationsForUsers?.includes(vacation.sender) || false;
+
+                return filter.includes(statuses.indexOf(vacation.status) + 1) && (
+                    <VacationCard key={index} vacation={vacation}>
+                        Sent by <span style={{ fontStyle: "italic" }}>{vacation.sender}</span>
+                        {vacation.status === VacationStatus.Pending && isApprovedUser && (
+                            <div>
+                                <Button variant="success" onClick={() => setVacationStatus(vacation.id, VacationStatus.Approved)}>Approve</Button>
+                                <Button variant="danger" onClick={() => setVacationStatus(vacation.id, VacationStatus.Rejected)}>Reject</Button>
+                            </div>
+                        )}
+                    </VacationCard>
+                );
+            })}
             </div>
-       </div>
+        </Col>
     );
-  };
+};
 
 export default VacationManager;

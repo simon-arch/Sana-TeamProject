@@ -2,6 +2,7 @@
 using GraphQL.Types;
 using Server.API.GraphInputTypes;
 using Server.API.GraphTypes;
+using Server.API.Mutations.Extensions;
 using Server.Authorization;
 using Server.Data.Repositories;
 using Server.Models;
@@ -60,6 +61,7 @@ public sealed class AuthMutation : ObjectGraphType
 
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
                 await context.RequestServices!.GetRequiredService<IUserRepository>().InsertAsync(user);
+                await UserMutationExtensions.UpdateApproveVacationsForUsersAsync(user.Username, user.ApprovedVacationsByUsers, userRepository);
                 return user;
             });
 

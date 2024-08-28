@@ -8,6 +8,16 @@ export default interface User {
     state: UserStatus;
     workType: WorkType;
     workTime: number | null;
+    approvedVacationsByUsers: string[];
+    approveVacationsForUsers: string[];
+}
+
+export interface UserLite {
+    username: string;
+    firstName: string;
+    lastName: string;
+    role: Role
+    state: UserStatus;
 }
 
 export enum Permission {
@@ -16,7 +26,7 @@ export enum Permission {
     ManageUserPermissions = "MANAGE_USER_PERMISSIONS",
     RegisterUser = "REGISTER_USER",
     DeleteUser = "DELETE_USER",
-    ReviewVacations = "REVIEW_VACATIONS",
+    ApproveVacations = "APPROVE_VACATIONS",
     FireUser = "FIRE_USER",
     ManageUserWorkInfo = "MANAGE_USER_WORK_INFO"
 }

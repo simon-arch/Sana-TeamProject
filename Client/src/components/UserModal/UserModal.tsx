@@ -10,10 +10,11 @@ import LastNameField from './ModalComponents/LastNameField.tsx';
 import User, {Permission, Role, UserStatus, WorkType} from "../../models/User.ts";
 import WorkInfoField from "./ModalComponents/WorkInfoField.tsx";
 import {SliceStatus} from "../../models/SliceState.ts";
+import ApprovedVacationsByUsersSelect from "./ModalComponents/ApprovedVacationsByUsersSelect.tsx";
 
 interface ModalProps {
     show: boolean;
-    setShow(prevState : boolean) : void
+    setShow(prevState: boolean): void
     user: User,
     setLocalStatus(prevState: SliceStatus): void
 }
@@ -24,7 +25,7 @@ const convertPayload = (rec: Record<string, boolean>): string[] => {
         .map(([key]) => key);
 };
 
-const UserModal = (props : ModalProps) : React.JSX.Element => {
+const UserModal = (props: ModalProps): React.JSX.Element => {
     const dispatch = useAppDispatch();
     const account = useAppSelector<User>(state => state.accountInfo.user);
 
@@ -32,7 +33,7 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
         props.user.state.includes(UserStatus.Fired)
             ? dispatch(deleteUser({username: props.user.username}))
             : dispatch(setUserState({username: props.user.username, state: UserStatus.Fired}))
-        
+
         props.setLocalStatus('loading');
         setConfirm(false);
         props.setShow(false);
@@ -48,6 +49,7 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
     const [permissions, setPermissions] = useState<Record<string, boolean>>({});
     const [workType, setWorkType] = useState(WorkType.FullTime);
     const [workTime, setWorkTime] = useState<number | null>(null);
+    const [approvers, setApprovers] = useState<string[]>([]);
 
     const [firstNameEdited, setFirstNameEdited] = useState(false);
     const [lastNameEdited, setLastNameEdited] = useState(false);
@@ -55,6 +57,7 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
     const [permissionsEdited, setPermissionsEdited] = useState(false);
     const [workTypeEdited, setWorkTypeEdited] = useState(false);
     const [workTimeEdited, setWorkTimeEdited] = useState(false);
+    const [usersEdited, setUsersEdited] = useState(false)
 
     const handleUpdate = () => {
         dispatch(updateRequest(
@@ -67,7 +70,8 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                 permissions: convertPayload(permissions),
                 state: UserStatus.Available,
                 workType: workType,
-                workTime: workTime
+                workTime: workTime,
+                approvedVacationsByUsers: approvers
             }
         ));
         props.setShow(false);
@@ -90,30 +94,52 @@ const UserModal = (props : ModalProps) : React.JSX.Element => {
                             <Form.Control name="lastname" type="text" value={props.user.username} readOnly/>
                         </InputGroup>
 
-                        <FirstNameField setFirstName={setFirstName} firstName={firstName} user={props.user} setEdited={setFirstNameEdited} isEdited={firstNameEdited}/>
-                        <LastNameField setLastName={setLastName} lastName={lastName} user={props.user} setEdited={setLastNameEdited} isEdited={lastNameEdited}/>
-                        <WorkInfoField setWorkTime={setWorkTime} setWorkTimeEdited={setWorkTimeEdited} workTime={workTime} isWorkTimeEdited={workTimeEdited}
-                                       setWorkType={setWorkType} setWorkTypeEdited={setWorkTypeEdited} workType={workType} isWorkTypeEdited={workTypeEdited}
+                        <FirstNameField setFirstName={setFirstName} firstName={firstName} user={props.user}
+                                        setEdited={setFirstNameEdited} isEdited={firstNameEdited}/>
+                        <LastNameField setLastName={setLastName} lastName={lastName} user={props.user}
+                                       setEdited={setLastNameEdited} isEdited={lastNameEdited}/>
+                        <WorkInfoField setWorkTime={setWorkTime} setWorkTimeEdited={setWorkTimeEdited}
+                                       workTime={workTime} isWorkTimeEdited={workTimeEdited}
+                                       setWorkType={setWorkType} setWorkTypeEdited={setWorkTypeEdited}
+                                       workType={workType} isWorkTypeEdited={workTypeEdited}
                                        user={props.user}/>
-                        <RoleField setRole={setRole} role={role} user={props.user} setEdited={setRoleEdited} isEdited={roleEdited}/>
-                        <PermissionSelect setPermissions={setPermissions} permissions={permissions} user={props.user} setEdited={setPermissionsEdited} isEdited={permissionsEdited}/>
+                        <RoleField setRole={setRole} role={role} user={props.user} setEdited={setRoleEdited}
+                                   isEdited={roleEdited}/>
+                        {
+                            props.user.permissions.includes(Permission.ApproveVacations) &&
+                                <ApprovedVacationsByUsersSelect
+                                setApprovers={setApprovers}
+                                approvers={approvers}
+                                user={props.user}
+                                setEdited={setUsersEdited}
+                                isEdited={usersEdited}/>
+                        }
+                        <PermissionSelect
+                            setPermissions={setPermissions}
+                            permissions={permissions}
+                            user={props.user}
+                            setEdited={setPermissionsEdited}
+                            isEdited={permissionsEdited}/>
 
                         {(props.user.username !== account.username
-                            && (account.permissions.includes(Permission.ManageUserRoles)
-                            || account.permissions.includes(Permission.ManageUserRoles)))
+                                && (account.permissions.includes(Permission.ManageUserRoles)
+                                    || account.permissions.includes(Permission.ManageUserRoles)))
                             &&
                             <div className="mt-4 d-flex justify-content-between">
-                            <Button variant="success"
-                                    disabled={!(firstNameEdited || lastNameEdited || roleEdited || permissionsEdited || workTimeEdited || workTypeEdited)}
-                                    onClick={handleUpdate}><BsCheck2 className="me-1"/>Confirm</Button>
-                            {confirm
-                                ? <Button onClick={() => handleRequest()} variant="danger"><BsXLg className="me-1"/>Are you sure?</Button>
-                                : props.user.state.includes(UserStatus.Fired)
-                                    ? account.permissions.includes(Permission.DeleteUser)
-                                        && <Button onClick={() => handleConfirm()} variant="danger"><BsXLg className="me-1"/>Delete</Button>
-                                    : account.permissions.includes(Permission.FireUser)
-                                        && <Button onClick={() => handleConfirm()} variant="danger"><BsXLg className="me-1"/>Fire</Button>
-                            } </div>
+                                <Button variant="success"
+                                        disabled={!(firstNameEdited || lastNameEdited || roleEdited || permissionsEdited || workTimeEdited || workTypeEdited || usersEdited)}
+                                        onClick={handleUpdate}><BsCheck2 className="me-1"/>Confirm</Button>
+                                {confirm
+                                    ? <Button onClick={() => handleRequest()} variant="danger"><BsXLg className="me-1"/>Are
+                                        you sure?</Button>
+                                    : props.user.state.includes(UserStatus.Fired)
+                                        ? account.permissions.includes(Permission.DeleteUser)
+                                        && <Button onClick={() => handleConfirm()} variant="danger"><BsXLg
+                                            className="me-1"/>Delete</Button>
+                                        : account.permissions.includes(Permission.FireUser)
+                                        && <Button onClick={() => handleConfirm()} variant="danger"><BsXLg
+                                            className="me-1"/>Fire</Button>
+                                } </div>
                         }
                     </>
                 )}
