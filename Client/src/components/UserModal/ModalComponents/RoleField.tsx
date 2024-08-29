@@ -15,7 +15,6 @@ interface RoleFieldProps {
 
 const RoleField = (props : RoleFieldProps) => {
     const account = useAppSelector<User>(state => state.accountInfo.user);
-    const availableRoles = useAppSelector<Role[]>(state => state.roles.roles);
 
     const [sourceRole, setSourceRole] = useState<Role>(Role.Developer);
 
@@ -53,8 +52,8 @@ const RoleField = (props : RoleFieldProps) => {
                     <DropdownButton
                         variant="secondary col-2 text-start bg-light text-dark"
                         title="Role">
-                        {availableRoles.map((role, index) => (
-                            <Dropdown.Item key={index} onClick={() => handleChange(role)}>{Capitalize(role as string)}</Dropdown.Item>
+                        {Object.values(Role).map((role, index) => (
+                            <Dropdown.Item key={index} onClick={() => handleChange(role)}>{Capitalize(role)}</Dropdown.Item>
                         ))}
                     </DropdownButton>
                     <Form.Control name="role" type="text" value={props.role} readOnly/>

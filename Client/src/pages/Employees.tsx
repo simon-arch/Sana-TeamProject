@@ -1,11 +1,9 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../hooks/redux.ts";
-import {getUsers} from "../store/slices/userSlice.ts";
+import {getUsers, getUsersWithApproveVacationsPermission} from "../store/slices/userSlice.ts";
 import {Badge, Button, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Spinner, Table} from "react-bootstrap";
 import {HiMagnifyingGlass} from "react-icons/hi2";
 import UserModal from "../components/UserModal/UserModal.tsx";
-import {rolesRequest} from "../store/slices/roleSlice.ts";
-import {permissionsRequest} from "../store/slices/permissionSlice.ts";
 import {Capitalize} from "../helpers/format.ts";
 import RegisterUserModal from "../components/UserModal/RegisterUserModal.tsx";
 import PageBar from "../components/PageBar/PageBar.tsx";
@@ -26,7 +24,7 @@ const Employees = () => {
     
     useEffect(() => {
         setUsers(usersRaw);
-    }, [dispatch, usersRaw])
+    }, [usersRaw])
 
     const [page, setPage] = useState(1);
     const pageSize = 10;
@@ -66,7 +64,7 @@ const Employees = () => {
 
     useEffect(() => {
         const subscription = onSearch$.pipe(
-            map((prompt: any) => prompt.trim()),
+            map(prompt => (prompt as string).trim()),
             debounceTime(400),
             distinctUntilChanged()
         ).subscribe(setDebouncedQuery);
@@ -91,11 +89,6 @@ const Employees = () => {
     }, [dispatch, sort]);
 
     useEffect(() => {
-        dispatch(rolesRequest());
-        dispatch(permissionsRequest());
-    }, [dispatch]);
-
-    useEffect(() => {
         if (status == 'idle')
             setLocalStatus('idle')
     }, [status]);
@@ -108,8 +101,8 @@ const Employees = () => {
     }, [dispatch, page, debouncedQuery, localStatus]);
 
     useEffect(() => {
-        updateUsers();
-    }, [])
+        dispatch(getUsersWithApproveVacationsPermission());
+    }, [dispatch]);
 
     return (
         <div className="p-3">
@@ -163,7 +156,7 @@ const Employees = () => {
                                                 {Capitalize(user.role)}
                                             </td>
                                             <td className="p-3">
-                                                <span className={`${styles["badge"]} ${styles[`badge-${user.state.toLowerCase()}`]}`}>{Capitalize(user.state)}</span>
+                                                <span className={`${styles["badge"]} ${styles[`badge-${user.state?.toLowerCase()}`]}`}>{Capitalize(user.state)}</span>
                                             </td>
                                             <td className="p-3 pb-2">
                                                 <button onClick={() => openModal(user)} className="btn border py-0 px-2">...</button>

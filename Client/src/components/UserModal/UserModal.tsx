@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {deleteUser, setUserState, updateRequest} from "../../store/slices/userSlice.ts";
 import {Button, Form, InputGroup, Modal} from "react-bootstrap";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
@@ -82,6 +82,7 @@ const UserModal = (props: ModalProps): React.JSX.Element => {
         <Modal show={props.show}
                onHide={() => props.setShow(false)}
                centered
+               fullscreen='lg-down'
                size="xl">
             <Modal.Header closeButton>
                 <Modal.Title>Details</Modal.Title>

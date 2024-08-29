@@ -1,11 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Dropdown, DropdownButton, Form, InputGroup, Modal, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {BsArrowCounterclockwise, BsCheck2, BsCheck2All} from "react-icons/bs";
-import {dismissError, getUsersWithApproveVacationsPermission, registerRequest, setError} from "../../store/slices/userSlice.ts";
+import {dismissError, registerRequest, setError} from "../../store/slices/userSlice.ts";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
-import {permissionsRequest} from "../../store/slices/permissionSlice.ts";
-import {rolesRequest} from "../../store/slices/roleSlice.ts";
-import {getWorkTypes} from "../../store/slices/workTypeSlice.ts";
 import User, {Permission, Role, UserLite, UserStatus, WorkType} from "../../models/User.ts";
 import {Capitalize, Clamp} from "../../helpers/format.ts";
 import config from "../../../config.json";
@@ -35,9 +32,6 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
     const [allowWorkTime, setAllowWorkTime] = useState(false);
 
     const users = useAppSelector<UserLite[]>(state => state.users.usersWithApprovalPermission);
-    const roles = useAppSelector<Role[]>(state => state.roles.roles);
-    const permissions = useAppSelector<Permission[]>(state => state.permissions.permissions);
-    const workTypes = useAppSelector<WorkType[]>(state => state.workTypes.workTypes);
     const account = useAppSelector<User>(state => state.accountInfo.user);
     const error = useAppSelector<SliceError>(state => state.users.error);
 
@@ -53,14 +47,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 ? prevSelectedUsers.filter((username) => username !== user.username)
                 : [...prevSelectedUsers, user.username]
         );
-      };
-
-    useEffect(() => {
-        dispatch(rolesRequest());
-        dispatch(permissionsRequest());
-        dispatch(getWorkTypes());
-        dispatch(getUsersWithApproveVacationsPermission());
-    }, [dispatch]);
+    };
 
     const handlePermissionChange = (perm: Permission) => {
         setSelectedPermissions(prev =>
@@ -138,6 +125,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
         <Modal show={props.show}
                 onHide={() => props.setShow(false)}
                centered
+               fullscreen='lg-down'
                size="xl">
             <Modal.Header closeButton>
                 <Modal.Title>Register New User</Modal.Title>
@@ -192,7 +180,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                     <DropdownButton
                         variant="secondary col-2 text-start bg-light text-dark"
                         title="Work Type">
-                        {workTypes.map((workType, index) => (<Dropdown.Item key={index}
+                        {Object.values(WorkType).map((workType, index) => (<Dropdown.Item key={index}
                             onClick={() => handleWorkTypeChange(workType)}>{Capitalize(workType)}</Dropdown.Item>))}
                     </DropdownButton>
                     <Form.Control
@@ -221,7 +209,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                     <DropdownButton
                         variant="secondary col-2 text-start bg-light text-dark"
                         title="Role">
-                        {roles.map((role, index) => (<Dropdown.Item key={index}
+                        {Object.values(Role).map((role, index) => (<Dropdown.Item key={index}
                             onClick={() => setRole(role)}>{Capitalize(role)}</Dropdown.Item>))}
                     </DropdownButton>
                     <Form.Control
@@ -301,7 +289,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
 
                 <table className="table text-start table-bordered">
                     <tbody>
-                    {permissions.map((perm, index) => (
+                    {Object.values(Permission).map((perm, index) => (
                         <tr key={index}>
                             <td>
                                 <input className="mx-2"

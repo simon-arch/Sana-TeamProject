@@ -21,7 +21,6 @@ interface WorkInfoFieldProps {
 
 const WorkInfoField = (props : WorkInfoFieldProps) => {
     const account = useAppSelector<User>(state => state.accountInfo.user);
-    const workTypes = useAppSelector<WorkType[]>(state => state.workTypes.workTypes);
 
     const [sourceWorkType, setSourceWorkType] = useState<WorkType>(WorkType.FullTime);
     const [sourceWorkTime, setSourceWorkTime] = useState<number | null>(null);
@@ -90,7 +89,7 @@ const WorkInfoField = (props : WorkInfoFieldProps) => {
                         <DropdownButton
                             variant="secondary col-2 text-start bg-light text-dark"
                             title="Work Type">
-                            {workTypes.map((type, index) => (
+                            {Object.values(WorkType).map((type, index) => (
                                 <Dropdown.Item key={index} onClick={() => handleWorkTypeChange(type)}>{Capitalize(type)}</Dropdown.Item>
                             ))}
                         </DropdownButton>

@@ -1,5 +1,6 @@
-import {FC, useEffect} from 'react';
-import {BsCalendar3Range, BsDoorOpenFill, BsEnvelopeFill, BsFillPersonLinesFill, BsMenuButtonWide, BsPeopleFill, BsUiChecksGrid} from "react-icons/bs";
+import {useEffect} from 'react';
+import {BsCalendar3Range, BsDoorOpenFill, BsEnvelopeFill, BsFillPersonLinesFill,
+        BsMenuButtonWide, BsPeopleFill, BsUiChecksGrid} from "react-icons/bs";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {Link} from "react-router-dom";
 import {accountInfoRequest, logout} from "../../store/slices/accountSlice.ts";
@@ -7,12 +8,8 @@ import {Capitalize} from '../../helpers/format.ts';
 import {Badge} from 'react-bootstrap';
 import { Permission } from '../../models/User.ts';
 
-const Sidebar : FC = () => {
+const Sidebar = () => {
     const dispatch = useAppDispatch();
-    const handleLogout = () => {
-        dispatch(logout())
-    }
-
     const {status, user} = useAppSelector(state => state.accountInfo);
 
     useEffect(() => {
@@ -72,7 +69,7 @@ const Sidebar : FC = () => {
                         <BsFillPersonLinesFill className="me-1"/>
                         <Link to="/about" className="text-decoration-none text-black">About</Link>
                     </li>
-                    <li className="my-1" onClick={handleLogout}>
+                    <li className="my-1" onClick={() => dispatch(logout())}>
                         <BsDoorOpenFill className="me-1 text-danger"/>
                         <Link to="/login" className="text-decoration-none text-danger">Logout</Link>
                     </li>

@@ -29,7 +29,6 @@ const data: Config = config as Config;
 
 const PermissionSelect = (props: Props) => {
     const account = useAppSelector<User>(state => state.accountInfo.user);
-    const permissions = useAppSelector<Permission[]>(state => state.permissions.permissions);
 
     const [sourceCheckboxes, setSourceCheckboxes] = useState<Record<string, boolean>>({});
     const [preset, setPreset] = useState<string>('');
@@ -37,24 +36,24 @@ const PermissionSelect = (props: Props) => {
     useEffect(() => {
         if (props.user) {
             const target : Record<string, boolean> = {};
-            permissions.forEach(perm => {
+            Object.values(Permission).forEach(perm => {
                 target[perm] = props.user.permissions.includes(perm);
             });
             props.setPermissions(target);
             setSourceCheckboxes(target);
             props.setEdited(false);
         }
-    }, [permissions, props.user]);
+    }, [props.user]);
 
     useEffect(() => {
         if (preset) {
             const target: Record<string, boolean> = {};
-            permissions.forEach(perm => {
+            Object.values(Permission).forEach(perm => {
                 target[perm] = data.presets[preset].includes(perm);
             });
             props.setPermissions(target);
         }
-    }, [permissions, preset]);
+    }, [preset]);
 
     const handlePresetChange = (preset: string) => {
         setPreset(preset);
@@ -100,7 +99,7 @@ const PermissionSelect = (props: Props) => {
             <div>
                 <table className="table text-start table-bordered">
                     <tbody>
-                    {permissions.map(perm => (
+                    {Object.values(Permission).map(perm => (
                         <tr key={perm}>
                             <td>
                                 <input className="mx-2"

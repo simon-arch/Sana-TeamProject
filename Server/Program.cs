@@ -6,7 +6,6 @@ using Server.Authorization;
 using Server.Data;
 using Server.Data.Helpers;
 using Server.Data.Repositories;
-using Server.Models;
 using Server.Services;
 
 internal class Program
