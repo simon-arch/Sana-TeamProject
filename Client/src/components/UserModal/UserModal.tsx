@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {deleteUser, setUserState, updateRequest} from "../../store/slices/userSlice.ts";
+import {userDelete, userStateUpdate, userUpdate} from "../../store/slices/userSlice.ts";
 import {Button, Form, InputGroup, Modal} from "react-bootstrap";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {BsCheck2, BsXLg} from "react-icons/bs";
@@ -31,8 +31,8 @@ const UserModal = (props: ModalProps): React.JSX.Element => {
 
     const handleRequest = () => {
         props.user.state.includes(UserStatus.Fired)
-            ? dispatch(deleteUser({username: props.user.username}))
-            : dispatch(setUserState({username: props.user.username, state: UserStatus.Fired}))
+            ? dispatch(userDelete({username: props.user.username}))
+            : dispatch(userStateUpdate({username: props.user.username, state: UserStatus.Fired}))
 
         props.setLocalStatus('loading');
         setConfirm(false);
@@ -60,7 +60,7 @@ const UserModal = (props: ModalProps): React.JSX.Element => {
     const [usersEdited, setUsersEdited] = useState(false)
 
     const handleUpdate = () => {
-        dispatch(updateRequest(
+        dispatch(userUpdate(
             {
                 username: props.user.username,
                 password: '',

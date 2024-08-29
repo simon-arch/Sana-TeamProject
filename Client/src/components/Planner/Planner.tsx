@@ -9,7 +9,7 @@ import {planRequest} from '../../store/slices/planSlice';
 import {Localize} from '../../helpers/format';
 import {getContrast, stringToHex} from '../../helpers/calculate';
 import {Button, Dropdown, DropdownButton} from 'react-bootstrap';
-import {getUsers} from '../../store/slices/userSlice';
+import {usersRequest} from '../../store/slices/userSlice';
 import User from "../../models/User.ts";
 import Plan from "../../models/Plan.ts";
 import {BsArrowCounterclockwise, BsCheck2All} from "react-icons/bs";
@@ -39,7 +39,7 @@ const Planner = () => {
     }, [selectedUsers]);
 
     useEffect(() => {
-        dispatch(getUsers({fields: `username`}));
+        dispatch(usersRequest({fields: `username`}));
     }, [])
 
     useEffect(() => {

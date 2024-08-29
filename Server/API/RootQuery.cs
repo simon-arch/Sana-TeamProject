@@ -10,7 +10,6 @@ namespace Server.API
             Name = "query";
 
             Field<UserQuery>("user").Resolve(context => new { });
-            Field<AuthQuery>("auth").Resolve(context => new { });
             Field<VacationQuery>("vacation").Resolve(context => new { });
             Field<TimeStampQuery>("timeStamp").Resolve(context => new { });
             Field<PlanQuery>("plan").Resolve(context => new { });

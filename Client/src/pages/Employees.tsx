@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../hooks/redux.ts";
-import {getUsers, getUsersWithApproveVacationsPermission} from "../store/slices/userSlice.ts";
+import {usersRequest, getUsersWithApproveVacationsPermission} from "../store/slices/userSlice.ts";
 import {Badge, Button, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Spinner, Table} from "react-bootstrap";
 import {HiMagnifyingGlass} from "react-icons/hi2";
 import UserModal from "../components/UserModal/UserModal.tsx";
@@ -45,7 +45,7 @@ const Employees = () => {
     };
 
     const updateUsers = () => {
-        dispatch(getUsers({pageNumber: page, pageSize, query: debouncedQuery}));
+        dispatch(usersRequest({pageNumber: page, pageSize, query: debouncedQuery}));
     }
 
     const openModal = (user: User) => {

@@ -13,7 +13,32 @@ namespace Server.API.Mutations;
 public sealed class UserMutation : ObjectGraphType
 {
     public UserMutation()
-    {        
+    {
+        Field<UserGraphType>("add")
+            .Argument<NonNullGraphType<UserInputGraphType>>("user")
+            .ResolveAsync(async context =>
+            {
+                context.WithPermission(Permission.RegisterUser);
+
+                var user = context.GetArgument<User>("user");
+                var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                var duplicate = await userRepository.GetAsync(user.Username);
+
+                if (duplicate != null)
+                {
+                    throw new ExecutionError("User with this username already exists")
+                    {
+                        Code = ResponseCode.BadRequest
+                    };
+                }
+
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+                await context.RequestServices!.GetRequiredService<IUserRepository>().InsertAsync(user);
+                await UserMutationExtensions.UpdateApproveVacationsForUsersAsync(user.Username, user.ApprovedVacationsByUsers, userRepository);
+                return user;
+            });
+
+
         Field<UserGraphType>("delete")
             .Argument<NonNullGraphType<StringGraphType>>("username")
             .ResolveAsync(async context =>

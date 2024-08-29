@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Dropdown, DropdownButton, Form, InputGroup, Modal, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {BsArrowCounterclockwise, BsCheck2, BsCheck2All} from "react-icons/bs";
-import {dismissError, registerRequest, setError} from "../../store/slices/userSlice.ts";
+import {dismissError, userCreate, setError} from "../../store/slices/userSlice.ts";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import User, {Permission, Role, UserLite, UserStatus, WorkType} from "../../models/User.ts";
 import {Capitalize, Clamp} from "../../helpers/format.ts";
@@ -96,7 +96,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
     const handleRegister = (e: React.FormEvent) => {
         e.preventDefault();
         if (username && firstName && lastName && password && role) {
-            dispatch(registerRequest({
+            dispatch(userCreate({
                 firstName: firstName,
                 lastName: lastName,
                 password: password,

@@ -23,11 +23,10 @@ const userSlice = createSlice(
         initialState,
         reducers: {
             //@ts-ignore
-            getUsers(state: UserState, action) {
+            usersRequest(state: UserState, action) {
                 state.status = 'loading';
             },
-
-            setUsers(state: UserState, action: PayloadAction<ResultSet<User>>) {
+            usersRequestResolve(state: UserState, action: PayloadAction<ResultSet<User>>) {
                 state.totalCount = action.payload.totalCount;
                 state.users = action.payload.results;
                 state.status = 'idle';
@@ -41,46 +40,39 @@ const userSlice = createSlice(
                 state.status = 'idle';
             },
             //@ts-ignore
-            registerRequest(state: UserState, action: PayloadAction<User>) {
+            userCreate(state: UserState, action: PayloadAction<User>) {
                 state.status = 'loading';
             },
-            registerSuccess(state: UserState) {
+            userCreateResolve(state: UserState) {
                 state.status = "idle";
             },
 
             //@ts-ignore
-            updateRequest(state: UserState, action) {
+            userUpdate(state: UserState, action) {
                 state.status = 'loading';
             },
-            updateSuccess(state: UserState) {
+            userUpdateResolve(state: UserState) {
                 state.status = "idle";
             },
 
             //@ts-ignore
-            deleteUser(state: UserState, action: PayloadAction<{ username: string }>) {
+            userDelete(state: UserState, action: PayloadAction<{ username: string }>) {
                 state.status = 'loading';
             },
-            deleteUserSuccess(state: UserState, action: PayloadAction<string>) {
-                state.users = state.users.filter(user => user.username !== action.payload);
+            userDeleteResolve(state: UserState) {
                 state.status = 'idle';
             },
             //@ts-ignore
-            setUserState(state: UserState, action: PayloadAction<{ username: string, state: UserStatus }>) {
+            userStateUpdate(state: UserState, action: PayloadAction<{ username: string, state: UserStatus }>) {
                 state.status = 'loading';
             },
-            setUserStateSuccess(state: UserState, action: PayloadAction<{ username: string, state: UserStatus }>) {
-                state.users = state.users.map(user => {
-                    if (user.username === action.payload.username) {
-                        user.state = action.payload.state;
-                    }
-                    return user;
-                });
+            userStateUpdateResolve(state: UserState) {
                 state.status = 'idle';
             },
 
             setError(state: UserState, action) {
-                state.status = 'error'
-                state.error = action.payload
+                state.status = 'error';
+                state.error = action.payload;
             },
             dismissError(state) {
                 state.error = null;
@@ -90,13 +82,13 @@ const userSlice = createSlice(
 );
 
 export const {
-    getUsers, setUsers,
+    usersRequest, usersRequestResolve,
     getUsersWithApproveVacationsPermission, setUsersWithApproveVacationsPermission,
-    registerRequest, registerSuccess,
-    deleteUser, deleteUserSuccess,
+    userCreate, userCreateResolve,
+    userDelete, userDeleteResolve,
     setError, dismissError,
-    updateRequest, updateSuccess,
-    setUserState, setUserStateSuccess
+    userUpdate, userUpdateResolve,
+    userStateUpdate, userStateUpdateResolve
 } = userSlice.actions;
 
 export default userSlice.reducer;

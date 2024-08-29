@@ -1,8 +1,5 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using Server.API.GraphInputTypes;
-using Server.API.GraphTypes;
-using Server.API.Mutations.Extensions;
 using Server.Authorization;
 using Server.Data.Repositories;
 using Server.Models;
@@ -39,30 +36,6 @@ public sealed class AuthMutation : ObjectGraphType
                 await userRepository.UpdateAsync(user);
 
                 return tokenService.GenerateAccessToken(user);
-            });
-
-        Field<UserGraphType>("register")
-            .Argument<NonNullGraphType<UserInputGraphType>>("user")
-            .ResolveAsync(async context =>
-            {
-                context.WithPermission(Permission.RegisterUser);
-
-                var user = context.GetArgument<User>("user");
-                var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
-                var duplicate = await userRepository.GetAsync(user.Username);
-
-                if (duplicate != null)
-                {
-                    throw new ExecutionError("User with this username already exists")
-                    {
-                        Code = ResponseCode.BadRequest
-                    };
-                }
-
-                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
-                await context.RequestServices!.GetRequiredService<IUserRepository>().InsertAsync(user);
-                await UserMutationExtensions.UpdateApproveVacationsForUsersAsync(user.Username, user.ApprovedVacationsByUsers, userRepository);
-                return user;
             });
 
         Field<StringGraphType>("refresh")
