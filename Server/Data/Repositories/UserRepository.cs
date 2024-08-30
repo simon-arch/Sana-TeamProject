@@ -36,6 +36,7 @@ namespace Server.Data.Repositories
                     ApprovedVacationsByUsers, ApproveVacationsForUsers 
                 FROM Users
                 {options.Condition}
+                {options.OrderBy}
                 {options.Pagination}";
 
             return new ResultSet<User>
@@ -99,9 +100,17 @@ namespace Server.Data.Repositories
             _sql.ExecuteAsync($"DELETE FROM Users WHERE Username = '{username}'");
     }
 
+    public enum Sort
+    {
+        FullName,
+        Role,
+        State
+    }
+
     public class GetAllOptions
     {
         public string Pagination { get; set; } = string.Empty;
+        public string OrderBy {  get; set; } = "(SELECT NULL)";
         public string Condition { get; set; } = string.Empty;
     }
 
@@ -115,10 +124,28 @@ namespace Server.Data.Repositories
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageNumber);
             ArgumentOutOfRangeException.ThrowIfNegative(pageSize);
 
-            _options.Pagination = $@"
-                ORDER BY (SELECT NULL)
-                OFFSET {(pageNumber - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
+            _options.Pagination = $"OFFSET {(pageNumber - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
 
+            return this;
+        }
+
+        public GetAllOptionsBuilder SortBy(Sort sort)
+        {
+            switch(sort)
+            {
+                case Sort.FullName:
+                    _options.OrderBy = "CONCAT(FirstName, ' ', LastName)";
+                    break;
+
+                case Sort.Role:
+                    _options.OrderBy = "Role";
+                    break;
+
+                case Sort.State:
+                    _options.OrderBy = "State";
+                    break;
+            }
+            
             return this;
         }
 
@@ -146,6 +173,8 @@ namespace Server.Data.Repositories
         {
             if (_conditions.Count > 0)
                 _options.Condition = "WHERE " + string.Join(" AND ", _conditions);
+
+            _options.OrderBy = $"ORDER BY {_options.OrderBy}";
 
             return _options;
         }

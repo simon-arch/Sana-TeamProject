@@ -111,33 +111,32 @@ export const userStateUpdateEpic = createEpic(
 export const usersRequestEpic = createEpic(
     usersRequest.type,
     action => {
-        const {pageNumber, pageSize, query} = action.payload;
-        const hasParams = pageNumber || pageSize || query;
-        let {fields} = action.payload;
-        if (!fields) {
-            fields = `
-                username
-                firstName
-                lastName
-                role
-                permissions
-                state
-                workType
-                workTime
-                approvedVacationsByUsers`;
-        }
+        const {pageNumber, pageSize, sort, query, includeFired, fields} = action.payload;
+
         return `
             query { 
                 user { 
-                    users ${hasParams ? `(
+                    users (
+                        includeFired: ${includeFired ?? false}
                         ${pageNumber ? `pageNumber: ${pageNumber}` : ''}
                         ${pageSize ? `pageSize: ${pageSize}` : ''}
+                        ${sort ? `sort: ${sort}` : ''}
                         ${query ? `query: "${query}"` : ''}
-                    )` : ""} {
-                            totalCount
-                            results {
-                                ${fields}
+                    ) {
+                        totalCount
+                        results {
+                            ${fields ?? `
+                                username
+                                firstName
+                                lastName
+                                role
+                                permissions
+                                state
+                                workType
+                                workTime
+                                approvedVacationsByUsers`
                             }
+                        }
                         } 
                 } 
             }`;

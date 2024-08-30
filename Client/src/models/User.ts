@@ -46,3 +46,9 @@ export enum Role {
     Developer = "DEVELOPER",
     UserManager = "USER_MANAGER",
 }
+
+export enum Sort {
+    FullName = "FULL_NAME",
+    Role = "ROLE",
+    State = "STATE",
+}

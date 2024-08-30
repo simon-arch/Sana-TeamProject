@@ -9,31 +9,27 @@ import RegisterUserModal from "../components/UserModal/RegisterUserModal.tsx";
 import PageBar from "../components/PageBar/PageBar.tsx";
 import {debounceTime, distinctUntilChanged, map, Subject} from "rxjs";
 import styles from "./styles/employees.module.css";
-import User, {Permission} from "../models/User.ts";
+import User, {Permission, Sort} from "../models/User.ts";
 import {SliceStatus} from "../models/SliceState.ts";
 
 
 const Employees = () => {
     const dispatch = useAppDispatch();
-    const usersRaw = useAppSelector<User[]>(state => state.users.users);
+    const users = useAppSelector<User[]>(state => state.users.users);
     const userNumber = useAppSelector<number>(state => state.users.totalCount);
     const account = useAppSelector<User>(state => state.accountInfo.user);
     
     const status = useAppSelector<SliceStatus>(state => state.users.status);
     const [localStatus, setLocalStatus] = useState<SliceStatus>('loading');
-    
-    useEffect(() => {
-        setUsers(usersRaw);
-    }, [usersRaw])
 
     const [page, setPage] = useState(1);
     const pageSize = 10;
 
-    const [users, setUsers] = useState<User[]>(usersRaw);
     const [show, setShow] = useState(false);
     const [user, setUser] = useState<User>(null!);
     const [showRegisterModal, setShowRegisterModal] = useState(false);
-    const [sort, setSort] = useState("name");
+    const [sort, setSort] = useState(Sort.FullName);
+    const [showFired, setShowFired] = useState(false);
 
     const [query, setQuery] = useState("");
     const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -43,10 +39,6 @@ const Employees = () => {
         setQuery(event.target.value);
         onSearch$.next(event.target.value);
     };
-
-    const updateUsers = () => {
-        dispatch(usersRequest({pageNumber: page, pageSize, query: debouncedQuery}));
-    }
 
     const openModal = (user: User) => {
         setShow(true);
@@ -73,32 +65,22 @@ const Employees = () => {
     }, [onSearch$]);
 
     useEffect(() => {
-        const source = [...users];
-        switch (sort) {
-            case "name":
-                source.sort((a, b) => `${a.firstName} ${b.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
-                break;
-            case "role":
-                source.sort((a, b) => a.role.localeCompare(b.role));
-                break;
-            case "status":
-                source.sort((a, b) => a.state.localeCompare(b.state));
-                break;
-        }
-        setUsers(source);
-    }, [dispatch, sort]);
-
-    useEffect(() => {
         if (status == 'idle')
             setLocalStatus('idle')
     }, [status]);
 
     useEffect(() => {
         if (localStatus == 'idle') {
-            updateUsers();
+            dispatch(usersRequest({
+                pageNumber: page,
+                pageSize: pageSize,
+                query: debouncedQuery,
+                sort: sort,
+                includeFired: showFired
+            }));
         }
         else setLocalStatus('loading')
-    }, [dispatch, page, debouncedQuery, localStatus]);
+    }, [dispatch, page, debouncedQuery, localStatus, sort, showFired]);
 
     useEffect(() => {
         dispatch(getUsersWithApproveVacationsPermission());
@@ -118,13 +100,22 @@ const Employees = () => {
                                      onChange={handleSearch}/>
                     </InputGroup>
                     <FormGroup className="w-25 d-flex align-items-center">
-                        <FormLabel htmlFor="sort" className="text-secondary my-0 me-2"><small>Sort by</small></FormLabel>
-                        <FormSelect id="sort" className="w-75" value={sort} onChange={(e) => setSort(e.target.value)}>
-                            <option value="name">Name</option>
-                            <option value="role">Role</option>
-                            <option value="status">Status</option>
+                        <FormLabel htmlFor="sort" className="text-secondary my-0 me-2" column='sm' sm='auto'>Sort by</FormLabel>
+                        <FormSelect id="sort" className="w-75" value={sort} onChange={e => setSort(e.target.value as Sort)}>
+                            {Object.values(Sort).map((sort, index) =>
+                                <option key={index} value={sort}>{Capitalize(sort)}</option>
+                            )}
                         </FormSelect>
                     </FormGroup>
+                    <FormLabel className="text-secondary my-0 align-content-end" column='sm' sm='auto'>
+                        <input type="checkbox"
+                               name="showFired"
+                               checked={showFired}
+                               onChange={e => setShowFired(e.target.checked)}
+                               className="me-1"
+                        />
+                        Show fired
+                    </FormLabel>
                 </div>
                 {account.permissions &&
                     (account.permissions.includes(Permission.RegisterUser)) &&
@@ -140,9 +131,9 @@ const Employees = () => {
                                 <Table hover className="border shadow rounded">
                                     <thead>
                                     <tr className={styles["table-header"]}>
-                                        <td className="col-md-4">Name</td>
-                                        <td className="col-md-3">Role</td>
-                                        <td className="col-md-2">Status</td>
+                                        <td className="col-md-4">{Capitalize(Sort.FullName)}</td>
+                                        <td className="col-md-3">{Capitalize(Sort.Role)}</td>
+                                        <td className="col-md-2">{Capitalize(Sort.State)}</td>
                                         <td className="col-1">Action</td>
                                     </tr>
                                     </thead>

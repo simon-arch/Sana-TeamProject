@@ -24,17 +24,18 @@ public sealed class UserQuery : ObjectGraphType
         Field<ResultSetGraphType<User, UserGraphType>>("users")
             .Argument<IntGraphType>("pageSize")
             .Argument<IntGraphType>("pageNumber")
+            .Argument<EnumerationGraphType<Sort>>("sort")
             .Argument<StringGraphType>("query")
+            .Argument<NonNullGraphType<BooleanGraphType>>("includeFired")
             .ResolveAsync(async context =>
             {
                 context.WithPermission(Permission.ViewUsers);
-                
-                bool canViewFired = context.HasPermission(Permission.DeleteUser) ||
-                                       context.HasPermission(Permission.FireUser);
 
                 var pageNumber = context.GetArgument<int?>("pageNumber");
                 var pageSize = context.GetArgument<int?>("pageSize");
+                var sort = context.GetArgument<Sort?>("sort");
                 var query = context.GetArgument<string?>("query");
+                var includeFired = context.GetArgument<bool>("includeFired");
 
                 var builder = new GetAllOptionsBuilder();
 
@@ -42,11 +43,15 @@ public sealed class UserQuery : ObjectGraphType
                 {
                     builder.SetPagination((int)pageNumber, (int)pageSize);
                 }
+                if (sort != null)
+                {
+                    builder.SortBy((Sort)sort);
+                }
                 if (query != null)
                 {
                     builder.SetQuery(query);
                 }
-                builder.IncludeFired(canViewFired);
+                builder.IncludeFired(includeFired);
 
                 return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync(builder.Build());
             });
