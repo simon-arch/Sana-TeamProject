@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-import {BsCalendar3Range, BsDoorOpenFill, BsEnvelopeFill, BsFillPersonLinesFill,
+import {BsCalendar3Range, BsDoorOpenFill, BsEnvelopeFill, BsFillFileBarGraphFill, BsFillPersonLinesFill,
         BsMenuButtonWide, BsPeopleFill, BsUiChecksGrid} from "react-icons/bs";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
 import {Link} from "react-router-dom";
@@ -42,6 +42,13 @@ const Sidebar = () => {
                         <BsPeopleFill className="me-1"/>
                         <Link to="/employees" className="text-decoration-none text-black">Employees</Link>
                     </li>
+                    {
+                        user.permissions?.includes(Permission.ViewStatistics) &&
+                    <li className="my-1">
+                        <BsFillFileBarGraphFill className="me-1"/>
+                        <Link to="/workInfo" className="text-decoration-none text-black">Statistics</Link>
+                    </li>
+                    }
                 </div>
                 <hr className="mx-3 my-0"/>
                 <div className="p-3">

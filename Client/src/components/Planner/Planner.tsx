@@ -1,5 +1,4 @@
 import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {useEffect, useState} from 'react';
@@ -46,7 +45,7 @@ const Planner = () => {
         if (status == 'idle' && plans) {
             const newEvents = plans.map(plan => (
                 {
-                    title: `${plan.owner}: ${plan.title}`,
+                    title: `${plan.owner}`,
                     start: Localize(plan.timeStart),
                     end: Localize(plan.timeEnd),
                     backgroundColor: `#${stringToHex(plan.owner)}`,
@@ -125,9 +124,9 @@ const Planner = () => {
             </DropdownButton>
             <FullCalendar
                 headerToolbar={{
-                    left: 'today prev,next addButton',
+                    left: 'today prev,next',
                     center: 'title',
-                    right: 'negZoom,posZoom dayGridMonth,timeGridWeek,timeGridDay'
+                    right: 'addButton negZoom,posZoom'
                   }}
                 customButtons={{
                     addButton: addButton,
@@ -137,8 +136,8 @@ const Planner = () => {
                 allDayText=''
                 buttonIcons={false}
                 height={"80vh"}
-                plugins={[dayGridPlugin, timeGridPlugin]}
-                initialView="dayGridMonth"
+                plugins={[timeGridPlugin]}
+                initialView="timeGridWeek"
                 events={events}
                 eventBorderColor="#212529"
                 slotDuration={`00:${slotMinutes}:00`}

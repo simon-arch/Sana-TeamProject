@@ -28,7 +28,8 @@ export enum Permission {
     DeleteUser = "DELETE_USER",
     ApproveVacations = "APPROVE_VACATIONS",
     FireUser = "FIRE_USER",
-    ManageUserWorkInfo = "MANAGE_USER_WORK_INFO"
+    ManageUserWorkInfo = "MANAGE_USER_WORK_INFO",
+    ViewStatistics = "VIEW_STATISTICS"
 }
 
 export enum UserStatus {

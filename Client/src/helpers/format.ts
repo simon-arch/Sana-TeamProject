@@ -12,6 +12,7 @@ export function Localize(value: Date | null): Date | null {
 }
 
 export function Clamp(value: number | null, min: number, max: number) {
+    if (value == 0) return min;
     if (value) {
         return Math.max(min, Math.min(value, max));
     }

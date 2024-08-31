@@ -10,6 +10,7 @@ import About from "./pages/About.tsx";
 import Organizer from "./pages/Organizer.tsx";
 import {Permission, Role} from "./models/User.ts";
 import VacationsManager from "./pages/VacationsManager.tsx";
+import UserWorkInfo from "./pages/UserWorkInfo.tsx";
 
 function App() {
     const isLoggedIn = useAppSelector(state => state.accountInfo.isLoggedIn);
@@ -34,6 +35,10 @@ function App() {
                                 {
                                     user.permissions?.includes(Permission.ApproveVacations) &&
                                     <Route path="/vacationsManager" element={<VacationsManager/>}/>
+                                }
+                                {
+                                    user.permissions?.includes(Permission.ViewStatistics) &&
+                                    <Route path="/workInfo" element={<UserWorkInfo/>}/>
                                 }
                                 <Route path="/organizer" element={<Organizer/>}/>
                                 <Route path="/about" element={<About/>}/>

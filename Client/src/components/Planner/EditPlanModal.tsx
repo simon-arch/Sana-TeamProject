@@ -8,6 +8,7 @@ import { Localize } from '../../helpers/format';
 import 'react-datepicker/dist/react-datepicker.css';
 import Plan from "../../models/Plan.ts";
 import {SliceError} from "../../models/SliceState.ts";
+import { isSameDay } from 'date-fns';
 
 interface EditProps {
     show : boolean,
@@ -19,8 +20,6 @@ interface EditProps {
 const EditTimeModal = (props: EditProps) : React.JSX.Element => {
     const dispatch = useAppDispatch();
 
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState<string | null>('');
     const [startDate, setStartDate] = useState<Date>();
     const [endDate, setEndDate] = useState<Date>();
     const [error, setError] = useState<SliceError>(null);
@@ -35,22 +34,18 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
     
     useEffect(() => {
         if (props.plan) {
-            setTitle(props.plan.title);
-            setDescription(props.plan.description);
             setStartDate(Localize(props.plan.timeStart)!);
             setEndDate(Localize(props.plan.timeEnd)!);
         }
     }, [props.show, props.plan]);
 
     const handleSubmit = () => {
-        if (!title) { setError("Title is missing"); return; }
         if (!startDate) { setError("Start date is missing"); return; }
         if (!endDate) { setError("End date is missing"); return; }
         if (startDate >= endDate) { setError("The end date cannot precede the start date"); return; }
+        if (!isSameDay(startDate, endDate)) { setError("The dates should take time on the same day"); return; }
         dispatch(planUpdate({
             id: props.plan.id,
-            title: title,
-            description: description,
             timeStart: startDate!.toISOString(), 
             timeEnd: endDate!.toISOString()
         }));
@@ -58,8 +53,6 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
     };
 
     const handleClose = () => {
-        setTitle('');
-        setDescription('');
         setStartDate(new Date());
         setEndDate(new Date());
         setError(null);
@@ -83,27 +76,6 @@ const EditTimeModal = (props: EditProps) : React.JSX.Element => {
                             name="owner"
                             defaultValue={props.plan.owner}
                             readOnly={true}/>
-                    </InputGroup>
-                    <InputGroup className="mt-2">
-                        <InputGroup.Text className="col-6">Title</InputGroup.Text>
-                        <Form.Control className="text-center" 
-                            onChange={e => setTitle(e.target.value)}
-                            name="title"
-                            type="text"
-                            placeholder="Plan title..."
-                            value={title}
-                            readOnly={props.isGuest}/>
-                    </InputGroup>
-                    <InputGroup className="mt-2" style={{height:150}}>
-                        <InputGroup.Text className="col-6">Description</InputGroup.Text>
-                        <Form.Control className="text-center" 
-                            style={{resize: 'none'}}
-                            onChange={e => setDescription(e.target.value)}
-                            name="description"
-                            as="textarea"
-                            placeholder="Plan description..."
-                            value={description || ""}
-                            readOnly={props.isGuest}/>
                     </InputGroup>
                     <Row className="d-flex justify-content-between my-2">
                         <Col md={5}>

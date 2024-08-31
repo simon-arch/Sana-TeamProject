@@ -28,7 +28,6 @@ namespace Server.Data.Repositories
                 AND Username = '{username}'";
             return _sql.QueryAsync<TimeStamp>(query);
         }
-
         public Task<TimeStamp?> GetAsync(int id)
         {
             string query = @$"

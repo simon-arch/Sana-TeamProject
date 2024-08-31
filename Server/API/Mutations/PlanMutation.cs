@@ -50,8 +50,6 @@ namespace Server.API.Mutations
 
             Field<PlanGraphType>("update")
                 .Argument<NonNullGraphType<IntGraphType>>("id")
-                .Argument<NonNullGraphType<StringGraphType>>("title")
-                .Argument<StringGraphType>("description")
                 .Argument<NonNullGraphType<DateTimeGraphType>>("timeStart")
                 .Argument<NonNullGraphType<DateTimeGraphType>>("timeEnd")
                 .ResolveAsync(async context =>
@@ -76,11 +74,6 @@ namespace Server.API.Mutations
                     {
                         plan.TimeEnd = DateTime.SpecifyKind((DateTime)timeEnd, DateTimeKind.Unspecified);
                     }
-                    if (title != null)
-                    {
-                        plan.Title = title;
-                    }
-                    plan.Description = description;
 
                     await planRepository.UpdateAsync(plan);
 

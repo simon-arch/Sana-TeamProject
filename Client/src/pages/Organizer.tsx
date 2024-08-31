@@ -5,7 +5,7 @@ const Organizer = () => {
         <div className="p-3 pb-0">
             <div>
                 <h1>Organizer</h1>
-                <p className="text-secondary">Share your future plans with others</p>
+                <p className="text-secondary">Share your future availability with others</p>
             </div>
             <Planner/>
         </div>

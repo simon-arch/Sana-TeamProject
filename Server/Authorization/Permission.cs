@@ -9,6 +9,7 @@
         DeleteUser = 4,
         ApproveVacations = 5,
         FireUser = 6,
-        ManageUserWorkInfo = 7
+        ManageUserWorkInfo = 7,
+        ViewStatistics = 8
     }
 }

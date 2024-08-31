@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import {Button, Col, Container, Form, InputGroup, Modal, OverlayTrigger, Row, Tooltip} from "react-bootstrap";
+import {Button, Col, Container, Modal, OverlayTrigger, Row, Tooltip} from "react-bootstrap";
 import DatePicker from 'react-datepicker';
 import {BsArrowCounterclockwise, BsCheck2} from 'react-icons/bs';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import { planCreate } from '../../store/slices/planSlice';
 import 'react-datepicker/dist/react-datepicker.css';
 import {SliceError} from "../../models/SliceState.ts";
+import { isSameDay } from 'date-fns';
 
 interface EditProps {
     show : boolean,
@@ -16,20 +17,16 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
     const dispatch = useAppDispatch();
 
     const username = useAppSelector(state => state.accountInfo.user.username);
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState<string | null>('');
     const [startDate, setStartDate] = useState<Date>(new Date(Date.now()));
     const [endDate, setEndDate] = useState<Date>(new Date(Date.now()));
     const [error, setError] = useState<SliceError>(null);
 
     const handleSubmit = () => {
-        if (!title) { setError("Title is missing"); return; }
         if (!startDate) { setError("Start date is missing"); return; }
         if (!endDate) { setError("End date is missing"); return; }
         if (startDate >= endDate) { setError("The end date cannot precede the start date"); return; }
+        if (!isSameDay(startDate, endDate)) { setError("The dates should take time on the same day"); return; }
         dispatch(planCreate({
-            title: title,
-            description: description,
             timeStart: startDate!.toISOString(), 
             timeEnd: endDate!.toISOString(),
             username: username
@@ -38,8 +35,6 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
     };
 
     const handleClose = () => {
-        setTitle('');
-        setDescription('');
         setStartDate(new Date());
         setEndDate(new Date());
         setError(null);
@@ -54,27 +49,9 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
                 <Modal.Title>Create Plan</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <InputGroup>
-                    <InputGroup.Text className="col-6">Title</InputGroup.Text>
-                    <Form.Control className="text-center" 
-                        onChange={e => setTitle(e.target.value)}
-                        type="text"
-                        name="title"
-                        placeholder="Plan title..."
-                        value={title}/>
-                </InputGroup>
-                <InputGroup className="mt-2" style={{height:150}}>
-                    <InputGroup.Text className="col-6">Description</InputGroup.Text>
-                    <Form.Control className="text-center" 
-                        style={{resize: 'none'}}
-                        onChange={e => setDescription(e.target.value)}
-                        name="description"
-                        as="textarea"
-                        placeholder="Plan description..."
-                        value={description || ""}/>
-                </InputGroup>
-                <Row className="d-flex justify-content-between my-2">
-                    <Col md={5}>
+                <Row className="mb-3">
+                    <Col>Start Date:</Col>
+                    <Col>
                         <DatePicker
                         selected={startDate}
                         name="startdate"
@@ -83,8 +60,11 @@ const AddTimeModal = (props: EditProps) : React.JSX.Element => {
                         dateFormat="MM/dd/yyyy h:mm aa"
                         todayButton="Today"
                         showTimeInput/>
-                    </Col>_
-                    <Col md={5}>
+                    </Col>
+                </Row>
+                <Row className="mb-3">
+                    <Col>End Date:</Col>
+                    <Col>
                         <DatePicker
                         name="enddate"
                         selected={endDate}

@@ -11,7 +11,7 @@ namespace Server.Data.Repositories
         public Task<Plan?> GetAsync(int id)
         {
             string query = @$"
-                SELECT Id, Title, Description, TimeStart, TimeEnd, Owner
+                SELECT Id, TimeStart, TimeEnd, Owner
                 FROM Plans
                 WHERE Id={id}";
             return _sql.QueryFirstOrDefaultAsync<Plan>(query);
@@ -20,7 +20,7 @@ namespace Server.Data.Repositories
         public Task<IEnumerable<Plan>> GetAllAsync(string[] usernames)
         {
             string query = $@"
-                SELECT Id, Title, Description, TimeStart, TimeEnd, Owner
+                SELECT Id, TimeStart, TimeEnd, Owner
                 FROM Plans
                 WHERE Owner='{string.Join("' OR Owner='", usernames)}'";
 
@@ -30,9 +30,9 @@ namespace Server.Data.Repositories
         public Task<int> InsertAsync(Plan plan)
         {
             string query = @"
-                INSERT INTO Plans (Title, Description, TimeStart, TimeEnd, Owner)
+                INSERT INTO Plans (TimeStart, TimeEnd, Owner)
                 OUTPUT INSERTED.Id
-                VALUES (@Title, @Description, @TimeStart, @TimeEnd, @Owner)";
+                VALUES (@TimeStart, @TimeEnd, @Owner)";
             return _sql.QuerySingleAsync<int>(query, plan);
         }
 
@@ -48,7 +48,7 @@ namespace Server.Data.Repositories
         {
             string query = @"
                 UPDATE Plans
-                SET Title=@Title, Description=@Description, TimeStart=@TimeStart, TimeEnd=@TimeEnd, Owner=@Owner
+                SET TimeStart=@TimeStart, TimeEnd=@TimeEnd, Owner=@Owner
                 WHERE Id=@Id";
             return _sql.ExecuteAsync(query, plan);
         }

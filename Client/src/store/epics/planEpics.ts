@@ -15,8 +15,6 @@ export const planRequestEpic = createEpic(
                 plan {
                     byUsernames(usernames: [${usernames.map((username: string) => `"${username}"`).join(',')}]) {
                         id
-                        title
-                        description
                         timeStart
                         timeEnd
                         owner
@@ -30,19 +28,15 @@ export const planRequestEpic = createEpic(
 export const planUpdateEpic = createEpic(
     planUpdate.type,
     action => {
-        const { id, timeStart, title, description, timeEnd } = action.payload;
+        const { id, timeStart, timeEnd } = action.payload;
         return `mutation {
                 plan {
                     update(
                         id: ${id}
-                        title: "${title}"
-                        description: "${description}"
                         timeStart: "${timeStart}"
                         timeEnd: "${timeEnd}"
                     ) {
                         id
-                        title
-                        description
                         timeStart
                         timeEnd
                         owner  
@@ -69,21 +63,17 @@ export const planDeleteEpic = createEpic(
 export const planCreateEpic = createEpic(
     planCreate.type,
     action => {
-        const { title, description, timeStart, timeEnd, username } = action.payload;
+        const { timeStart, timeEnd, username } = action.payload;
         return `mutation {
                 plan {
                     add(
                         plan: {
-                            title: "${title}"
-                            description: "${description}"
                             timeStart: "${timeStart}"
                             timeEnd: "${timeEnd}"
                             owner: "${username}"
                         }
                     ) {
                         id
-                        title
-                        description
                         timeStart
                         timeEnd
                         owner
