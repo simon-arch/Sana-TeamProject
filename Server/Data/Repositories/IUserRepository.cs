@@ -13,5 +13,6 @@ namespace Server.Data.Repositories
         Task InsertAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(string username);
+        Task UpdateTokenAsync(string username, string tokenId);
     }
 }

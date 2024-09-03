@@ -14,8 +14,7 @@ public class User
     public required State State { get; set; } = State.Available;
     public required WorkType WorkType { get; set; } = WorkType.FullTime;
     public decimal? WorkTime { get; set; }
-    public List<string> ApprovedVacationsByUsers { get; set; } = [];
-    public List<string> ApproveVacationsForUsers { get; set; } = [];
+    public VacationApprovers? VacationApprovers { get; set; }
 }
 
 public enum State

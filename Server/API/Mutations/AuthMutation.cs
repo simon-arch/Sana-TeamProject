@@ -16,33 +16,58 @@ public sealed class AuthMutation : ObjectGraphType
             .Argument<NonNullGraphType<StringGraphType>>("password")
             .ResolveAsync(async context =>
             {
-                var username = context.GetArgument<string>("username");
-                var password = context.GetArgument<string>("password");
-
-                var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
-
-                var user = await userRepository.GetAsync(username);
-
-                if (user == null ||
-                    user.State == State.Fired ||
-                    !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                var logger = context.RequestServices!.GetRequiredService<ILogger<UserMutation>>();
+                try
                 {
-                    throw new ExecutionError("Wrong credentials") { Code = ResponseCode.Unauthorized };
+                    var username = context.GetArgument<string>("username");
+                    var password = context.GetArgument<string>("password");
+                    var tokenId = context.GetArgument<string>("tokenId");
+
+                    logger.LogInformation("Attempting login for user: {Username}", username);
+
+                    var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+
+                    var user = await userRepository.GetAsync(username);
+
+                    if (user == null)
+                    {
+                        logger.LogWarning("User not found: {Username}", username);
+                        throw new ExecutionError("Wrong credentials") { Code = ResponseCode.Unauthorized };
+                    }
+
+                    if (user.State == State.Fired)
+                    {
+                        logger.LogWarning("Attempt to login with fired user account: {Username}", username);
+                        throw new ExecutionError("Wrong credentials") { Code = ResponseCode.Unauthorized };
+                    }
+
+                    if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                    {
+                        logger.LogWarning("Invalid password for user: {Username}", username);
+                        throw new ExecutionError("Wrong credentials") { Code = ResponseCode.Unauthorized };
+                    }
+
+                    var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
+
+                    user.TokenId = tokenService.SetRefreshTokenToCookie(context.RequestServices!
+                        .GetRequiredService<IHttpContextAccessor>().HttpContext!);
+                    await userRepository.UpdateTokenAsync(username, tokenId);
+
+                    logger.LogInformation("Successful login for user: {Username}", username);
+
+                    return tokenService.GenerateAccessToken(user);
                 }
-
-                var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
-
-                user.TokenId = tokenService.SetRefreshTokenToCookie(accessor.HttpContext!);
-                await userRepository.UpdateAsync(user);
-
-                return tokenService.GenerateAccessToken(user);
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error during login process");
+                    throw;
+                }
             });
 
         Field<StringGraphType>("refresh")
             .ResolveAsync(async context =>
             {
                 var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
-
                 var token = tokenService.GetRefreshTokenFromCookie(accessor.HttpContext!)
                             ?? throw new ExecutionError("Token not found") { Code = ResponseCode.BadRequest };
 
@@ -54,7 +79,7 @@ public sealed class AuthMutation : ObjectGraphType
                            ?? throw new ExecutionError("Invalid Token") { Code = ResponseCode.BadRequest };
 
                 user.TokenId = tokenService.SetRefreshTokenToCookie(accessor.HttpContext!);
-                await userRepository.UpdateAsync(user);
+                await userRepository.UpdateAsync(user); // Ensure this correctly updates the user in DB
 
                 return tokenService.GenerateAccessToken(user);
             });
@@ -63,7 +88,6 @@ public sealed class AuthMutation : ObjectGraphType
             .ResolveAsync(async context =>
             {
                 var tokenService = context.RequestServices!.GetRequiredService<TokenService>();
-
                 var token = tokenService.GetRefreshTokenFromCookie(accessor.HttpContext!)
                             ?? throw new ExecutionError("Token not found") { Code = ResponseCode.BadRequest };
 

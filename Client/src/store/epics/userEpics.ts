@@ -28,7 +28,7 @@ export const userCreateEpic = createEpic(
                         state: ${user.state},
                         workType: ${user.workType},
                         workTime: ${user.workTime},
-                        approvedVacationsByUsers: ${JSON.stringify(user.approvedVacationsByUsers)}
+                        vacationApprovers: { approvedVacationsByUsers: ${JSON.stringify(user.approvers.approvedVacationsByUsers)} }
                     }
                     ) { 
                         username 
@@ -39,7 +39,7 @@ export const userCreateEpic = createEpic(
                         state
                         workType
                         workTime
-                        approvedVacationsByUsers
+                        vacationApprovers: { approvedVacationsByUsers }
                     }
             }
         }`;
@@ -78,7 +78,7 @@ export const userUpdateEpic = createEpic(
                         permissions: [${(user.permissions)}],
                         workType: ${user.workType},
                         workTime: ${user.workTime},
-                        approvedVacationsByUsers: [${user.approvedVacationsByUsers.map(user => `"${user}"`)}]
+                        vacationApprovers: { approvedVacationsByUsers: [${user.vacationApprovers.approvedVacationsByUsers.map(user => `"${user}"`)}] }
                         }
                     ) {
                         username
@@ -134,7 +134,7 @@ export const usersRequestEpic = createEpic(
                                 state
                                 workType
                                 workTime
-                                approvedVacationsByUsers`
+                                vacationApprovers: {approvedVacationsByUsers}`
                             }
                         }
                         } 

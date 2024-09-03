@@ -8,8 +8,12 @@ export default interface User {
     state: UserStatus;
     workType: WorkType;
     workTime: number | null;
+    vacationApprovers: VacationApprovers;
+
+}
+
+export interface VacationApprovers {
     approvedVacationsByUsers: string[];
-    approveVacationsForUsers: string[];
 }
 
 export interface UserLite {

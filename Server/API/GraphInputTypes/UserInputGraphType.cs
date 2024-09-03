@@ -16,6 +16,6 @@ public sealed class UserInputGraphType : InputObjectGraphType<User>
         Field(u => u.State);
         Field(u => u.WorkType);
         Field(u => u.WorkTime, nullable: true);
-        Field(u => u.ApprovedVacationsByUsers, nullable: true);
+        Field<VacationApproversInputGraphType>("vacationApprovers");
     }
 }

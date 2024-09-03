@@ -18,8 +18,22 @@ public sealed class UserQuery : ObjectGraphType
                 context.Authorize();
 
                 var username = context.GetArgument<string>("username");
-                return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username);
+                Console.WriteLine($"Fetching user data for: {username}");
+
+                var user = await context.RequestServices!.GetRequiredService<IUserRepository>().GetAsync(username);
+
+                if (user == null)
+                {
+                    Console.WriteLine($"No user found for: {username}");
+                }
+                else
+                {
+                    Console.WriteLine($"User fetched successfully: {user.Username}");
+                }
+
+                return user;
             });
+
 
         Field<ResultSetGraphType<User, UserGraphType>>("users")
             .Argument<IntGraphType>("pageSize")
