@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import Stopwatch from "../components/Stopwatch/Stopwatch.tsx";
 import WorkSessions from "../components/WorkSessions/WorkSessions.tsx";
 import {useAppDispatch, useAppSelector} from "../hooks/redux.ts";
-import {WorkType} from "../models/User.ts";
 import { workTimeIntervalRequest } from "../store/slices/timeStampSlice.ts";
 import { format, lastDayOfMonth } from "date-fns";
 import TimeStamp from "../models/TimeStamp.ts";
@@ -31,10 +30,9 @@ const Dashboard = () => {
         return time;
     }
 
-    const workType = useAppSelector<WorkType>(state => state.accountInfo.user.workType);
     return (
         <div className="p-2 mb-3">
-            {workType === WorkType.PartTime && <Stopwatch/>}
+            <Stopwatch/>
             <Card className="col-3 mb-2" border="info">
             <Card.Body>
                 <Card.Title>Monthly Work Progress</Card.Title>

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using Server.Authorization;
 using Server.Models;
 
@@ -27,7 +28,7 @@ namespace Server.Data.Repositories
             return _sql.QueryFirstOrDefaultAsync<User>(query);
         }
 
-        public Task<ResultSet<User>> GetAllAsync() => GetAllAsync(new GetAllOptions());
+        public Task<ResultSet<User>> GetAllAsync() => GetAllAsync(new GetAllOptionsBuilder().Build());
 
         public async Task<ResultSet<User>> GetAllAsync(GetAllOptions options)
         {
@@ -38,6 +39,8 @@ namespace Server.Data.Repositories
                 {options.Condition}
                 {options.OrderBy}
                 {options.Pagination}";
+
+            Console.WriteLine(sql);
 
             return new ResultSet<User>
             {
@@ -131,20 +134,13 @@ namespace Server.Data.Repositories
 
         public GetAllOptionsBuilder SortBy(Sort sort)
         {
-            switch(sort)
+            _options.OrderBy = sort switch
             {
-                case Sort.FullName:
-                    _options.OrderBy = "CONCAT(FirstName, ' ', LastName)";
-                    break;
-
-                case Sort.Role:
-                    _options.OrderBy = "Role";
-                    break;
-
-                case Sort.State:
-                    _options.OrderBy = "State";
-                    break;
-            }
+                Sort.FullName => "CONCAT(FirstName, ' ', LastName)",
+                Sort.Role => "Role",
+                Sort.State => "State",
+                _ => _options.OrderBy
+            };
             
             return this;
         }
@@ -155,6 +151,13 @@ namespace Server.Data.Repositories
             {
                 _conditions.Add($"CONCAT(FirstName, ' ', LastName) LIKE '%{query}%'");
             }
+
+            return this;
+        }
+
+        public GetAllOptionsBuilder OfWorkType(WorkType workType)
+        {
+            _conditions.Add($"WorkType = {(int)workType}");
 
             return this;
         }
