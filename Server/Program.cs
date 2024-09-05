@@ -18,6 +18,7 @@ internal class Program
 
         builder.Services.AddSingleton<TokenService>();
         builder.Services.AddHostedService<MidnightCleanupService>();
+        builder.Services.AddHostedService<TimeStampAutoStopService>();
 
         builder.Services.AddSingleton<DbProvider>();
 

@@ -47,32 +47,12 @@ namespace Server.Services
             var resultSet = await userRepository.GetAllAsync();
             foreach (var user in resultSet.Results)
             {
-                switch(user.WorkType)
+                var latest = await timeStampRepository.GetLatestAsync(user.Username);
+                if (latest != null && latest.TimeEnd == null)
                 {
-                    case WorkType.FullTime:
-                        if (user.WorkTime == null)
-                        {
-                            user.WorkTime = 8;
-                            await userRepository.UpdateAsync(user);
-                        }
-
-                        await timeStampRepository.InsertAsync(new()
-                        {
-                            Username = user.Username,
-                            TimeStart = DateTime.Today.AddHours(8).ToUniversalTime(),
-                            TimeEnd = DateTime.Today.AddHours((double)(8 + user.WorkTime)).ToUniversalTime(),
-                            Source = Source.SYSTEM,
-                        });
-                        break;
-                    case WorkType.PartTime:
-                        var latest = await timeStampRepository.GetLatestAsync(user.Username);
-                        if (latest != null && latest.TimeEnd == null)
-                        {
-                            latest.TimeEnd = DateTime.Today.AddSeconds(-1).ToUniversalTime();
-                            latest.Source = Source.SYSTEM;
-                            await timeStampRepository.UpdateAsync(latest);
-                        }
-                        break;
+                    latest.TimeEnd = DateTime.Today.AddSeconds(-1).ToUniversalTime();
+                    latest.Source = Source.SYSTEM;
+                    await timeStampRepository.UpdateAsync(latest);
                 }
             }
         }

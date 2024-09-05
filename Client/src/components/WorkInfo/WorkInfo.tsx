@@ -93,6 +93,7 @@ const WorkInfo = () => {
                                 <th className="w-25">Start</th>
                                 <th className="w-25">Finish</th>
                                 <th className="w-25">Worktime</th>
+                                <th className="w-25">Source</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -113,6 +114,7 @@ const WorkInfo = () => {
                                                     <td>{Localize(ts.timeStart)!.toLocaleTimeString()}</td>
                                                     <td>{Localize(ts.timeEnd)!.toLocaleTimeString()}</td>
                                                     <td>{getTimeByDifference(new Date(ts.timeEnd!).getTime() - new Date(ts.timeStart).getTime())}</td>
+                                                    <td>{ts.source}</td>
                                                 </tr>
                                             </React.Fragment>
                                         )
