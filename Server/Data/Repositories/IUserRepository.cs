@@ -10,9 +10,9 @@ namespace Server.Data.Repositories
         Task<ResultSet<User>> GetAllAsync();
         Task<ResultSet<User>> GetAllAsync(GetAllOptions options);
         Task<IEnumerable<User>> GetUsersWithPermissionsAsync(Permission[] permissions);
+        Task<IEnumerable<User>> GetUsersByApproverAsync(string currentUsername);
         Task InsertAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(string username);
-        Task UpdateTokenAsync(string username, string tokenId);
     }
 }

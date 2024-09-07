@@ -70,7 +70,7 @@ public sealed class UserQuery : ObjectGraphType
                 return await context.RequestServices!.GetRequiredService<IUserRepository>().GetAllAsync(builder.Build());
             });
         
-        Field<ListGraphType<UsersWithPermissionsGraphType>>("usersWithPermission")
+        Field<ListGraphType<UserLiteGraphType>>("usersWithPermission")
             .Argument<ListGraphType<EnumerationGraphType<Permission>>>("permissions")
             .ResolveAsync(async context =>
             {
@@ -85,10 +85,13 @@ public sealed class UserQuery : ObjectGraphType
                 return users;
             });
 
-
-
-
-
-
+        Field<ListGraphType<UserLiteGraphType>>("usersByApprover")
+            .Argument<NonNullGraphType<StringGraphType>>("username")
+            .ResolveAsync(async context =>
+            {
+                var currentUsername = context.GetArgument<string>("username");
+                var userRepository = context.RequestServices!.GetRequiredService<IUserRepository>();
+                return await userRepository.GetUsersByApproverAsync(currentUsername);
+            });
     }
 }

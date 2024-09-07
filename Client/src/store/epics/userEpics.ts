@@ -3,7 +3,7 @@ import {
     userCreate, userCreateResolve,
     userDelete, userDeleteResolve,
     usersRequest, usersRequestResolve,
-    userUpdate,userUpdateResolve,
+    userUpdate, userUpdateResolve,
     userStateUpdate, userStateUpdateResolve,
     getUsersWithApproveVacationsPermission, setUsersWithApproveVacationsPermission,
     setError
@@ -28,7 +28,7 @@ export const userCreateEpic = createEpic(
                         state: ${user.state},
                         workType: ${user.workType},
                         workTime: ${user.workTime},
-                        vacationApprovers: { approvedVacationsByUsers: ${JSON.stringify(user.approvers.approvedVacationsByUsers)} }
+                        vacationApprovers: { approvedVacationsByUsers: ${JSON.stringify(user.vacationApprovers.approvedVacationsByUsers)} }
                     }
                     ) { 
                         username 
@@ -39,7 +39,7 @@ export const userCreateEpic = createEpic(
                         state
                         workType
                         workTime
-                        vacationApprovers: { approvedVacationsByUsers }
+                        vacationApprovers { approvedVacationsByUsers }
                     }
             }
         }`;
@@ -134,7 +134,7 @@ export const usersRequestEpic = createEpic(
                                 state
                                 workType
                                 workTime
-                                vacationApprovers: {approvedVacationsByUsers}`
+                                vacationApprovers {approvedVacationsByUsers}`
                             }
                         }
                         } 
@@ -164,6 +164,7 @@ export const getUsersWithApproveVacationsPermissionEpic = createEpic(
     data => setUsersWithApproveVacationsPermission(data.data.user.usersWithPermission),
     error => setError(error.message)
 );
+
 
 export const userEpics = [
     userCreateEpic,

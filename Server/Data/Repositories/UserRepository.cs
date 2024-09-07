@@ -45,16 +45,16 @@ namespace Server.Data.Repositories
         public async Task<ResultSet<User>> GetAllAsync(GetAllOptions options)
         {
             string sql = @$"
-        SELECT 
-            u.Username, u.PasswordHash, u.TokenId, u.FirstName, u.LastName, u.Role, 
-            u.Permissions, u.State, u.WorkType, u.WorkTime,
-            va.UserUsername, va.ApprovedVacationsByUsers
-        FROM Users u
-        LEFT JOIN VacationApprovers va ON u.Username = va.UserUsername
-        {options.Condition}
-        {options.OrderBy}
-        {options.Pagination}";
-            
+            SELECT 
+                u.Username, u.PasswordHash, u.TokenId, u.FirstName, u.LastName, u.Role, 
+                u.Permissions, u.State, u.WorkType, u.WorkTime,
+                va.UserUsername, va.ApprovedVacationsByUsers
+            FROM Users u
+            LEFT JOIN VacationApprovers va ON u.Username = va.UserUsername
+            {options.Condition}
+            {options.OrderBy}
+            {options.Pagination}";
+
             var result = await _sql.QueryAsync<User, VacationApprovers, User>(
                 sql,
                 (user, vacationApprovers) =>
@@ -64,7 +64,7 @@ namespace Server.Data.Repositories
                         UserUsername = user.Username,
                         ApprovedVacationsByUsers = new List<string>()
                     };
-                    
+
                     if (vacationApprovers?.ApprovedVacationsByUsers != null)
                     {
                         user.VacationApprovers.ApprovedVacationsByUsers =
@@ -75,14 +75,14 @@ namespace Server.Data.Repositories
                 },
                 splitOn: "UserUsername"
             );
-            
+
             return new ResultSet<User>
             {
                 TotalCount = await _CountAsync(options.Condition),
                 Results = result.ToList()
             };
         }
-        
+
         // TODO: Refactor this method to use a stored procedure
         public async Task<IEnumerable<User>> GetUsersWithPermissionsAsync(Permission[] permissions)
         {
@@ -102,7 +102,28 @@ namespace Server.Data.Repositories
 
             return await _sql.QueryAsync<User>(query);
         }
+        
+        public async Task<IEnumerable<User>> GetUsersByApproverAsync(string currentUsername)
+        {
+            if (_sql.State != ConnectionState.Open)
+            {
+                await _sql.OpenAsync();
+            }
 
+            string query = @"
+                    SELECT u.Username, u.FirstName, u.LastName, u.Role, u.State
+                    FROM Users u
+                    LEFT JOIN VacationApprovers va ON u.Username = va.UserUsername
+                    WHERE va.ApprovedVacationsByUsers LIKE @CurrentUsername";
+
+            var result = await _sql.QueryAsync<User>(
+                query,
+                new { CurrentUsername = $"%{currentUsername}%" }
+            );
+
+            return result.ToList();
+        }
+        
         public async Task InsertAsync(User user)
         {
             if (_sql.State != ConnectionState.Open)
@@ -149,7 +170,7 @@ namespace Server.Data.Repositories
                 throw;
             }
         }
-        
+
         public async Task UpdateAsync(User user)
         {
             if (_sql.State != ConnectionState.Open)
@@ -200,22 +221,7 @@ namespace Server.Data.Repositories
                 throw;
             }
         }
-        
-        public async Task UpdateTokenAsync(string username, string tokenId)
-        {
-            if (_sql.State != ConnectionState.Open)
-            {
-                await _sql.OpenAsync();
-            }
 
-            string query = @"
-                UPDATE Users
-                SET TokenId = @TokenId
-                WHERE Username = @Username";
-
-            await _sql.ExecuteAsync(query, new { Username = username, TokenId = tokenId });
-        }
-        
         public async Task DeleteAsync(string username)
         {
             if (_sql.State != ConnectionState.Open)

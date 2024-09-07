@@ -32,7 +32,7 @@ export const userInfoEpic = createEpic(
                 state
                 workType
                 workTime
-                vacationApprovers: {approvedVacationsByUsers}
+                vacationApprovers {approvedVacationsByUsers}
             } 
         } 
     }`,

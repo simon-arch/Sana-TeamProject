@@ -3,7 +3,7 @@ import {Button, Dropdown, DropdownButton, Form, InputGroup, Modal, OverlayTrigge
 import {BsArrowCounterclockwise, BsCheck2, BsCheck2All} from "react-icons/bs";
 import {dismissError, userCreate, setError} from "../../store/slices/userSlice.ts";
 import {useAppDispatch, useAppSelector} from "../../hooks/redux.ts";
-import User, {Permission, Role, UserLite, UserStatus, WorkType} from "../../models/User.ts";
+import {Permission, Role, UserLite, UserStatus, WorkType} from "../../models/User.ts";
 import {Capitalize, Clamp} from "../../helpers/format.ts";
 import config from "../../../config.json";
 import {Config} from "./ModalComponents/PermissionSelect.tsx";
@@ -11,7 +11,9 @@ import {SliceError, SliceStatus} from "../../models/SliceState.ts";
 
 interface ModalProps {
     show: boolean,
+
     setShow(prevState: boolean): void,
+
     setLocalStatus(prevState: SliceStatus): void
 }
 
@@ -32,14 +34,12 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
     const [allowWorkTime, setAllowWorkTime] = useState(false);
 
     const users = useAppSelector<UserLite[]>(state => state.users.usersWithApprovalPermission);
-    const account = useAppSelector<User>(state => state.accountInfo.user);
     const error = useAppSelector<SliceError>(state => state.users.error);
 
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [showDrop, setShowDrop] = useState(false);
 
-    const filteredUsers = users.filter((user) => user.username !== account.username && user.username.includes(searchQuery));
 
     const handleSelect = (user: UserLite) => {
         setSelectedUsers((prevSelectedUsers) =>
@@ -106,8 +106,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 username: username,
                 workTime: workTime,
                 workType: workType,
-                approvedVacationsByUsers: selectedUsers,
-                approveVacationsForUsers: []
+                vacationApprovers: {approvedVacationsByUsers: selectedUsers}
             }));
             resetState();
             props.setLocalStatus('loading');
@@ -123,7 +122,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
 
     return (
         <Modal show={props.show}
-                onHide={() => props.setShow(false)}
+               onHide={() => props.setShow(false)}
                centered
                fullscreen='lg-down'
                size="xl">
@@ -181,7 +180,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                         variant="secondary col-2 text-start bg-light text-dark"
                         title="Work Type">
                         {Object.values(WorkType).map((workType, index) => (<Dropdown.Item key={index}
-                            onClick={() => handleWorkTypeChange(workType)}>{Capitalize(workType)}</Dropdown.Item>))}
+                                                                                          onClick={() => handleWorkTypeChange(workType)}>{Capitalize(workType)}</Dropdown.Item>))}
                     </DropdownButton>
                     <Form.Control
                         type="text"
@@ -210,7 +209,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                         variant="secondary col-2 text-start bg-light text-dark"
                         title="Role">
                         {Object.values(Role).map((role, index) => (<Dropdown.Item key={index}
-                            onClick={() => setRole(role)}>{Capitalize(role)}</Dropdown.Item>))}
+                                                                                  onClick={() => setRole(role)}>{Capitalize(role)}</Dropdown.Item>))}
                     </DropdownButton>
                     <Form.Control
                         type="text"
@@ -223,40 +222,44 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                 <InputGroup className="mb-1">
                     <DropdownButton
                         autoClose="outside"
-                        title="Review Vacations For"
+                        title="Review Vacations By"
                         variant="secondary col-2 text-start bg-light text-dark"
                         onToggle={() => setShowDrop(!showDrop)}
                         show={showDrop}>
                         <div className="px-2">
                             <input
-                            name="search"
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}/>
-                        <Button className="ms-1" variant="outline-dark" onClick={() => setSelectedUsers(users.map(user => user.username))}><BsCheck2All/></Button>
-                        <Button className="ms-1" variant="outline-dark" onClick={() => setSelectedUsers([])}><BsArrowCounterclockwise/></Button>
+                                name="search"
+                                type="text"
+                                placeholder="Search..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}/>
+                            <Button className="ms-1" variant="outline-dark"
+                                    onClick={() => setSelectedUsers(users.map(user => user.username))}><BsCheck2All/></Button>
+                            <Button className="ms-1" variant="outline-dark"
+                                    onClick={() => setSelectedUsers([])}><BsArrowCounterclockwise/></Button>
                         </div>
-                        <div style={{ maxHeight: '200px', overflowY: 'auto'}}>
+                        <div style={{maxHeight: '200px', overflowY: 'auto'}}>
                             {
-                                filteredUsers.length > 0 ?
-                                (filteredUsers.map((user, index) => (
-                                    <Dropdown.Item
-                                    as="button"
-                                    key={index}
-                                    eventKey={index}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handleSelect(user);
-                                }}><input
-                                        type="checkbox"
-                                        checked={selectedUsers.includes(user.username)}
-                                        name={`${user}${index}`}
-                                        readOnly
-                                        className="me-2"/>
-                                    {user.username}
-                                </Dropdown.Item>
-                                ))) : <Dropdown.Item disabled>No users found</Dropdown.Item>
+                                users.length > 0 ?
+                                    (users
+                                        .filter(user => user.state !== UserStatus.Fired)
+                                        .map(user => (
+                                        <Dropdown.Item
+                                            as="button"
+                                            key={user.username}
+                                            eventKey={user.username}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                handleSelect(user);
+                                            }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedUsers.includes(user.username)}
+                                                onChange={() => handleSelect(user)}
+                                                className="me-2"/>
+                                            {`${user.firstName} ${user.lastName}`}
+                                        </Dropdown.Item>
+                                    ))) : <Dropdown.Item disabled>No users found</Dropdown.Item>
                             }
                         </div>
                     </DropdownButton>
@@ -264,7 +267,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                         style={{textOverflow: "ellipsis"}}
                         type="text"
                         name="preset"
-                        value={ (selectedUsers.length > 0 ? selectedUsers.join(', ') : 'none') }
+                        value={(selectedUsers.length > 0 ? selectedUsers.join(', ') : 'none')}
                         autoComplete="off"
                         readOnly/>
                 </InputGroup>
@@ -314,7 +317,7 @@ const RegisterUserModal = (props: ModalProps): React.JSX.Element => {
                             </Tooltip>
                         }
                     >
-                            <Button variant="success" onClick={handleRegister}><BsCheck2 className="me-1"/>Register</Button>
+                        <Button variant="success" onClick={handleRegister}><BsCheck2 className="me-1"/>Register</Button>
                     </OverlayTrigger>
                 </div>
             </Modal.Body>

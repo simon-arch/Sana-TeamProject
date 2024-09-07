@@ -52,18 +52,7 @@ const About = () => {
                     <td>Status:</td>
                     <td>{Capitalize(account.state)}</td>
                 </tr>
-                <tr>
-                    <td>Vacations Can Be Approved By:</td>
-                    <td>
-                        {Capitalize(account.approvedVacationsByUsers.join(", ")) || "Nobody"}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Vacations Can Be Approved For:</td>
-                    <td>
-                        {Capitalize(account.approveVacationsForUsers.join(", ")) || "No one"}
-                    </td>
-                </tr>
+    
                 </tbody>
             </Table>
         </div>

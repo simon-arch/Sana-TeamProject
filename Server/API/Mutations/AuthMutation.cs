@@ -21,7 +21,6 @@ public sealed class AuthMutation : ObjectGraphType
                 {
                     var username = context.GetArgument<string>("username");
                     var password = context.GetArgument<string>("password");
-                    var tokenId = context.GetArgument<string>("tokenId");
 
                     logger.LogInformation("Attempting login for user: {Username}", username);
 
@@ -51,7 +50,7 @@ public sealed class AuthMutation : ObjectGraphType
 
                     user.TokenId = tokenService.SetRefreshTokenToCookie(context.RequestServices!
                         .GetRequiredService<IHttpContextAccessor>().HttpContext!);
-                    await userRepository.UpdateTokenAsync(username, tokenId);
+                    await userRepository.UpdateAsync(user);
 
                     logger.LogInformation("Successful login for user: {Username}", username);
 
@@ -79,7 +78,7 @@ public sealed class AuthMutation : ObjectGraphType
                            ?? throw new ExecutionError("Invalid Token") { Code = ResponseCode.BadRequest };
 
                 user.TokenId = tokenService.SetRefreshTokenToCookie(accessor.HttpContext!);
-                await userRepository.UpdateAsync(user); // Ensure this correctly updates the user in DB
+                await userRepository.UpdateAsync(user);
 
                 return tokenService.GenerateAccessToken(user);
             });

@@ -14,8 +14,11 @@ import ApprovedVacationsByUsersSelect from "./ModalComponents/ApprovedVacationsB
 
 interface ModalProps {
     show: boolean;
+
     setShow(prevState: boolean): void
+
     user: User,
+
     setLocalStatus(prevState: SliceStatus): void
 }
 
@@ -71,7 +74,7 @@ const UserModal = (props: ModalProps): React.JSX.Element => {
                 state: UserStatus.Available,
                 workType: workType,
                 workTime: workTime,
-                approvedVacationsByUsers: approvers
+                vacationApprovers: {approvedVacationsByUsers: approvers}
             }
         ));
         props.setShow(false);
@@ -106,15 +109,14 @@ const UserModal = (props: ModalProps): React.JSX.Element => {
                                        user={props.user}/>
                         <RoleField setRole={setRole} role={role} user={props.user} setEdited={setRoleEdited}
                                    isEdited={roleEdited}/>
-                        {
-                            props.user.permissions.includes(Permission.ApproveVacations) &&
-                                <ApprovedVacationsByUsersSelect
-                                setApprovers={setApprovers}
-                                approvers={approvers}
-                                user={props.user}
-                                setEdited={setUsersEdited}
-                                isEdited={usersEdited}/>
-                        }
+
+                        <ApprovedVacationsByUsersSelect
+                            setApprovers={setApprovers}
+                            approvers={approvers}
+                            user={props.user}
+                            setEdited={setUsersEdited}
+                            isEdited={usersEdited}/>
+
                         <PermissionSelect
                             setPermissions={setPermissions}
                             permissions={permissions}

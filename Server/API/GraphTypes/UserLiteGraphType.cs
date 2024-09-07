@@ -3,9 +3,9 @@ using Server.Models;
 
 namespace Server.API.GraphTypes;
 
-public sealed class UsersWithPermissionsGraphType : ObjectGraphType<User>
+public sealed class UserLiteGraphType : ObjectGraphType<User>
 {
-    public UsersWithPermissionsGraphType()
+    public UserLiteGraphType()
     {
         Field(u => u.Username);
         Field(u => u.FirstName);

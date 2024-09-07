@@ -6,12 +6,14 @@ import SliceState from "../../models/SliceState.ts";
 export interface UserState extends SliceState {
     users: User[];
     usersWithApprovalPermission: UserLite[];
+    usersByApprover: UserLite[];
     totalCount: number;
 }
 
 const initialState: UserState = {
     users: [],
     usersWithApprovalPermission: [],
+    usersByApprover: [],
     totalCount: 0,
     status: 'idle',
     error: null
@@ -37,6 +39,14 @@ const userSlice = createSlice(
             setUsersWithApproveVacationsPermission(state: UserState, action: PayloadAction<UserLite[]>) {
                 state.totalCount = action.payload.length;
                 state.usersWithApprovalPermission = action.payload;
+                state.status = 'idle';
+            },
+            getUsersByApprover(state: UserState) {
+                state.status = 'loading';
+            },
+            setUsersByApprover(state: UserState, action: PayloadAction<UserLite[]>) {
+                state.totalCount = action.payload.length;
+                state.usersByApprover = action.payload;
                 state.status = 'idle';
             },
             //@ts-ignore
@@ -84,6 +94,7 @@ const userSlice = createSlice(
 export const {
     usersRequest, usersRequestResolve,
     getUsersWithApproveVacationsPermission, setUsersWithApproveVacationsPermission,
+    getUsersByApprover, setUsersByApprover,
     userCreate, userCreateResolve,
     userDelete, userDeleteResolve,
     setError, dismissError,

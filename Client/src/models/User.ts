@@ -9,7 +9,6 @@ export default interface User {
     workType: WorkType;
     workTime: number | null;
     vacationApprovers: VacationApprovers;
-
 }
 
 export interface VacationApprovers {
